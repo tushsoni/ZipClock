@@ -230,11 +230,10 @@
          flex-shrink: 0;
          }
          .nav-btn-box.dark {
-    background: #30b5c7;
-    color: #fff;
-    border-color: #30b5c7;
-}
-
+         background: #30b5c7;
+         color: #fff;
+         border-color: #30b5c7;
+         }
          .step-item {
          background: #fff;
          border: 1px solid #e2e8f0;
@@ -258,7 +257,7 @@
          color: #4338ca;
          box-shadow: 0 4px 6px -1px rgba(92, 103, 242, 0.1);
          }
-         .connector-line { height: 1px; background-color: #e2e8f0; flex: 0.3; margin: 0 8px; }
+         .connector-line { height: 1px; background-color: #999ca0; flex: 0.3; margin: 0 8px; }
          .badge-ui {
          width: 24px;
          height: 24px;
@@ -863,8 +862,8 @@
          }
          .v-sep {
          width: 1px;
-         height: 18px;
-         background-color: #e2e8f0;
+         height: 35px;
+         background-color: #d6dade;
          margin: 0 12px;
          }
          .graph-icon-svg {
@@ -2372,9 +2371,6 @@
          color:#334155;
          }
          /* Time Loss column — IMPORTANT */
-         .hourly-data-table thead th:nth-child(10){
-         color:#1d4ed8;
-         }
          .hourly-data-table tbody td:nth-child(10){
          color:#2563eb;
          font-weight:700;
@@ -2497,56 +2493,255 @@
          text-align: center;
          pointer-events: none;
          }
-
          :root {
-    --glass-bg: #ffffff;
-    --text-main: #0f172a;
-    --text-muted: #64748b;
-    --chart-blue: #3b82f6;
-    --chart-green: #10b981;
-    --chart-orange: #f59e0b;
-    --chart-red: #ef4444;
-    --chart-purple: #8b5cf6;
-    --chart-gray: #e2e8f0;
-}
-
-/* Premium Card Style */
-.premium-chart-card {
-    background: var(--glass-bg);
-    border: 1px solid #f1f5f9;
-    border-radius: 16px;
-    padding: 24px;
-    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.02), 0 10px 15px -3px rgba(0, 0, 0, 0.03);
-    transition: transform 0.2s ease, box-shadow 0.2s ease;
-}
-
-.premium-chart-card:hover {
-    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.05);
-}
-
-.chart-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 20px;
-}
-
-.chart-header h5 {
-    font-size: 15px;
-    font-weight: 700;
-    color: var(--text-main);
-    letter-spacing: -0.01em;
-}
-
-.chart-legend-badge {
-    font-size: 11px;
-    font-weight: 600;
-    padding: 4px 10px;
-    border-radius: 999px;
-    background: #f8fafc;
-    color: var(--text-muted);
-}
-
+         --glass-bg: #ffffff;
+         --text-main: #0f172a;
+         --text-muted: #64748b;
+         --chart-blue: #3b82f6;
+         --chart-green: #10b981;
+         --chart-orange: #f59e0b;
+         --chart-red: #ef4444;
+         --chart-purple: #8b5cf6;
+         --chart-gray: #e2e8f0;
+         }
+         /* Premium Card Style */
+         .premium-chart-card {
+         background: var(--glass-bg);
+         border: 1px solid #f1f5f9;
+         border-radius: 16px;
+         padding: 24px;
+         box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.02), 0 10px 15px -3px rgba(0, 0, 0, 0.03);
+         transition: transform 0.2s ease, box-shadow 0.2s ease;
+         }
+         .premium-chart-card:hover {
+         box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.05);
+         }
+         .chart-header {
+         display: flex;
+         justify-content: space-between;
+         align-items: center;
+         margin-bottom: 20px;
+         }
+         .chart-header h5 {
+         font-size: 15px;
+         font-weight: 700;
+         color: var(--text-main);
+         letter-spacing: -0.01em;
+         }
+         .chart-legend-badge {
+         font-size: 11px;
+         font-weight: 600;
+         padding: 4px 10px;
+         border-radius: 999px;
+         background: #f8fafc;
+         color: var(--text-muted);
+         }
+         /* Container Polish */
+         .panel-header {
+         padding: 24px 32px; /* Breathing room */
+         background: linear-gradient(to bottom, #ffffff, #fcfdfe);
+         display: flex;
+         flex-direction: column;
+         gap: 16px;
+         }
+         /* Title Polish */
+         .panel-title {
+         font-size: 20px;
+         font-weight: 800; /* Bold, premium weight */
+         color: #0f172a;
+         display: flex;
+         align-items: center;
+         gap: 12px;
+         letter-spacing: -0.02em;
+         }
+         .panel-title i {
+         color: #2563eb; /* Vibrant brand blue */
+         font-size: 22px;
+         background: #eff6ff;
+         padding: 8px;
+         border-radius: 10px;
+         }
+         /* Elegant Separator */
+         .header-separator {
+         height: 1px;
+         background: linear-gradient(to right, #e2e8f0, #f8fafc);
+         width: 100%;
+         }
+         /* Professional Date Filter */
+         .date-filter-main {
+         display: inline-flex;
+         align-items: center;
+         gap: 10px;
+         padding: 8px 16px;
+         background: #ffffff; 
+         border: 1px solid #e2e8f0;
+         border-radius: 10px;
+         font-size: 13px;
+         font-weight: 700;
+         color: #334155; 
+         cursor: pointer;
+         width: fit-content;
+         box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+         transition: all 0.2s ease;
+         }
+         .date-filter-main:hover {
+         border-color: #3b82f6;
+         background: #f8faff;
+         box-shadow: 0 4px 12px rgba(59, 130, 246, 0.08);
+         }
+         .date-filter-main i.bi-calendar3 {
+         color: #3b82f6;
+         font-size: 14px;
+         }
+         .date-filter-main i.bi-chevron-down {
+         font-size: 10px;
+         color: #94a3b8;
+         }
+         /* Container: Modern Ice-Blue Gradient */
+         .detail-header-premium {
+         background: linear-gradient(135deg, ##30b5c7 0%, #f0f1f2 100%);
+         padding: 24px 32px;
+         border-bottom: 1px solid #e2e8f0;
+         box-shadow: 0 4px 12px rgba(15, 23, 42, 0.03);
+         position: relative;
+         }
+         .header-top-row {
+         display: flex;
+         justify-content: space-between;
+         align-items: center;
+         width: 100%;
+         }
+         /* Typography: High Contrast & Depth */
+         .panel-title-premium {
+         font-size: 24px !important;
+         font-weight: 800 !important; /* Premium 'Heavy' weight */
+         color: #0f172a;
+         letter-spacing: -0.04em;
+         display: flex;
+         align-items: center;
+         }
+         #activePeriod {
+         font-weight: 700 !important;
+         font-size: 13px !important;
+         margin-left: 20px;
+         color: #3b82f6; 
+         background: rgba(59, 130, 246, 0.08); /* Transparent tint */
+         padding: 6px 16px;
+         border-radius: 999px; 
+         border: 1px solid rgba(59, 130, 246, 0.1);
+         text-transform: uppercase;
+         letter-spacing: 0.03em;
+         box-shadow: inset 0 1px 2px rgba(255,255,255,0.5);
+         }
+         /* Actions: Polished Buttons */
+         .print-btn-premium {
+         color: #94a3b8;
+         font-size: 20px;
+         cursor: pointer;
+         transition: all 0.2s ease;
+         padding: 10px;
+         border-radius: 12px;
+         background: transparent;
+         }
+         .print-btn-premium:hover {
+         color: #3b82f6;
+         background: #ffffff;
+         box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+         }
+         .btn-back-modern {
+         display: flex;
+         align-items: center;
+         gap: 10px;
+         padding: 10px 24px;
+         background: #79787d; /* Dark Navy for high contrast */
+         color: #ffffff;
+         border: none;
+         border-radius: 12px;
+         font-size: 14px;
+         font-weight: 700;
+         cursor: pointer;
+         transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+         box-shadow: 0 4px 10px rgba(30, 41, 59, 0.2);
+         }
+         .btn-back-modern:hover {
+         background: #79787d;
+         transform: translateX(-4px);
+         box-shadow: 0 6px 15px rgba(30, 41, 59, 0.3);
+         }
+         .report-dropdown-wrapper {
+         position: relative;
+         display: inline-block;
+         }
+         /* Pill-shaped trigger button */
+         .btn-report-trigger {
+         display: flex;
+         align-items: center;
+         gap: 8px;
+         padding: 6px 14px;
+         background: #ffffff;
+         border: 1px solid #cbd5e1;
+         border-radius: 999px; /* Perfect pill shape */
+         color: #3b82f6;
+         cursor: pointer;
+         transition: all 0.2s ease;
+         }
+         .btn-report-trigger:hover {
+         background: #f8fafc;
+         border-color: #3b82f6;
+         }
+         /* Floating Dropdown Menu */
+         .report-menu {
+         position: absolute;
+         top: calc(100% + 8px);
+         right: 0;
+         width: 220px;
+         background: #ffffff;
+         border: 1px solid #e2e8f0;
+         border-radius: 12px;
+         box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+         z-index: 1100;
+         overflow: hidden;
+         animation: fadeInScale 0.2s ease-out;
+         }
+         .report-item {
+         display: flex;
+         align-items: center;
+         gap: 12px;
+         padding: 12px 16px;
+         font-size: 14px;
+         font-weight: 600;
+         color: #1e293b;
+         cursor: pointer;
+         border-bottom: 1px solid #f1f5f9;
+         }
+         .report-item:last-child {
+         border-bottom: none;
+         }
+         .report-item i {
+         color: #6366f1; /* Indigo color from screenshot */
+         font-size: 16px;
+         }
+         .report-item:hover {
+         background: #f8fafc;
+         color: #3b82f6;
+         }
+         @keyframes fadeInScale {
+         from { opacity: 0; transform: scale(0.95) translateY(-10px); }
+         to { opacity: 1; transform: scale(1) translateY(0); }
+         }
+         .kpi-divider {
+         height: 1px;
+         background-color: #d6dade; /* Subtle light gray to match premium theme */
+         width: 100%;
+         margin: 16px 0; /* Provides balanced spacing above and below */
+         }
+         .main-kpi-value {
+         display: block;
+         font-size: 28px;
+         font-weight: 800;
+         color: #0f172a;
+         letter-spacing: -0.02em;
+         }
       </style>
    </head>
    <body>
@@ -2556,7 +2751,7 @@
             <div class="nav-link"><i class="bi bi-grid-3x3-gap-fill"></i> My App <i class="bi bi-caret-down-fill" style="font-size: 8px;"></i></div>
             <div class="nav-link"><i class="bi bi-house-door"></i> Dashboard</div>
             <div class="nav-link"><i class="bi bi-clock-history"></i> Site Clock</div>
-            <div class="nav-link"><i class="bi bi-geo-alt"></i> 00814-00201 <i class="bi bi-caret-down-fill" style="font-size: 8px;"></i></div>
+            <div class="nav-link"><i class="bi bi-geo-alt"></i> 99999 <i class="bi bi-caret-down-fill" style="font-size: 8px;"></i></div>
          </div>
          <div class="header-center">
             <div class="weather"><i class="bi bi-cloud-snow"></i><span>-6°C</span></div>
@@ -2564,7 +2759,7 @@
             <div class="time-box"><b>10:25</b><sup>A</sup><span>America/Toronto</span></div>
          </div>
          <div class="header-right">
-            <div class="store-tag"><i class="bi bi-shop"></i> 814</div>
+            <div class="store-tag"><i class="bi bi-shop"></i> 99999</div>
             <i class="bi bi-moon" style="margin-left: 10px;"></i>
             <i class="bi bi-gear" style="margin-left: 10px;"></i>
             <i class="bi bi-person-circle" style="margin-left: 10px;"></i>
@@ -2579,6 +2774,7 @@
             <li><a href="#" class="menu-item active"><i class="bi bi-wallet2"></i><span class="menu-label">Payroll Management</span></a></li>
             <li><a href="#" class="menu-item"><i class="bi bi-graph-down-arrow"></i><span class="menu-label">Time Loss Summary</span></a></li>
             <li><a href="#" class="menu-item"><i class="bi bi-file-earmark-bar-graph"></i><span class="menu-label">Reports</span></a></li>
+            <li><a href="#" class="menu-item"><i class="bi bi-clock"></i><span class="menu-label">Time Clock Devices</span></a></li>
          </ul>
          <div class="sidebar-footer">
             <div class="settings-circle"><i class="bi bi-gear"></i></div>
@@ -2588,11 +2784,14 @@
       <main class="main-content">
          <div id="landingScreen" class="payroll-panel">
             <div class="panel-header">
-               <div class="panel-title"><i class="bi bi-wallet2"></i> Payroll Management</div>
+               <div class="panel-title">
+                  <i class="bi bi-wallet2"></i> 
+                  Payroll Management
+               </div>
                <div class="header-separator"></div>
                <div class="date-filter-main">
                   <i class="bi bi-calendar3"></i>
-                  <span>01/20/2026 - 01/31/2026</span>
+                  <span>12/30/2025 - 02/02/2026</span>
                   <i class="bi bi-chevron-down"></i>
                </div>
             </div>
@@ -2623,20 +2822,62 @@
                         <td><span class="status-pill status-notsent">Not Sent</span></td>
                         <td style="text-align: center;"><i class="bi bi-pencil-square action-icon" onclick="showDetailView('01/27/2026 - 02/02/2026')"></i></td>
                      </tr>
+                     <tr>
+                        <td>01/13/2026 - 01/26/2026</td>
+                        <td>784.15</td>
+                        <td>24.75</td>
+                        <td>0.00</td>
+                        <td><span class="val-currency">$</span>0.00</td>
+                        <td><span class="val-currency">$</span>14,210.30</td>
+                        <td><span class="status-pill status-finalized" style="background: var(--status-green-bg); color: var(--status-green-text);">Finalized</span></td>
+                        <td><span class="status-pill status-notsent">Not Processed</span></td>
+                        <td style="text-align: center;"><i class="bi bi-pencil-square action-icon" onclick="showDetailView('01/13/2026 - 01/26/2026')"></i></td>
+                     </tr>
+                     <tr>
+                        <td>12/30/2025 - 01/12/2026</td>
+                        <td>762.40</td>
+                        <td>18.20</td>
+                        <td>4.50</td>
+                        <td><span class="val-currency">$</span>225.00</td>
+                        <td><span class="val-currency">$</span>13,850.15</td>
+                        <td><span class="status-pill status-finalized" style="background: var(--status-green-bg); color: var(--status-green-text);">Finalized</span></td>
+                        <td><span class="status-pill status-sent" style="background: var(--status-green-bg); color: var(--status-green-text);">Processed</span></td>
+                        <td style="text-align: center;"><i class="bi bi-pencil-square action-icon" onclick="showDetailView('12/30/2025 - 01/12/2026')"></i></td>
+                     </tr>
                   </tbody>
                </table>
             </div>
          </div>
          <div id="detailScreen" class="payroll-panel hidden">
-            <div class="panel-header" style="border-bottom: 1px solid var(--border-color); padding: 15px 25px; background: white;">
+            <div class="panel-header detail-header-premium">
                <div class="header-top-row">
-                  <div class="panel-title" style="font-weight: 600; font-size: 18px;">
-                     Payroll <span id="activePeriod" style="font-weight: 400; font-size: 14px; margin-left: 10px; color: #64748b;"></span>
+                  <div class="panel-title panel-title-premium">
+                     Payroll <span id="activePeriod">01/27/2026 - 02/02/2026</span>
                   </div>
-                  <div style="display: flex; align-items: center; gap: 15px;">
-                     <i class="bi bi-printer print-btn"></i>
-                     <button class="btn-back" onclick="showLandingView()">
-                     <i class="bi bi-chevron-left"></i> Back
+                  <div style="display: flex; align-items: center; gap: 20px;">
+                     <div class="report-dropdown-wrapper">
+                        <button class="btn-report-trigger" onclick="toggleReportMenu(event)">
+                        <i class="bi bi-printer"></i>
+                        <i class="bi bi-caret-down-fill" style="font-size: 8px;"></i>
+                        </button>
+                        <div id="reportMenu" class="report-menu hidden">
+                           <div class="report-item">
+                              <i class="bi bi-wallet2"></i> <span>Payroll Report</span>
+                           </div>
+                           <div class="report-item">
+                              <i class="bi bi-cash-stack"></i> <span>Extra Pay Report</span>
+                           </div>
+                           <div class="report-item">
+                              <i class="bi bi-calendar2-x"></i> <span>Time Off Report</span>
+                           </div>
+                           <div class="report-item">
+                              <i class="bi bi-shield-check"></i> <span>Audit Trail Report</span>
+                           </div>
+                        </div>
+                     </div>
+                     <button class="btn-back-modern" onclick="showLandingView()">
+                     <i class="bi bi-arrow-left" style="font-size: 18px;"></i> 
+                     Back
                      </button>
                   </div>
                </div>
@@ -2777,61 +3018,56 @@
                   </div>
                   <!-- CHART PLACEHOLDERS -->
                   <!-- ===== INSIGHTS CHARTS ===== -->
-<div class="insights-charts" style="display: grid; grid-template-columns: 1fr 1fr; gap: 24px; padding: 24px;">
-    
-    <div class="premium-chart-card">
-        <div class="chart-header">
-            <h5>Payroll Breakdown</h5>
-            <div class="chart-legend-badge">Current Period</div>
-        </div>
-        <div class="bar-chart" id="payrollBarChart" style="height: 220px; align-items: flex-end; padding-bottom: 20px;">
-            </div>
-    </div>
-
-    <div class="premium-chart-card">
-        <div class="chart-header">
-            <h5>Payroll Distribution</h5>
-            <div class="chart-legend-badge">By Employee</div>
-        </div>
-        <div class="donut-wrapper" style="width: 200px; height: 200px; margin: 0 auto;">
-            <svg id="payrollSvg" viewBox="0 0 40 40" class="donut-svg"></svg>
-            <div class="donut-center">
-                <b id="donutCenterValue" style="font-size: 18px; color: var(--text-main);">$0.00</b>
-                <span id="donutCenterLabel" style="font-size: 11px; color: var(--text-muted);">Total</span>
-            </div>
-            <div id="donutTooltip" class="donut-tooltip hidden"></div>
-        </div>
-    </div>
-
-    <div class="premium-chart-card">
-        <div class="chart-header">
-            <h5>Payroll vs Last Period</h5>
-            <div style="display: flex; gap: 8px;">
-                <span class="chart-legend-badge" style="background: #eff6ff; color: #3b82f6;">● Current</span>
-                <span class="chart-legend-badge" style="background: #f1f5f9; color: #94a3b8;">● Previous</span>
-            </div>
-        </div>
-        <div class="compare-bar-chart" style="height: 220px;">
-            </div>
-    </div>
-
-    <div class="premium-chart-card" style="display: flex; flex-direction: column; justify-content: space-between;">
-        <div>
-            <div class="chart-header">
-                <h5>Cost per Employee</h5>
-                <i class="bi bi-info-circle" style="color: var(--text-muted); cursor: pointer;"></i>
-            </div>
-            <div class="efficiency-chart" style="height: 180px;">
-                </div>
-        </div>
-        <div class="efficiency-insight success" style="margin-top: 15px; border-radius: 12px; font-weight: 600;">
-            <i class="bi bi-lightning-charge-fill"></i>
-            Efficiency improved by <b>13%</b>
-        </div>
-    </div>
-</div>
-
-<!-- ===== PAYROLL RISK SUMMARY ===== -->
+                  <div class="insights-charts" style="display: grid; grid-template-columns: 1fr 1fr; gap: 24px; padding: 24px;">
+                     <div class="premium-chart-card">
+                        <div class="chart-header">
+                           <h5>Payroll Breakdown</h5>
+                           <div class="chart-legend-badge">Current Period</div>
+                        </div>
+                        <div class="bar-chart" id="payrollBarChart" style="height: 220px; align-items: flex-end; padding-bottom: 20px;">
+                        </div>
+                     </div>
+                     <div class="premium-chart-card">
+                        <div class="chart-header">
+                           <h5>Payroll Distribution</h5>
+                           <div class="chart-legend-badge">By Employee</div>
+                        </div>
+                        <div class="donut-wrapper" style="width: 200px; height: 200px; margin: 0 auto;">
+                           <svg id="payrollSvg" viewBox="0 0 40 40" class="donut-svg"></svg>
+                           <div class="donut-center">
+                              <b id="donutCenterValue" style="font-size: 18px; color: var(--text-main);">$0.00</b>
+                              <span id="donutCenterLabel" style="font-size: 11px; color: var(--text-muted);">Total</span>
+                           </div>
+                           <div id="donutTooltip" class="donut-tooltip hidden"></div>
+                        </div>
+                     </div>
+                     <div class="premium-chart-card">
+                        <div class="chart-header">
+                           <h5>Payroll vs Last Period</h5>
+                           <div style="display: flex; gap: 8px;">
+                              <span class="chart-legend-badge" style="background: #eff6ff; color: #3b82f6;">● Current</span>
+                              <span class="chart-legend-badge" style="background: #f1f5f9; color: #94a3b8;">● Previous</span>
+                           </div>
+                        </div>
+                        <div class="compare-bar-chart" style="height: 220px;">
+                        </div>
+                     </div>
+                     <div class="premium-chart-card" style="display: flex; flex-direction: column; justify-content: space-between;">
+                        <div>
+                           <div class="chart-header">
+                              <h5>Cost per Employee</h5>
+                              <i class="bi bi-info-circle" style="color: var(--text-muted); cursor: pointer;"></i>
+                           </div>
+                           <div class="efficiency-chart" style="height: 180px;">
+                           </div>
+                        </div>
+                        <div class="efficiency-insight success" style="margin-top: 15px; border-radius: 12px; font-weight: 600;">
+                           <i class="bi bi-lightning-charge-fill"></i>
+                           Efficiency improved by <b>13%</b>
+                        </div>
+                     </div>
+                  </div>
+                  <!-- ===== PAYROLL RISK SUMMARY ===== -->
                   <div class="payroll-risk-panel">
                      <div class="risk-header">
                         <div class="risk-icon">
@@ -2975,8 +3211,7 @@
                         </ul>
                      </div>
                   </div>
-
-                                    <div class="insights-table">
+                  <div class="insights-table">
                      <table class="formal-table">
                         <thead>
                            <tr>
@@ -3032,7 +3267,6 @@
                         </tbody>
                      </table>
                   </div>
-
                   <!-- ===== FINAL APPROVAL SUMMARY ===== -->
                   <div class="final-approval-panel">
                      <!-- Left: Approval Context -->
@@ -3546,18 +3780,16 @@
             <div class="kpi-container">
                <div class="kpi-card border-blue">
                   <div class="kpi-header">
-                     <span>Total Hours</span>
-                     <div class="kpi-icon-badge icon-bg-blue" onclick="openKpiGraph('hrs')">
-                        <svg class="graph-icon-svg" viewBox="0 0 24 24">
-                           <path d="M4 20h16V4h-2v14H6V11h2v7h2V7h2v11h2v-4h2v4h2v2H4v-2z" fill-rule="evenodd"/>
-                        </svg>
+                     <span>TOTAL HOURS</span>
+                     <div class="kpi-icon-badge icon-bg-blue">
+                        <i class="bi bi-bar-chart-fill"></i>
                      </div>
                   </div>
-                  <b>26.97</b>
+                  <b class="main-kpi-value">26.97</b>
                   <div class="kpi-divider"></div>
                   <div class="kpi-footer">
                      <div class="footer-item">
-                        <span class="footer-label">Yesterday</span>
+                        <span class="footer-label">YESTERDAY</span>
                         <span class="footer-value">8.50</span>
                      </div>
                      <div class="v-sep"></div>
@@ -4431,36 +4663,36 @@
          }
          
          
-function buildPayrollInsights() {
-    // Refresh global metrics and AI cards
-    if (typeof populateInsightKPIs === "function") populateInsightKPIs();
-    if (typeof buildAIPayrollInsights === "function") buildAIPayrollInsights();
-
-    // Preparation: Using demo-optimized values for visual impact
-    const payroll = {
-        regular: 864.31,
-        ot: 424.75, // Increased for demo visibility
-        dt: 248.50, // Increased for demo visibility
-        extra: 375.00 // Increased for demo visibility
-    };
-
-    const colors = {
-        regular: '#3b82f6', 
-        ot: '#f59e0b',      
-        dt: '#ef4444',      
-        extra: '#8b5cf6'    
-    };
-
-    /* ===========================================
-       CHART 1: PAYROLL BREAKDOWN (PRO SCALE)
-       =========================================== */
-    const breakdownChart = document.getElementById('payrollBarChart');
-    if (breakdownChart) {
-        breakdownChart.innerHTML = '';
-        // Lowering the multiplier from 1.15 to 1.05 to make bars taller
-        const maxVal = Math.max(...Object.values(payroll)) * 1.05; 
-
-        Object.entries(payroll).forEach(([key, val]) => {
+         function buildPayrollInsights() {
+         // Refresh global metrics and AI cards
+         if (typeof populateInsightKPIs === "function") populateInsightKPIs();
+         if (typeof buildAIPayrollInsights === "function") buildAIPayrollInsights();
+         
+         // Preparation: Using demo-optimized values for visual impact
+         const payroll = {
+         regular: 864.31,
+         ot: 424.75, // Increased for demo visibility
+         dt: 248.50, // Increased for demo visibility
+         extra: 375.00 // Increased for demo visibility
+         };
+         
+         const colors = {
+         regular: '#3b82f6', 
+         ot: '#f59e0b',      
+         dt: '#ef4444',      
+         extra: '#8b5cf6'    
+         };
+         
+         /* ===========================================
+         CHART 1: PAYROLL BREAKDOWN (PRO SCALE)
+         =========================================== */
+         const breakdownChart = document.getElementById('payrollBarChart');
+         if (breakdownChart) {
+         breakdownChart.innerHTML = '';
+         // Lowering the multiplier from 1.15 to 1.05 to make bars taller
+         const maxVal = Math.max(...Object.values(payroll)) * 1.05; 
+         
+         Object.entries(payroll).forEach(([key, val]) => {
             const barWrapper = document.createElement('div');
             barWrapper.className = 'bar-wrapper';
             const height = (val / maxVal) * 100;
@@ -4471,33 +4703,33 @@ function buildPayrollInsights() {
                 <span class="bar-name-label" style="margin-top:12px; font-weight:700;">${key.toUpperCase()}</span>
             `;
             breakdownChart.appendChild(barWrapper);
-        });
-    }
-
-    /* ===========================================
-       CHART 2: SVG DONUT (AUTOLOAD FIX)
-       =========================================== */
-    const total = Object.values(payroll).reduce((a, b) => a + b, 0);
-    const svg = document.getElementById('payrollSvg');
-    const centerVal = document.getElementById('donutCenterValue');
-    const centerLabel = document.getElementById('donutCenterLabel');
-
-    if (svg) {
-        centerVal.innerText = `$${total.toFixed(2)}`;
-        centerLabel.innerText = 'Total';
-        svg.innerHTML = ''; 
-        let currentPercent = 0;
-        const palette = ['#3b82f6', '#22c55e', '#f59e0b', '#8b5cf6'];
-        
-        // Demo distribution
-        const dist = [
+         });
+         }
+         
+         /* ===========================================
+         CHART 2: SVG DONUT (AUTOLOAD FIX)
+         =========================================== */
+         const total = Object.values(payroll).reduce((a, b) => a + b, 0);
+         const svg = document.getElementById('payrollSvg');
+         const centerVal = document.getElementById('donutCenterValue');
+         const centerLabel = document.getElementById('donutCenterLabel');
+         
+         if (svg) {
+         centerVal.innerText = `$${total.toFixed(2)}`;
+         centerLabel.innerText = 'Total';
+         svg.innerHTML = ''; 
+         let currentPercent = 0;
+         const palette = ['#3b82f6', '#22c55e', '#f59e0b', '#8b5cf6'];
+         
+         // Demo distribution
+         const dist = [
             { label: 'Andrew K', value: total * 0.4 },
             { label: 'Sarah M', value: total * 0.3 },
             { label: 'Andrew R', value: total * 0.2 },
             { label: 'Others', value: total * 0.1 }
-        ];
-
-        dist.forEach((emp, i) => {
+         ];
+         
+         dist.forEach((emp, i) => {
             const percent = (emp.value / total) * 100;
             const segment = document.createElementNS("http://www.w3.org/2000/svg", "circle");
             segment.setAttribute("class", "donut-segment");
@@ -4516,26 +4748,26 @@ function buildPayrollInsights() {
             });
             svg.appendChild(segment);
             currentPercent += percent;
-        });
-    }
-
-    /* ===========================================
-       CHART 3: PAYROLL VS LAST PERIOD (PRO SCALE)
-       =========================================== */
-    const compareChart = document.querySelector('.compare-bar-chart');
-    if (compareChart) {
-        compareChart.innerHTML = '';
-        const compareData = [
+         });
+         }
+         
+         /* ===========================================
+         CHART 3: PAYROLL VS LAST PERIOD (PRO SCALE)
+         =========================================== */
+         const compareChart = document.querySelector('.compare-bar-chart');
+         if (compareChart) {
+         compareChart.innerHTML = '';
+         const compareData = [
             { label: 'Reg', cur: 4200, prev: 4600 },
             { label: 'OT', cur: 2200, prev: 1800 },
             { label: 'DT', cur: 1500, prev: 1200 },
             { label: 'Extra', cur: 1800, prev: 1100 }
-        ];
-        
-        // Tight maxVal for taller appearance
-        const maxCompare = 4800; 
-
-        compareData.forEach(item => {
+         ];
+         
+         // Tight maxVal for taller appearance
+         const maxCompare = 4800; 
+         
+         compareData.forEach(item => {
             const col = document.createElement('div');
             col.className = 'compare-col';
             col.style.cssText = "display: flex; flex-direction: column; align-items: center; justify-content: flex-end; height: 100%; flex: 1;";
@@ -4554,18 +4786,18 @@ function buildPayrollInsights() {
                 <span style="font-size: 11px; font-weight: 800; color: #64748b;">${item.label}</span>
             `;
             compareChart.appendChild(col);
-        });
-    }
-
-    /* ===========================================
-       CHART 4: COST PER EMPLOYEE (PRO SCALE)
-       =========================================== */
-    const efficiencyChart = document.querySelector('.efficiency-chart');
-    if (efficiencyChart) {
-        efficiencyChart.innerHTML = '';
-        const effData = { current: 987, last: 1120 };
-        const maxEff = 1200;
-        efficiencyChart.innerHTML = `
+         });
+         }
+         
+         /* ===========================================
+         CHART 4: COST PER EMPLOYEE (PRO SCALE)
+         =========================================== */
+         const efficiencyChart = document.querySelector('.efficiency-chart');
+         if (efficiencyChart) {
+         efficiencyChart.innerHTML = '';
+         const effData = { current: 987, last: 1120 };
+         const maxEff = 1200;
+         efficiencyChart.innerHTML = `
             <div style="display: flex; align-items: flex-end; gap: 60px; height: 100%; justify-content: center;">
                 <div style="text-align: center; display: flex; flex-direction: column; align-items: center; justify-content: flex-end; height: 100%;">
                     <b style="font-size: 16px; font-weight: 900; margin-bottom: 8px; color: #3b82f6;">$${effData.current}</b>
@@ -4578,9 +4810,9 @@ function buildPayrollInsights() {
                     <span style="font-size: 12px; font-weight: 700; color: #64748b; margin-top: 10px;">Last Period</span>
                 </div>
             </div>
-        `;
-    }
-}
+         `;
+         }
+         }
          
          
          function populateSubmitPayrollTiles() {
@@ -5110,43 +5342,57 @@ function buildPayrollInsights() {
            window.addEventListener('DOMContentLoaded', () => {
          document.getElementById('timeLossModal').classList.add('hidden');
          });
-
+         
          /**
- * Handles arrow-based navigation through the payroll tabs
- * @param {string} direction - 'next' or 'prev'
- */
-function moveStepper(direction) {
-    // 1. Define the order of your tabs (matching your setActiveStep keys)
-    const tabOrder = ['fix', 'extra', 'hourly', 'submit'];
-    
-    // 2. Find the current active step element
-    const currentStepEl = document.querySelector('.step-item.active');
-    if (!currentStepEl) return;
-
-    // 3. Extract the tab key from the onclick attribute
-    // Example: onclick="setActiveStep(this, 'extra')" -> 'extra'
-    const currentOnclick = currentStepEl.getAttribute('onclick');
-    const currentKey = currentOnclick.match(/'([^']+)'/)[1];
-    
-    // 4. Calculate the new index
-    let currentIndex = tabOrder.indexOf(currentKey);
-    let newIndex;
-
-    if (direction === 'next') {
-        newIndex = (currentIndex + 1 < tabOrder.length) ? currentIndex + 1 : 0; // Loop to start or stop at end
-    } else {
-        newIndex = (currentIndex - 1 >= 0) ? currentIndex - 1 : tabOrder.length - 1; // Loop to end or stop at start
-    }
-
-    // 5. Find the DOM element for the new index and click it
-    const targetKey = tabOrder[newIndex];
-    const targetStepEl = document.querySelector(`.step-item[onclick*="${targetKey}"]`);
-    
-    if (targetStepEl) {
-        // We call setActiveStep directly to reuse your existing tab-switching logic
-        setActiveStep(targetStepEl, targetKey);
-    }
-}
+         * Handles arrow-based navigation through the payroll tabs
+         * @param {string} direction - 'next' or 'prev'
+         */
+         function moveStepper(direction) {
+         // 1. Define the order of your tabs (matching your setActiveStep keys)
+         const tabOrder = ['fix', 'extra', 'hourly', 'submit'];
+         
+         // 2. Find the current active step element
+         const currentStepEl = document.querySelector('.step-item.active');
+         if (!currentStepEl) return;
+         
+         // 3. Extract the tab key from the onclick attribute
+         // Example: onclick="setActiveStep(this, 'extra')" -> 'extra'
+         const currentOnclick = currentStepEl.getAttribute('onclick');
+         const currentKey = currentOnclick.match(/'([^']+)'/)[1];
+         
+         // 4. Calculate the new index
+         let currentIndex = tabOrder.indexOf(currentKey);
+         let newIndex;
+         
+         if (direction === 'next') {
+         newIndex = (currentIndex + 1 < tabOrder.length) ? currentIndex + 1 : 0; // Loop to start or stop at end
+         } else {
+         newIndex = (currentIndex - 1 >= 0) ? currentIndex - 1 : tabOrder.length - 1; // Loop to end or stop at start
+         }
+         
+         // 5. Find the DOM element for the new index and click it
+         const targetKey = tabOrder[newIndex];
+         const targetStepEl = document.querySelector(`.step-item[onclick*="${targetKey}"]`);
+         
+         if (targetStepEl) {
+         // We call setActiveStep directly to reuse your existing tab-switching logic
+         setActiveStep(targetStepEl, targetKey);
+         }
+         }
+         
+         function toggleReportMenu(event) {
+         event.stopPropagation();
+         const menu = document.getElementById('reportMenu');
+         menu.classList.toggle('hidden');
+         }
+         
+         // Close the menu if the user clicks anywhere else on the screen
+         window.addEventListener('click', function() {
+         const menu = document.getElementById('reportMenu');
+         if (menu && !menu.classList.contains('hidden')) {
+         menu.classList.add('hidden');
+         }
+         });
          
       </script>
    </body>
