@@ -1,0 +1,919 @@
+<!DOCTYPE html>
+<html lang="en">
+   <head>
+      <meta charset="UTF-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <title>Dashboard</title>
+      <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+      <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+      <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+      <style>
+         :root {
+         --bg-color: #f4f6f9;
+         --nav-navy: #001d3d;
+         --sidebar-navy: #001d3d;
+         --accent-blue: #1e62ff;
+         --white: #ffffff;
+         --text-main: #1e293b;
+         --text-dim: #64748b;
+         --sidebar-collapsed: 60px;
+         --sidebar-expanded: 240px;
+         --border-light: #e2e8f0;
+         }
+         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Roboto', sans-serif; }
+         body { background-color: var(--bg-color); color: var(--text-main); overflow-x: hidden; }
+         /* --- Header --- */
+         header {
+         height: 50px;
+         background-color: #001d3d;
+         display: flex;
+         justify-content: space-between;
+         align-items: center;
+         padding: 0 15px;
+         color: white;
+         position: fixed;
+         top: 0;
+         width: 100%;
+         z-index: 1001;
+         border-bottom: 1px solid rgba(255,255,255,0.1);
+         }
+         .header-left { display: flex; align-items: center; gap: 15px; font-size: 13px; }
+         .header-left img { width: 24px; height: 24px; }
+         .nav-item { display: flex; align-items: center; gap: 5px; cursor: pointer; color: #cbd5e1; }
+         .nav-item.active { color: white; }
+         .header-center { display: flex; gap: 20px; align-items: center; font-size: 13px; }
+         .header-right { display: flex; align-items: center; gap: 15px; }
+         .store-badge { background: rgba(255,255,255,0.1); padding: 2px 10px; border-radius: 4px; font-size: 12px; border: 1px solid rgba(255,255,255,0.2); }
+         /* --- Sidebar (Hover to Expand Logic) --- */
+         .sidebar {
+         width: var(--sidebar-collapsed);
+         background-color: var(--sidebar-navy);
+         height: calc(100vh - 50px);
+         position: fixed;
+         top: 50px;
+         left: 0;
+         z-index: 1000;
+         display: flex;
+         flex-direction: column;
+         transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+         overflow: hidden;
+         white-space: nowrap;
+         }
+         .sidebar:hover {
+         width: var(--sidebar-expanded);
+         }
+         .menu-list { list-style: none; padding-top: 10px; flex-grow: 1; }
+         .menu-item { 
+         display: flex; 
+         align-items: center; 
+         height: 50px; 
+         padding: 0 20px; 
+         color: #a5b4fc; 
+         text-decoration: none; 
+         transition: 0.2s; 
+         font-size: 14px; 
+         }
+         .menu-item:hover { background: rgba(255,255,255,0.05); }
+         .menu-item.active { background: #1e293b; color: white; border-left: 4px solid #3b82f6; }
+         .menu-item i { font-size: 20px; min-width: 25px; margin-right: 25px; }
+         .menu-label {
+         opacity: 0;
+         transition: opacity 0.2s;
+         }
+         .sidebar:hover .menu-label {
+         opacity: 1;
+         }
+         .sidebar-footer { 
+         padding: 15px; 
+         border-top: 1px solid rgba(255,255,255,0.1); 
+         display: flex; 
+         flex-direction: column; 
+         align-items: center;
+         }
+         .sidebar:hover .sidebar-footer { align-items: flex-start; }
+         .help-btn { 
+         background: #1e62ff; 
+         color: white; 
+         border: none; 
+         width: 30px; 
+         height: 30px; 
+         border-radius: 4px; 
+         cursor: pointer; 
+         font-size: 0; 
+         transition: all 0.2s;
+         display: flex;
+         align-items: center;
+         justify-content: center;
+         }
+         .help-btn::before { content: 'H'; font-size: 12px; }
+         .sidebar:hover .help-btn { 
+         width: 100%; 
+         font-size: 12px; 
+         }
+         .sidebar:hover .help-btn::before { content: 'Help'; }
+         .main-content {
+         margin-left: var(--sidebar-collapsed);
+         padding: 70px 20px 30px 20px;
+         transition: margin-left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+         }
+         /* --- Controls --- */
+         .dash-controls { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+         .date-navigator { display: flex; align-items: center; gap: 12px; background: white; padding: 6px 16px; border-radius: 4px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); font-size: 14px; }
+         .btn-go { background: #1e62ff; color: white; border: none; padding: 4px 12px; border-radius: 4px; cursor: pointer; }
+         /* --- KPI TILES --- */
+         .kpi-row { display: grid; grid-template-columns: repeat(5, 1fr); gap: 15px; margin-bottom: 20px; }
+         .kpi-card { background: white; padding: 15px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); position: relative; }
+         .kpi-card {
+         transition: transform 0.25s ease, box-shadow 0.25s ease;
+         }
+         .kpi-card:hover {
+         transform: translateY(-3px);
+         box-shadow:
+         0 8px 20px rgba(0, 0, 0, 0.08),
+         0 3px 8px rgba(0, 0, 0, 0.06);
+         }
+         .kpi-card:hover .kpi-icon {
+         transform: scale(1.06);
+         transition: transform 0.25s ease;
+         }
+         .kpi-card::after {
+         content: '';
+         position: absolute;
+         inset: 0;
+         border-radius: 8px;
+         pointer-events: none;
+         opacity: 0;
+         transition: opacity 0.25s ease;
+         }
+         .kpi-card:hover::after {
+         box-shadow: inset 0 0 0 1px rgba(59, 130, 246, 0.12);
+         opacity: 1;
+         }
+         .kpi-label { font-size: 12px; color: var(--text-dim); margin-bottom: 8px; }
+         .kpi-main-val { font-size: 22px; font-weight: 700; }
+         .graph-icon { position: absolute; top: 15px; right: 15px; width: 32px; height: 32px; opacity: 0.8; }
+         .kpi-split { display: flex; border-top: 1px solid #f1f5f9; margin-top: 10px; padding-top: 10px; gap: 10px; }
+         .split-label { font-size: 9px; color: var(--text-dim); display: block; text-transform: uppercase; }
+         .split-val { font-size: 12px; font-weight: 700; }
+         /* --- Grouped Metrics --- */
+         .grouped-metrics-row { display: grid; grid-template-columns: 1.2fr 1.2fr 1.2fr 1fr; gap: 15px; margin-bottom: 25px; }
+         .metric-block { border-radius: 8px; padding: 15px; color: white; display: flex; justify-content: space-between; align-items: center; }
+         .block-red {
+         background: linear-gradient(135deg, #ff6a6a 0%, #ff4d4d 100%);
+         }
+         .block-purple {
+         background: linear-gradient(135deg, #6a6ff5 0%, #5b5ee6 100%);
+         }
+         .block-teal {
+         background: linear-gradient(135deg, #20c997 0%, #17b890 100%);
+         }
+         .block-blue {
+         background: linear-gradient(135deg, #0ea5e9 0%, #0284c7 100%);
+         }
+         .metric-block {
+         box-shadow: 
+         inset 0 1px 0 rgba(255,255,255,0.15),
+         0 6px 16px rgba(0,0,0,0.12);
+         }
+         .metric-sub-item {
+         border-right: 1px solid rgba(255,255,255,0.25);
+         }
+         .metric-sub-item i {
+         opacity: 0.95;
+         }
+         .metric-sub-item { text-align: center; flex: 1; border-right: 1px solid rgba(255,255,255,0.2); }
+         .metric-sub-item:last-child { border-right: none; }
+         .metric-sub-item i { font-size: 20px; display: block; margin-bottom: 5px; }
+         .metric-sub-item span { font-size: 10px; text-decoration: underline; display: block; margin-bottom: 2px; }
+         .metric-sub-item b { font-size: 16px; }
+         /* --- Visuals and Action Section --- */
+         .chart-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 20px; }
+         .chart-container {
+         background: white;
+         border-radius: 8px;
+         padding: 15px;
+         box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+         height: 320px;          /* ✅ FIXED visual size */
+         }
+         .chart-container canvas {
+         width: 100% !important;
+         height: 260px !important;  /* ✅ prevents horizontal growth illusion */
+         }
+         .chart-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
+         .chart-title { font-size: 14px; font-weight: 700; color: #334155; }
+         .chart-filter { font-size: 12px; border: 1px solid #e2e8f0; padding: 2px 8px; border-radius: 4px; color: #64748b; }
+         .action-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+         .action-card { background: white; border-radius: 8px; padding: 15px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+         .action-title { font-size: 14px; font-weight: 700; margin-bottom: 12px; display: flex; align-items: center; gap: 8px; }
+         .badge-count { background: #3b82f6; color: white; border-radius: 50%; padding: 2px 6px; font-size: 11px; }
+         .alert-banner { background: #3b82f6; color: white; padding: 10px 15px; border-radius: 6px; font-size: 13px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; cursor: pointer; }
+         .punch-list { border: 1px solid #f1f5f9; border-radius: 6px; }
+         .punch-item { display: flex; justify-content: space-between; align-items: center; padding: 10px; border-bottom: 1px solid #f1f5f9; }
+         .punch-item:last-child { border-bottom: none; }
+         .emp-info { display: flex; align-items: center; gap: 10px; }
+         .emp-avatar { width: 30px; height: 30px; border-radius: 50%; background: #e2e8f0; display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: bold; }
+         .emp-details b { font-size: 12px; display: block; }
+         .emp-details span { font-size: 11px; color: #64748b; }
+         .action-btns { display: flex; gap: 8px; }
+         .btn-icon { border: 1px solid #e2e8f0; background: white; padding: 4px 8px; border-radius: 4px; cursor: pointer; color: #10b981; }
+         .btn-edit { color: #3b82f6; }
+         .kpi-graph-icon {
+         position: absolute;
+         top: 14px;
+         right: 14px;
+         width: 34px;
+         height: 34px;
+         background: #ffffff;
+         border-radius: 8px;
+         box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
+         display: flex;
+         align-items: center;
+         justify-content: center;
+         }
+         .kpi-graph-icon svg {
+         width: 18px;
+         height: 18px;
+         }
+         .kpi-graph-icon rect {
+         fill: #22c55e;
+         }
+         /* KPI Footer Wrapper */
+         .kpi-footer {
+         margin-top: 16px;
+         padding: 12px 14px;
+         display: grid;
+         grid-template-columns: 1fr 1px 1fr;
+         align-items: center;
+         background: #f8fafc;
+         border-radius: 10px;
+         border: 1px solid #eef2f7;
+         }
+         /* Footer items */
+         .kpi-footer-item {
+         display: flex;
+         flex-direction: column;
+         gap: 4px;
+         }
+         .kpi-footer-item.left {
+         align-items: flex-start;
+         }
+         .kpi-footer-item.right {
+         align-items: flex-end;
+         }
+         /* Vertical divider */
+         .kpi-footer-divider {
+         width: 1px;
+         height: 100%;
+         background: linear-gradient(
+         to bottom,
+         transparent,
+         #cbd5e1,
+         transparent
+         );
+         }
+         /* Labels */
+         .footer-label {
+         font-size: 9px;
+         letter-spacing: 0.12em;
+         text-transform: uppercase;
+         font-weight: 600;
+         color: #64748b;
+         }
+         /* Values */
+         .footer-value {
+         font-size: 14px;
+         font-weight: 700;
+         color: #0f172a;
+         }
+         /* Positive emphasis */
+         .kpi-footer-item.positive .footer-value {
+         color: #16a34a;
+         }
+         /* Negative (future-proof) */
+         .kpi-footer-item.negative .footer-value {
+         color: #dc2626;
+         }
+         /* KPI header (icon + title) */
+         .kpi-header {
+         display: flex;
+         align-items: center;
+         gap: 8px;
+         margin-bottom: 6px;
+         }
+         /* Icon styling */
+         /* Base icon */
+         .kpi-icon {
+         font-size: 14px;
+         padding: 6px;
+         border-radius: 8px;
+         line-height: 1;
+         display: flex;
+         align-items: center;
+         justify-content: center;
+         }
+         /* Blue – Performance */
+         .kpi-icon.blue {
+         color: #2563eb;
+         background: rgba(37, 99, 235, 0.12);
+         }
+         /* Green – Money */
+         .kpi-icon.green {
+         color: #16a34a;
+         background: rgba(22, 163, 74, 0.12);
+         }
+         /* Orange – Cost / Risk */
+         .kpi-icon.orange {
+         color: #ea580c;
+         background: rgba(234, 88, 12, 0.12);
+         }
+         /* Purple – Workforce */
+         .kpi-icon.purple {
+         color: #7c3aed;
+         background: rgba(124, 58, 237, 0.12);
+         }
+         /* Teal – Compliance */
+         .kpi-icon.teal {
+         color: #0d9488;
+         background: rgba(13, 148, 136, 0.12);
+         }
+         /* Title text */
+         .kpi-label {
+         font-size: 12px;
+         font-weight: 500;
+         color: #64748b;
+         line-height: 1;
+         }
+         .kpi-icon {
+         font-size: 16px;          /* ⬅ was 14px */
+         padding: 7px;             /* ⬅ slightly more breathing room */
+         border-radius: 9px;
+         line-height: 1;
+         position: relative;
+         top: -3px;
+         display: flex;
+         align-items: center;
+         justify-content: center;
+         }
+         /* Trend wrapper */
+         .kpi-trend {
+         display: flex;
+         align-items: center;
+         gap: 6px;
+         margin-top: 6px;
+         font-size: 12px;
+         font-weight: 600;
+         }
+         /* Icon */
+         .kpi-trend i {
+         font-size: 13px;
+         }
+         /* Text parts */
+         .trend-value {
+         font-weight: 700;
+         }
+         .trend-period {
+         font-weight: 500;
+         color: #64748b;
+         }
+         /* Positive */
+         .kpi-trend.up {
+         color: #16a34a;
+         }
+         /* Negative */
+         .kpi-trend.down {
+         color: #dc2626;
+         }
+         .kpi-trend {
+         display: inline-flex;      /* ✅ shrink to content */
+         align-items: center;
+         gap: 6px;
+         padding: 4px 8px;
+         border-radius: 999px;
+         font-size: 12px;
+         font-weight: 600;
+         width: fit-content;        /* ✅ extra safety */
+         }
+         /* Positive */
+         .kpi-trend.up {
+         background: rgba(22, 163, 74, 0.08);
+         color: #16a34a;
+         }
+         /* Negative */
+         .kpi-trend.down {
+         background: rgba(220, 38, 38, 0.08);
+         color: #dc2626;
+         }
+         /* Icon size */
+         .kpi-trend i {
+         font-size: 13px;
+         }
+         /* Secondary text */
+         .kpi-trend span:last-child {
+         font-weight: 500;
+         color: inherit;
+         }
+
+/* FIX: Prevents charts from growing continuously */
+.chart-wrapper { position: relative; height: 250px; width: 100%; }
+
+/* Layout for new components */
+.full-width-section { width: 100%; margin-bottom: 20px; }
+.analysis-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 20px; }
+
+/* Table Styling */
+.analysis-table { width: 100%; border-collapse: collapse; font-size: 13px; background: white; border-radius: 8px; overflow: hidden; }
+.analysis-table th { text-align: left; padding: 12px; background: #f8fafc; color: #64748b; border-bottom: 2px solid #edf2f7; }
+.analysis-table td { padding: 12px; border-bottom: 1px solid #f1f5f9; }
+.status-pill { padding: 2px 8px; border-radius: 12px; font-size: 11px; font-weight: 600; }
+.pill-danger { background: #fee2e2; color: #ef4444; }
+.pill-success { background: #dcfce7; color: #22c55e; }
+/* Container adjustments */
+.punch-list { 
+    border: 1px solid #e2e8f0; 
+    border-radius: 4px; 
+    background: white;
+}
+
+.punch-item { 
+    padding: 12px 15px; 
+    border-bottom: 1px solid #f1f5f9; 
+}
+
+.punch-item:last-child { border-bottom: none; }
+
+/* Text styling */
+.emp-details b { 
+    font-size: 13px; 
+    color: #334155; 
+    margin-bottom: 2px;
+}
+
+.emp-details span { 
+    font-size: 12px; 
+    color: #94a3b8; /* Lighter grey for the time string */
+}
+
+/* Button styling to match image */
+.btn-icon {
+    background: white;
+    border: 1px solid #e2e8f0;
+    border-radius: 6px;
+    padding: 6px 10px;
+    transition: all 0.2s;
+}
+
+.btn-icon i { font-size: 16px; }
+
+/* Blue Pencil / Green Thumb */
+.btn-edit { color: #3b82f6 !important; }
+.btn-icon:last-child { color: #22c55e !important; }
+
+      </style>
+   </head>
+   <body>
+      <header>
+         <div class="header-left">
+            <img src="https://agcdn.altametrics.com/hw_prod_others/common/images/app_icon/zipclock.svg">
+            <div class="nav-item"><i class="bi bi-grid-3x3-gap-fill"></i> My App <i class="bi bi-caret-down-fill" style="font-size:10px"></i></div>
+            <div class="nav-item"><i class="bi bi-house-door"></i> Dashboard</div>
+            <div class="nav-item"><i class="bi bi-clock"></i> Site Clock</div>
+            <div class="nav-item active"><i class="bi bi-geo-alt"></i> 99999 <i class="bi bi-caret-down-fill" style="font-size:10px"></i></div>
+         </div>
+         <div class="header-center">
+            <span><i class="bi bi-cloud-snow"></i> -6°C</span>
+            <span><b>10:25</b><sup>A</sup> America/Toronto</span>
+         </div>
+         <div class="header-right">
+            <div class="store-badge"><i class="bi bi-shop"></i> 99999</div>
+            <i class="bi bi-moon"></i>
+            <i class="bi bi-gear"></i>
+            <i class="bi bi-person-circle" style="font-size:20px;"></i>
+         </div>
+      </header>
+      <aside class="sidebar">
+         <ul class="menu-list">
+            <li><a href="#" class="menu-item active"><i class="bi bi-house-door"></i> <span class="menu-label">Dashboard</span></a></li>
+            <li><a href="#" class="menu-item"><i class="bi bi-clock"></i> <span class="menu-label">Site Clock</span></a></li>
+            <li><a href="#" class="menu-item"><i class="bi bi-calendar-check"></i> <span class="menu-label">Punch Management</span></a></li>
+            <li>
+  <a href="Payroll-Management.html" class="menu-item">
+    <i class="bi bi-wallet2"></i>
+    <span class="menu-label">Payroll Management</span>
+  </a>
+</li>
+
+            <li><a href="#" class="menu-item"><i class="bi bi-graph-down"></i> <span class="menu-label">Time Loss Summary</span></a></li>
+            <li><a href="#" class="menu-item"><i class="bi bi-file-earmark-bar-graph"></i> <span class="menu-label">Reports</span></a></li>
+            <li><a href="#" class="menu-item"><i class="bi bi-cpu"></i> <span class="menu-label">Time Clock Devices</span></a></li>
+            <li><a href="#" class="menu-item"><i class="bi bi-people"></i> <span class="menu-label">Employees</span></a></li>
+         </ul>
+         <div class="sidebar-footer">
+            <i class="bi bi-gear" style="color:#a5b4fc; font-size:20px; margin-bottom:10px; display:block;"></i>
+         </div>
+      </aside>
+      <main class="main-content">
+         <div class="dash-controls">
+            <div class="date-navigator">
+               <i class="bi bi-chevron-left" style="cursor: pointer;"></i>
+               <i class="bi bi-calendar3"></i>
+               <span>06/19/2024</span>
+               <i class="bi bi-chevron-right" style="cursor: pointer;"></i>
+               <button class="btn-go">GO</button>
+            </div>
+            <div style="font-size: 12px; color: var(--text-dim);">Last updated: <b>Wed, Jun 19, 5:43a</b></div>
+         </div>
+
+         <div class="kpi-row">
+            <div class="kpi-card">
+               <div class="kpi-header">
+                  <i class="bi bi-speedometer2 kpi-icon blue"></i>
+                  <span class="kpi-label">Labor Efficiency</span>
+               </div>
+               <div class="kpi-main-val">94.2%</div>
+               <div class="kpi-trend up">
+                  <i class="bi bi-arrow-up"></i>
+                  <span class="trend-value">+12.0%</span>
+                  <span class="trend-period">this week</span>
+               </div>
+               <div class="kpi-graph-icon">
+                  <svg viewBox="0 0 24 24"><rect x="3" y="11" width="3" height="8" rx="1" fill="#22c55e"></rect><rect x="9" y="7" width="3" height="12" rx="1" fill="#22c55e"></rect><rect x="15" y="4" width="3" height="15" rx="1" fill="#22c55e"></rect></svg>
+               </div>
+               <div class="kpi-footer">
+                  <div class="kpi-footer-item left"><span class="footer-label">PROJECTED</span><span class="footer-value">92.0%</span></div>
+                  <div class="kpi-footer-divider"></div>
+                  <div class="kpi-footer-item right positive"><span class="footer-label">VARIANCE</span><span class="footer-value">+2.2%</span></div>
+               </div>
+            </div>
+            <div class="kpi-card">
+               <div class="kpi-header">
+                  <i class="bi bi-currency-dollar kpi-icon green"></i>
+                  <span class="kpi-label">Average Hourly Rate</span>
+               </div>
+               <div class="kpi-main-val">$18.45</div>
+               <div class="kpi-trend down">
+                  <i class="bi bi-arrow-down"></i>
+                  <span class="trend-value">-3.0%</span>
+                  <span class="trend-period">this week</span>
+               </div>
+               <div class="kpi-graph-icon">
+                  <svg viewBox="0 0 24 24"><rect x="3" y="11" width="3" height="8" rx="1" fill="#22c55e"></rect><rect x="9" y="7" width="3" height="12" rx="1" fill="#22c55e"></rect><rect x="15" y="4" width="3" height="15" rx="1" fill="#22c55e"></rect></svg>
+               </div>
+               <div class="kpi-footer">
+                  <div class="kpi-footer-item left"><span class="footer-label">LAST WEEK</span><span class="footer-value">$17.90</span></div>
+                  <div class="kpi-footer-divider"></div>
+                  <div class="kpi-footer-item right"><span class="footer-label">BUDGET</span><span class="footer-value">$18.50</span></div>
+               </div>
+            </div>
+            <div class="kpi-card">
+               <div class="kpi-header">
+                  <i class="bi bi-graph-up-arrow kpi-icon orange"></i>
+                  <span class="kpi-label">Projected OT Cost</span>
+               </div>
+               <div class="kpi-main-val">$1,240.00</div>
+               <div class="kpi-trend up">
+                  <i class="bi bi-arrow-up"></i>
+                  <span class="trend-value">+5.4%</span>
+                  <span class="trend-period">this week</span>
+               </div>
+               <div class="kpi-graph-icon">
+                  <svg viewBox="0 0 24 24"><rect x="3" y="11" width="3" height="8" rx="1" fill="#22c55e"></rect><rect x="9" y="7" width="3" height="12" rx="1" fill="#22c55e"></rect><rect x="15" y="4" width="3" height="15" rx="1" fill="#22c55e"></rect></svg>
+               </div>
+               <div class="kpi-footer">
+                  <div class="kpi-footer-item left"><span class="footer-label">ESTIMATED</span><span class="footer-value">$1.1k</span></div>
+                  <div class="kpi-footer-divider"></div>
+                  <div class="kpi-footer-item right"><span class="footer-label">CAPACITY</span><span class="footer-value">88%</span></div>
+               </div>
+            </div>
+            <div class="kpi-card">
+               <div class="kpi-header">
+                  <i class="bi bi-people kpi-icon purple"></i>
+                  <span class="kpi-label">Staff Retention</span>
+               </div>
+               <div class="kpi-main-val">98.1%</div>
+               <div class="kpi-trend up">
+                  <i class="bi bi-arrow-up"></i>
+                  <span class="trend-value">+1.8%</span>
+                  <span class="trend-period">this week</span>
+               </div>
+               <div class="kpi-graph-icon">
+                  <svg viewBox="0 0 24 24"><rect x="3" y="11" width="3" height="8" rx="1" fill="#22c55e"></rect><rect x="9" y="7" width="3" height="12" rx="1" fill="#22c55e"></rect><rect x="15" y="4" width="3" height="15" rx="1" fill="#22c55e"></rect></svg>
+               </div>
+               <div class="kpi-footer">
+                  <div class="kpi-footer-item left"><span class="footer-label">NEW HIRES</span><span class="footer-value">4</span></div>
+                  <div class="kpi-footer-divider"></div>
+                  <div class="kpi-footer-item right"><span class="footer-label">CHURN</span><span class="footer-value">0</span></div>
+               </div>
+            </div>
+            <div class="kpi-card">
+               <div class="kpi-header">
+                  <i class="bi bi-shield-check kpi-icon teal"></i>
+                  <span class="kpi-label">Compliance Score</span>
+               </div>
+               <div class="kpi-main-val">100%</div>
+               <div class="kpi-trend up">
+                  <i class="bi bi-arrow-up"></i>
+                  <span class="trend-value">+0.5%</span>
+                  <span class="trend-period">this week</span>
+               </div>
+               <div class="kpi-graph-icon">
+                  <svg viewBox="0 0 24 24"><rect x="3" y="11" width="3" height="8" rx="1" fill="#22c55e"></rect><rect x="9" y="7" width="3" height="12" rx="1" fill="#22c55e"></rect><rect x="15" y="4" width="3" height="15" rx="1" fill="#22c55e"></rect></svg>
+               </div>
+               <div class="kpi-footer">
+                  <div class="kpi-footer-item left"><span class="footer-label">AUDITS</span><span class="footer-value">12/12</span></div>
+                  <div class="kpi-footer-divider"></div>
+                  <div class="kpi-footer-item right positive"><span class="footer-label">STATUS</span><span class="footer-value">PASS</span></div>
+               </div>
+            </div>
+         </div>
+
+         <div class="grouped-metrics-row">
+            <div class="metric-block block-red">
+               <div class="metric-sub-item"><i class="bi bi-clock"></i><span>Clocked In</span><b>6</b></div>
+               <div class="metric-sub-item"><i class="bi bi-cup-hot"></i><span>On Break</span><b>2</b></div>
+               <div class="metric-sub-item"><i class="bi bi-calendar-event"></i><span>Upcoming</span><b>10</b></div>
+            </div>
+            <div class="metric-block block-purple">
+               <div class="metric-sub-item"><i class="bi bi-stopwatch"></i><span>OT Hours</span><b>00:00</b></div>
+               <div class="metric-sub-item"><i class="bi bi-stopwatch-fill"></i><span>DT Hours</span><b>00:00</b></div>
+               <div class="metric-sub-item"><i class="bi bi-clock-fill"></i><span>Total Hours</span><b>100:29</b></div>
+            </div>
+            <div class="metric-block block-teal">
+               <div class="metric-sub-item"><i class="bi bi-currency-dollar"></i><span>Labor Amt</span><b>2,062</b></div>
+               <div class="metric-sub-item"><i class="bi bi-graph-up-arrow"></i><span>Actual Sales</span><b>10,321</b></div>
+               <div class="metric-sub-item"><i class="bi bi-percent"></i><span>Labor %</span><b>19.98</b></div>
+            </div>
+            <div class="metric-block block-blue">
+               <div class="metric-sub-item"><i class="bi bi-graph-down"></i><span>Timeloss $</span><b>297.68</b></div>
+               <div class="metric-sub-item"><i class="bi bi-pie-chart"></i><span>Timeloss %</span><b>2.90</b></div>
+            </div>
+         </div>
+
+         <div class="action-grid" style="margin-bottom: 20px; display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+            <div class="action-card">
+               <div class="action-title" style="font-weight: 700; font-size: 14px; margin-bottom: 12px;">Needing Action <span class="badge-count" style="background: #3b82f6; color: white; border-radius: 50%; padding: 2px 7px; font-size: 11px;">8</span></div>
+               <div class="alert-banner" style="background: #3b82f6; color: white; padding: 10px 15px; border-radius: 6px; font-size: 13px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; cursor: pointer;">
+                  <span><i class="bi bi-info-circle"></i> Punches needing acknowledgement <span style="background:rgba(255,255,255,0.3); padding:0 6px; border-radius:10px;">14</span></span>
+                  <i class="bi bi-chevron-right"></i>
+               </div>
+               <div style="font-size:12px; font-weight:700; background:#f8fafc; padding:8px; border:1px solid #e2e8f0; border-bottom:none;">Punches for Approval</div>
+<div class="punch-list">
+   <div class="punch-item">
+      <div class="emp-info">
+         <div class="emp-avatar">
+            <img src="https://i.pravatar.cc/150?u=drew1" alt="DR" style="width: 100%; height: 100%; border-radius: 50%; object-fit: cover;">
+         </div>
+         <div class="emp-details">
+            <b>Angela T</b>
+            <span>Clock In - Tue, Apr 29, 05:25 AM : Clock Out - Tue, Apr 29, 05:26 AM</span>
+         </div>
+      </div>
+      <div class="action-btns">
+         <button class="btn-icon btn-edit"><i class="bi bi-pencil-square"></i></button>
+         <button class="btn-icon"><i class="bi bi-hand-thumbs-up"></i></button>
+      </div>
+   </div>
+   <div class="punch-item">
+      <div class="emp-info">
+         <div class="emp-avatar">
+            <img src="https://i.pravatar.cc/150?u=drew2" alt="DR" style="width: 100%; height: 100%; border-radius: 50%; object-fit: cover;">
+         </div>
+         <div class="emp-details">
+            <b>Adam J</b>
+            <span>Clock In - Tue, Apr 29, 05:35 AM : Clock Out - Tue, Apr 29, 05:36 AM</span>
+         </div>
+      </div>
+      <div class="action-btns">
+         <button class="btn-icon btn-edit"><i class="bi bi-pencil-square"></i></button>
+         <button class="btn-icon"><i class="bi bi-hand-thumbs-up"></i></button>
+      </div>
+   </div>
+</div>
+            </div>
+            <div class="action-card">
+               <div class="action-title" style="font-weight: 700; font-size: 14px; margin-bottom: 12px;">Awaiting Action from Others <span class="badge-count" style="background: #3b82f6; color: white; border-radius: 50%; padding: 2px 7px; font-size: 11px;">1</span></div>
+               <div class="alert-banner" style="background: #3b82f6; color: white; padding: 10px 15px; border-radius: 6px; font-size: 13px; display: flex; justify-content: space-between; align-items: center; cursor: pointer;">
+                  <span><i class="bi bi-info-circle"></i> Pending Acknowledgement <span style="background:rgba(255,255,255,0.3); padding:0 6px; border-radius:10px;">23</span></span>
+                  <i class="bi bi-chevron-right"></i>
+               </div>
+            </div>
+         </div>
+
+         <div class="chart-grid">
+            <div class="chart-container">
+               <div class="chart-header">
+                  <span class="chart-title">Timekeeping Efficiency <i class="bi bi-calendar-event"></i></span>
+                  <span class="chart-filter">Actual Vs Scheduled Hours <i class="bi bi-caret-down-fill"></i></span>
+               </div>
+               <canvas id="efficiencyChart" height="180"></canvas>
+            </div>
+            <div class="chart-container">
+               <div class="chart-header">
+                  <span class="chart-title">Timekeeping Trend</span>
+                  <span class="chart-filter">Actual Vs Scheduled Hours <i class="bi bi-caret-down-fill"></i></span>
+               </div>
+               <canvas id="trendChart" height="180"></canvas>
+            </div>
+         </div>
+
+         <div class="chart-grid">
+            <div class="chart-container">
+               <div class="chart-header">
+                  <span class="chart-title">Labor Cost Distribution <i class="bi bi-pie-chart"></i></span>
+                  <span class="chart-filter">By Department <i class="bi bi-caret-down-fill"></i></span>
+               </div>
+               <canvas id="laborDistChart"></canvas>
+            </div>
+            <div class="chart-container">
+               <div class="chart-header">
+                  <span class="chart-title">Punch Accuracy Trend <i class="bi bi-check-circle"></i></span>
+                  <span class="chart-filter">Auto vs. Manual <i class="bi bi-caret-down-fill"></i></span>
+               </div>
+               <canvas id="accuracyChart"></canvas>
+            </div>
+         </div>
+
+         <div class="analysis-grid" style="margin-bottom: 20px; display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+            <div class="action-card">
+               <div class="chart-header"><span class="chart-title">Shift Coverage</span></div>
+               <div class="chart-wrapper" style="height: 250px;"><canvas id="coverageChart"></canvas></div>
+            </div>
+            <div class="action-card">
+               <div class="chart-header"><span class="chart-title">Time Loss Reasons</span></div>
+               <div class="chart-wrapper" style="height: 250px;"><canvas id="lossTypeChart"></canvas></div>
+            </div>
+         </div>
+
+         <div class="full-width-section">
+            <div class="action-card">
+               <div class="chart-header">
+                  <span class="chart-title"><i class="bi bi-table"></i> Labor Variance by Dept</span>
+               </div>
+               <table class="analysis-table">
+                  <thead>
+                     <tr>
+                        <th>Department</th>
+                        <th>Scheduled</th>
+                        <th>Actual</th>
+                        <th>Variance</th>
+                        <th>Status</th>
+                     </tr>
+                  </thead>
+                  <tbody>
+                     <tr><td><b>Kitchen</b></td><td>450h</td><td>472h</td><td style="color:red">+22h</td><td><span class="status-pill pill-danger">Over</span></td></tr>
+                     <tr><td><b>Service</b></td><td>320h</td><td>310h</td><td style="color:green">-10h</td><td><span class="status-pill pill-success">Under</span></td></tr>
+                  </tbody>
+               </table>
+            </div>
+         </div>
+      </main>
+      <script>
+         new Chart(document.getElementById('efficiencyChart'), {
+             type: 'bar',
+             data: {
+                 labels: ['17/06', '18/06', '19/06', '20/06', '21/06', '22/06', '23/06'],
+                 datasets: [
+                     { label: 'Actual Hours', data: [42, 44, 44, 33, 42, 44, 44], backgroundColor: '#a855f7', barThickness: 15 },
+                     { label: 'Scheduled Hours', data: [36, 40, 33, 33, 36, 36, 36], backgroundColor: '#eab308', barThickness: 15 }
+                 ]
+             },
+             options: {
+         responsive: true,
+         maintainAspectRatio: false,   // ✅ allows fixed container control
+         
+         plugins: {
+         legend: {
+             position: 'bottom'
+         }
+         },
+         
+         scales: {
+         x: {
+             categoryPercentage: 0.6,  // ✅ locks category width
+             barPercentage: 0.55,      // ✅ locks bar width
+             grid: {
+                 display: false
+             }
+         },
+         y: {
+             beginAtZero: true,
+             max: 100,
+             ticks: {
+                 stepSize: 20
+             }
+         }
+         }
+         }
+         
+         });
+         
+         new Chart(document.getElementById('trendChart'), {
+             type: 'bar',
+             data: {
+                 labels: ['17/06', '18/06', '19/06', '20/06', '21/06', '22/06', '23/06'],
+                 datasets: [
+                     { type: 'bar', label: 'Current Actual', data: [42, 44, 44, 33, 42, 44, 44], backgroundColor: '#3b82f6', barThickness: 18, maxBarThickness: 18 },
+                     { type: 'bar', label: 'Current Schduled', data: [36, 40, 33, 33, 36, 36, 36], backgroundColor: '#22c55e', barThickness: 18, maxBarThickness: 18 },
+                     { type: 'line', label: 'Previous Actual', data: [34, 42, 0, 0, 0, 0, 0], borderColor: '#a855f7', tension: 0.1, fill: false },
+                     { type: 'line', label: 'Previous Schedule', data: [34, 40, 34, 33, 36, 36, 36], borderColor: '#f97316', tension: 0.1, fill: false }
+                 ]
+             },
+             options: {
+         responsive: true,
+         maintainAspectRatio: false,   // ✅ allows fixed container control
+         
+         plugins: {
+         legend: {
+             position: 'bottom'
+         }
+         },
+         
+         scales: {
+         x: {
+             categoryPercentage: 0.6,  // ✅ locks category width
+             barPercentage: 0.55,      // ✅ locks bar width
+             grid: {
+                 display: false
+             }
+         },
+         y: {
+             beginAtZero: true,
+             max: 100,
+             ticks: {
+                 stepSize: 20
+             }
+         }
+         }
+         }
+         
+         });
+         
+         // NEW CHART 3: Labor Cost Distribution (Pie)
+         new Chart(document.getElementById('laborDistChart'), {
+         type: 'doughnut',
+         data: {
+         labels: ['Kitchen', 'Front House', 'Delivery', 'Admin'],
+         datasets: [{
+            data: [45, 30, 15, 10],
+            backgroundColor: ['#3b82f6', '#10b981', '#f59e0b', '#6366f1'],
+            borderWidth: 0
+         }]
+         },
+         options: {
+         responsive: true,
+         maintainAspectRatio: false,
+         plugins: { legend: { position: 'bottom' } },
+         cutout: '70%' // Makes it a clean doughnut
+         }
+         });
+         
+         // NEW CHART 4: Punch Accuracy Trend (Line)
+         new Chart(document.getElementById('accuracyChart'), {
+         type: 'line',
+         data: {
+         labels: ['17/06', '18/06', '19/06', '20/06', '21/06', '22/06', '23/06'],
+         datasets: [{
+            label: 'Manual Edits',
+            data: [5, 8, 2, 4, 9, 3, 2],
+            borderColor: '#ef4444',
+            backgroundColor: 'rgba(239, 68, 68, 0.1)',
+            fill: true,
+            tension: 0.4
+         }]
+         },
+         options: {
+         responsive: true,
+         maintainAspectRatio: false,
+         plugins: { legend: { position: 'bottom' } },
+         scales: {
+            y: { beginAtZero: true, grid: { color: '#f1f5f9' } },
+            x: { grid: { display: false } }
+         }
+         }
+         });
+
+         // FIX: Apply to all new and existing charts to stop growth
+const chartOptions = { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom' } } };
+
+new Chart(document.getElementById('coverageChart'), {
+    type: 'line',
+    data: {
+        labels: ['6a', '9a', '12p', '3p', '6p', '9p'],
+        datasets: [
+            { label: 'Staff Needed', data: [5, 10, 15, 12, 20, 10], borderColor: '#cbd5e1', borderDash: [5, 5], fill: false },
+            { label: 'Staff Actual', data: [4, 9, 14, 13, 17, 11], borderColor: '#1e62ff', backgroundColor: 'rgba(30, 98, 255, 0.1)', fill: true, tension: 0.4 }
+        ]
+    },
+    options: chartOptions
+});
+
+new Chart(document.getElementById('lossTypeChart'), {
+    type: 'doughnut',
+    data: {
+        labels: ['Early In', 'Late Out', 'Unauthorized OT'],
+        datasets: [{ data: [40, 30, 30], backgroundColor: ['#f87171', '#fbbf24', '#34d399'] }]
+    },
+    options: { ...chartOptions, cutout: '70%' }
+});
+      </script>
+   </body>
+</html>
