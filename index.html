@@ -1,0 +1,2887 @@
+<!DOCTYPE html>
+<html lang="en">
+   <head>
+      <meta charset="UTF-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <title>Dashboard</title>
+      <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+      <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+      <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+      <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.0.0"></script>
+      <style>
+         :root {
+         --bg-color: #f4f6f9;
+         --nav-navy: #001d3d;
+         --sidebar-navy: #001d3d;
+         --accent-blue: #1e62ff;
+         --white: #ffffff;
+         --text-main: #1e293b;
+         --text-dim: #64748b;
+         --sidebar-collapsed: 60px;
+         --sidebar-expanded: 240px;
+         --border-light: #e2e8f0;
+         }
+         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Roboto', sans-serif; }
+         body { background-color: var(--bg-color); color: var(--text-main); overflow-x: hidden; }
+         /* --- Header --- */
+         header {
+         height: 50px;
+         background-color: #001d3d;
+         display: flex;
+         justify-content: space-between;
+         align-items: center;
+         padding: 0 15px;
+         color: white;
+         position: fixed;
+         top: 0;
+         width: 100%;
+         z-index: 1001;
+         border-bottom: 1px solid rgba(255,255,255,0.1);
+         }
+         .header-left { display: flex; align-items: center; gap: 15px; font-size: 13px; }
+         .header-left img { width: 24px; height: 24px; }
+         .nav-item { display: flex; align-items: center; gap: 5px; cursor: pointer; color: #cbd5e1; }
+         .nav-item.active { color: white; }
+         .header-center { display: flex; gap: 20px; align-items: center; font-size: 13px; }
+         .header-right { display: flex; align-items: center; gap: 15px; }
+         .store-badge { background: rgba(255,255,255,0.1); padding: 2px 10px; border-radius: 4px; font-size: 12px; border: 1px solid rgba(255,255,255,0.2); }
+         /* --- Sidebar (Hover to Expand Logic) --- */
+         .sidebar {
+         width: var(--sidebar-collapsed);
+         background-color: var(--sidebar-navy);
+         height: calc(100vh - 50px);
+         position: fixed;
+         top: 50px;
+         left: 0;
+         z-index: 1000;
+         display: flex;
+         flex-direction: column;
+         transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+         overflow: hidden;
+         white-space: nowrap;
+         }
+         .sidebar:hover {
+         width: var(--sidebar-expanded);
+         }
+         .menu-list { list-style: none; padding-top: 10px; flex-grow: 1; }
+         .menu-item { 
+         display: flex; 
+         align-items: center; 
+         height: 50px; 
+         padding: 0 20px; 
+         color: #a5b4fc; 
+         text-decoration: none; 
+         transition: 0.2s; 
+         font-size: 14px; 
+         }
+         .menu-item:hover { background: rgba(255,255,255,0.05); }
+         .menu-item.active { background: #1e293b; color: white; border-left: 4px solid #3b82f6; }
+         .menu-item i { font-size: 20px; min-width: 25px; margin-right: 25px; }
+         .menu-label {
+         opacity: 0;
+         transition: opacity 0.2s;
+         }
+         .sidebar:hover .menu-label {
+         opacity: 1;
+         }
+         .sidebar-footer { 
+         padding: 15px; 
+         border-top: 1px solid rgba(255,255,255,0.1); 
+         display: flex; 
+         flex-direction: column; 
+         align-items: center;
+         }
+         .sidebar:hover .sidebar-footer { align-items: flex-start; }
+         .help-btn { 
+         background: #1e62ff; 
+         color: white; 
+         border: none; 
+         width: 30px; 
+         height: 30px; 
+         border-radius: 4px; 
+         cursor: pointer; 
+         font-size: 0; 
+         transition: all 0.2s;
+         display: flex;
+         align-items: center;
+         justify-content: center;
+         }
+         .help-btn::before { content: 'H'; font-size: 12px; }
+         .sidebar:hover .help-btn { 
+         width: 100%; 
+         font-size: 12px; 
+         }
+         .sidebar:hover .help-btn::before { content: 'Help'; }
+         .main-content {
+         margin-left: var(--sidebar-collapsed);
+         padding: 70px 20px 30px 20px;
+         transition: margin-left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+         }
+         /* --- Controls --- */
+         .dash-controls { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+         .date-navigator { display: flex; align-items: center; gap: 12px; background: white; padding: 6px 16px; border-radius: 4px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); font-size: 14px; }
+         .btn-go { background: #1e62ff; color: white; border: none; padding: 9px 12px; border-radius: 4px; cursor: pointer; }
+         /* --- KPI TILES --- */
+         .kpi-row { display: grid; grid-template-columns: repeat(5, 1fr); gap: 15px; margin-bottom: 20px; }
+         .kpi-card { background: white; padding: 15px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); position: relative; }
+         .kpi-card {
+         transition: transform 0.25s ease, box-shadow 0.25s ease;
+         }
+         .kpi-card:hover {
+         transform: translateY(-3px);
+         box-shadow:
+         0 8px 20px rgba(0, 0, 0, 0.08),
+         0 3px 8px rgba(0, 0, 0, 0.06);
+         }
+         .kpi-card:hover .kpi-icon {
+         transform: scale(1.06);
+         transition: transform 0.25s ease;
+         }
+         .kpi-card::after {
+         content: '';
+         position: absolute;
+         inset: 0;
+         border-radius: 8px;
+         pointer-events: none;
+         opacity: 0;
+         transition: opacity 0.25s ease;
+         }
+         .kpi-card:hover::after {
+         box-shadow: inset 0 0 0 1px rgba(59, 130, 246, 0.12);
+         opacity: 1;
+         }
+         .kpi-label { font-size: 12px; color: var(--text-dim); margin-bottom: 8px; }
+         .kpi-main-val { font-size: 22px; font-weight: 700; }
+         .graph-icon { position: absolute; top: 15px; right: 15px; width: 32px; height: 32px; opacity: 0.8; }
+         .kpi-split { display: flex; border-top: 1px solid #f1f5f9; margin-top: 10px; padding-top: 10px; gap: 10px; }
+         .split-label { font-size: 9px; color: var(--text-dim); display: block; text-transform: uppercase; }
+         .split-val { font-size: 12px; font-weight: 700; }
+         /* --- Grouped Metrics --- */
+         .grouped-metrics-row { display: grid; grid-template-columns: 1.2fr 1.2fr 1.2fr 1fr; gap: 15px; margin-bottom: 25px; }
+         .metric-block { border-radius: 8px; padding: 15px; color: white; display: flex; justify-content: space-between; align-items: center; }
+         .block-red {
+         background: linear-gradient(135deg, #ff6a6a 0%, #ff4d4d 100%);
+         }
+         .block-purple {
+         background: linear-gradient(135deg, #6a6ff5 0%, #5b5ee6 100%);
+         }
+         .block-teal {
+         background: linear-gradient(135deg, #20c997 0%, #17b890 100%);
+         }
+         .block-blue {
+         background: linear-gradient(135deg, #0ea5e9 0%, #0284c7 100%);
+         }
+         .metric-block {
+         box-shadow: 
+         inset 0 1px 0 rgba(255,255,255,0.15),
+         0 6px 16px rgba(0,0,0,0.12);
+         }
+         .metric-sub-item {
+         border-right: 1px solid rgba(255,255,255,0.25);
+         }
+         .metric-sub-item i {
+         opacity: 0.95;
+         }
+         .metric-sub-item { text-align: center; flex: 1; border-right: 1px solid rgba(255,255,255,0.2); }
+         .metric-sub-item:last-child { border-right: none; }
+         .metric-sub-item i { font-size: 20px; display: block; margin-bottom: 5px; }
+         .metric-sub-item span { font-size: 10px; text-decoration: underline; display: block; margin-bottom: 2px; }
+         .metric-sub-item b { font-size: 16px; }
+         /* --- Visuals and Action Section --- */
+         .chart-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 20px; }
+         .chart-container {
+         background: white;
+         border-radius: 8px;
+         padding: 15px;
+         box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+         height: 320px;          /* ✅ FIXED visual size */
+         }
+         .chart-container canvas {
+         width: 100% !important;
+         height: 260px !important;  /* ✅ prevents horizontal growth illusion */
+         }
+         .chart-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
+         .chart-title { font-size: 14px; font-weight: 700; color: #334155; }
+         .chart-filter { font-size: 12px; border: 1px solid #e2e8f0; padding: 2px 8px; border-radius: 4px; color: #64748b; }
+         .action-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+         .action-card { background: white; border-radius: 8px; padding: 15px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+         .action-title { font-size: 14px; font-weight: 700; margin-bottom: 12px; display: flex; align-items: center; gap: 8px; }
+         .badge-count { background: #3b82f6; color: white; border-radius: 50%; padding: 2px 6px; font-size: 11px; }
+         .alert-banner { background: #3b82f6; color: white; padding: 10px 15px; border-radius: 6px; font-size: 13px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; cursor: pointer; }
+         .punch-list { border: 1px solid #f1f5f9; border-radius: 6px; }
+         .punch-item { display: flex; justify-content: space-between; align-items: center; padding: 10px; border-bottom: 1px solid #f1f5f9; }
+         .punch-item:last-child { border-bottom: none; }
+         .emp-info { display: flex; align-items: center; gap: 10px; }
+         .emp-avatar { width: 30px; height: 30px; border-radius: 50%; background: #e2e8f0; display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: bold; }
+         .emp-details b { font-size: 12px; display: block; }
+         .emp-details span { font-size: 11px; color: #64748b; }
+         .action-btns { display: flex; gap: 8px; }
+         .btn-icon { border: 1px solid #e2e8f0; background: white; padding: 4px 8px; border-radius: 4px; cursor: pointer; color: #10b981; }
+         .btn-edit { color: #3b82f6; }
+         .kpi-graph-icon {
+    position: absolute;
+    top: 14px;
+    right: 14px;
+    width: 34px;
+    height: 34px;
+    background: #ffffff;
+    border-radius: 8px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    
+    /* ADD THESE THREE LINES */
+    cursor: pointer; 
+    transition: all 0.2s ease;
+    z-index: 10;
+}
+
+/* ADD THIS NEW HOVER STATE */
+.kpi-graph-icon:hover {
+    background: #f0f7ff; /* Light blue tint on hover */
+    transform: translateY(-2px); /* Slight lift effect */
+    box-shadow: 0 6px 14px rgba(37, 99, 235, 0.15); /* Stronger shadow */
+}
+
+.kpi-graph-icon:active {
+    transform: translateY(0); /* Press down effect */
+}
+         .kpi-graph-icon svg {
+         width: 18px;
+         height: 18px;
+         }
+         .kpi-graph-icon rect {
+         fill: #22c55e;
+         }
+         /* KPI Footer Wrapper */
+         .kpi-footer {
+         margin-top: 16px;
+         padding: 12px 14px;
+         display: grid;
+         grid-template-columns: 1fr 1px 1fr;
+         align-items: center;
+         background: #f8fafc;
+         border-radius: 10px;
+         border: 1px solid #eef2f7;
+         }
+         /* Footer items */
+         .kpi-footer-item {
+         display: flex;
+         flex-direction: column;
+         gap: 4px;
+         }
+         .kpi-footer-item.left {
+         align-items: flex-start;
+         }
+         .kpi-footer-item.right {
+         align-items: flex-end;
+         }
+         /* Vertical divider */
+         .kpi-footer-divider {
+         width: 1px;
+         height: 100%;
+         background: linear-gradient(
+         to bottom,
+         transparent,
+         #cbd5e1,
+         transparent
+         );
+         }
+         /* Labels */
+         .footer-label {
+         font-size: 9px;
+         letter-spacing: 0.12em;
+         text-transform: uppercase;
+         font-weight: 600;
+         color: #64748b;
+         }
+         /* Values */
+         .footer-value {
+         font-size: 14px;
+         font-weight: 700;
+         color: #0f172a;
+         }
+         /* Positive emphasis */
+         .kpi-footer-item.positive .footer-value {
+         color: #16a34a;
+         }
+         /* Negative (future-proof) */
+         .kpi-footer-item.negative .footer-value {
+         color: #dc2626;
+         }
+         /* KPI header (icon + title) */
+         .kpi-header {
+         display: flex;
+         align-items: center;
+         gap: 8px;
+         margin-bottom: 6px;
+         }
+         /* Icon styling */
+         /* Base icon */
+         .kpi-icon {
+         font-size: 14px;
+         padding: 6px;
+         border-radius: 8px;
+         line-height: 1;
+         display: flex;
+         align-items: center;
+         justify-content: center;
+         }
+         /* Blue – Performance */
+         .kpi-icon.blue {
+         color: #2563eb;
+         background: rgba(37, 99, 235, 0.12);
+         }
+         /* Green – Money */
+         .kpi-icon.green {
+         color: #16a34a;
+         background: rgba(22, 163, 74, 0.12);
+         }
+         /* Orange – Cost / Risk */
+         .kpi-icon.orange {
+         color: #ea580c;
+         background: rgba(234, 88, 12, 0.12);
+         }
+         /* Purple – Workforce */
+         .kpi-icon.purple {
+         color: #7c3aed;
+         background: rgba(124, 58, 237, 0.12);
+         }
+         /* Teal – Compliance */
+         .kpi-icon.teal {
+         color: #0d9488;
+         background: rgba(13, 148, 136, 0.12);
+         }
+         /* Title text */
+         .kpi-label {
+         font-size: 12px;
+         font-weight: 500;
+         color: #64748b;
+         line-height: 1;
+         }
+         .kpi-icon {
+         font-size: 16px;          /* ⬅ was 14px */
+         padding: 7px;             /* ⬅ slightly more breathing room */
+         border-radius: 9px;
+         line-height: 1;
+         position: relative;
+         top: -3px;
+         display: flex;
+         align-items: center;
+         justify-content: center;
+         }
+         /* Trend wrapper */
+         .kpi-trend {
+         display: flex;
+         align-items: center;
+         gap: 6px;
+         margin-top: 6px;
+         font-size: 12px;
+         font-weight: 600;
+         }
+         /* Icon */
+         .kpi-trend i {
+         font-size: 13px;
+         }
+         /* Text parts */
+         .trend-value {
+         font-weight: 700;
+         }
+         .trend-period {
+         font-weight: 500;
+         color: #64748b;
+         }
+         /* Positive */
+         .kpi-trend.up {
+         color: #16a34a;
+         }
+         /* Negative */
+         .kpi-trend.down {
+         color: #dc2626;
+         }
+         .kpi-trend {
+         display: inline-flex;      /* ✅ shrink to content */
+         align-items: center;
+         gap: 6px;
+         padding: 4px 8px;
+         border-radius: 999px;
+         font-size: 12px;
+         font-weight: 600;
+         width: fit-content;        /* ✅ extra safety */
+         }
+         /* Positive */
+         .kpi-trend.up {
+         background: rgba(22, 163, 74, 0.08);
+         color: #16a34a;
+         }
+         /* Negative */
+         .kpi-trend.down {
+         background: rgba(220, 38, 38, 0.08);
+         color: #dc2626;
+         }
+         /* Icon size */
+         .kpi-trend i {
+         font-size: 13px;
+         }
+         /* Secondary text */
+         .kpi-trend span:last-child {
+         font-weight: 500;
+         color: inherit;
+         }
+
+/* FIX: Prevents charts from growing continuously */
+.chart-wrapper { position: relative; height: 250px; width: 100%; }
+
+/* Layout for new components */
+.full-width-section { width: 100%; margin-bottom: 20px; }
+.analysis-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 20px; }
+
+/* Table Styling */
+.analysis-table { width: 100%; border-collapse: collapse; font-size: 13px; background: white; border-radius: 8px; overflow: hidden; }
+.analysis-table th { text-align: left; padding: 12px; background: #f8fafc; color: #64748b; border-bottom: 2px solid #edf2f7; }
+.analysis-table td { padding: 12px; border-bottom: 1px solid #f1f5f9; }
+.status-pill { padding: 2px 8px; border-radius: 12px; font-size: 11px; font-weight: 600; }
+.pill-danger { background: #fee2e2; color: #ef4444; }
+.pill-success { background: #dcfce7; color: #22c55e; }
+/* Container adjustments */
+.punch-list { 
+    border: 1px solid #e2e8f0; 
+    border-radius: 4px; 
+    background: white;
+}
+
+.punch-item { 
+    padding: 12px 15px; 
+    border-bottom: 1px solid #f1f5f9; 
+}
+
+.punch-item:last-child { border-bottom: none; }
+
+/* Text styling */
+.emp-details b { 
+    font-size: 13px; 
+    color: #334155; 
+    margin-bottom: 2px;
+}
+
+.emp-details span { 
+    font-size: 12px; 
+    color: #94a3b8; /* Lighter grey for the time string */
+}
+
+/* Button styling to match image */
+.btn-icon {
+    background: white;
+    border: 1px solid #e2e8f0;
+    border-radius: 6px;
+    padding: 6px 10px;
+    transition: all 0.2s;
+}
+
+.btn-icon i { font-size: 16px; }
+
+/* Blue Pencil / Green Thumb */
+.btn-edit { color: #3b82f6 !important; }
+.btn-icon:last-child { color: #22c55e !important; }
+
+/* Animation for opening the screen */
+#liveStatusContainer {
+    animation: slideUp 0.4s cubic-bezier(0, 0, 0.2, 1);
+}
+
+@keyframes slideUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* Custom Scrollbar for suggestions */
+.suggestion-scroll::-webkit-scrollbar {
+    width: 5px;
+}
+.suggestion-scroll::-webkit-scrollbar-thumb {
+    background: #e2e8f0;
+    border-radius: 10px;
+}
+
+/* Modern Table Row Hover */
+.table-hover-row {
+    transition: background 0.2s;
+}
+.table-hover-row:hover {
+    background: #f8fafc;
+}
+
+/* Premium Card Scaling */
+.premium-card {
+    transition: transform 0.3s ease;
+}
+.premium-card:hover {
+    transform: translateY(-5px);
+}
+
+/* ===== INFO ICON (Floating, like screenshot #2) ===== */
+
+.info-icon {
+  position: relative;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: #2563eb;            /* Blue circle */
+  color: #ffffff;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  cursor: pointer;
+  margin-right: 8px;
+  flex-shrink: 0;
+  z-index: 20;
+}
+
+/* i symbol */
+.info-icon::before {
+  content: "i";
+  font-weight: 700;
+  font-family: Arial, sans-serif;
+}
+
+/* ===== TOOLTIP ===== */
+.info-icon::after {
+  content: attr(data-tooltip);
+  position: fixed;                /* 🔥 KEY FIX */
+  background: #0f172a;
+  color: #ffffff;
+  padding: 8px 12px;
+  border-radius: 8px;
+  font-size: 12px;
+  white-space: nowrap;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.25);
+
+  opacity: 0;
+  pointer-events: none;
+  transform: translateY(6px);
+  transition: opacity .15s ease, transform .15s ease;
+
+  z-index: 999999;                /* 🔥 OVERRIDES EVERYTHING */
+}
+
+/* Show tooltip */
+.info-icon:hover::after {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.info-icon::after {
+  left: var(--x);
+  top: calc(var(--y) - 10px);
+}
+
+
+/* ===== HARD LOCK: 5 rows visible max ===== */
+
+/* Punch lists (Suggest Break / Clock Out) */
+.punch-list.component-scroll {
+  max-height: 280px;        /* ~5 punch-item rows */
+  overflow-y: auto;
+}
+
+/* Each punch row height normalization */
+.punch-item {
+  min-height: 52px;
+}
+
+/* Call Employee table scroll */
+.component-scroll {
+  max-height: 300px;        /* ~5 table rows */
+  overflow-y: auto;
+}
+
+/* Prevent cards from growing */
+.action-card {
+  display: flex;
+  flex-direction: column;
+}
+
+/* Keep header fixed, scroll only content */
+.action-card > .chart-header {
+  flex-shrink: 0;
+}
+
+/* ===== Call Employee table scroll fix ===== */
+
+/* Lock Call Employee card height */
+.call-employee-card {
+  display: flex;
+  flex-direction: column;
+}
+
+/* Keep header fixed */
+.call-employee-card .chart-header {
+  flex-shrink: 0;
+}
+
+/* Scroll ONLY table body */
+.call-employee-table-wrapper {
+  max-height: 260px;      /* ≈ 5 rows */
+  overflow-y: auto;
+}
+
+/* Optional: smooth scrollbar */
+.call-employee-table-wrapper::-webkit-scrollbar {
+  width: 6px;
+}
+.call-employee-table-wrapper::-webkit-scrollbar-thumb {
+  background: #e2e8f0;
+  border-radius: 8px;
+}
+
+/* ===== Soft blinking info icon ===== */
+@keyframes infoPulse {
+  0% {
+    box-shadow: 0 0 0 0 rgba(37, 99, 235, 0.6);
+  }
+  70% {
+    box-shadow: 0 0 0 6px rgba(37, 99, 235, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(37, 99, 235, 0);
+  }
+}
+
+.info-icon {
+  animation: infoPulse 1.8s infinite;
+}
+
+/* ===== Select Position – premium dropdown ===== */
+.position-select {
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+
+  min-width: 190px;
+  height: 34px;
+
+  padding: 6px 36px 6px 12px;
+  border-radius: 8px;
+  border: 1px solid #e2e8f0;
+
+  background: #ffffff
+    url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 20 20'><path fill='%233b82f6' d='M5 7l5 5 5-5z'/></svg>")
+    no-repeat right 12px center;
+
+  font-size: 13px;
+  font-weight: 500;
+  color: #1e293b;
+
+  cursor: pointer;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.04);
+}
+
+/* Hover */
+.position-select:hover {
+  border-color: #93c5fd;
+}
+
+/* Focus */
+.position-select:focus {
+  outline: none;
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 3px rgba(59,130,246,0.15);
+}
+
+/* Dropdown list styling (supported browsers) */
+.position-select option {
+  font-size: 13px;
+  padding: 8px;
+}
+
+/* ===== Search Input – premium style ===== */
+.search-input {
+  min-width: 180px;
+  height: 34px;
+
+  padding: 6px 12px 6px 34px;   /* left space for icon */
+  border-radius: 8px;
+  border: 1px solid #e2e8f0;
+
+  font-size: 13px;
+  font-weight: 500;
+  color: #1e293b;
+
+  background: #ffffff url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill='%2394a3b8' d='M10 2a8 8 0 105.293 14.293l4.707 4.707 1.414-1.414-4.707-4.707A8 8 0 0010 2zm0 2a6 6 0 110 12 6 6 0 010-12z'/%3E%3C/svg%3E") no-repeat left 10px center;
+
+}
+
+.search-input {
+  min-width: 180px;
+  height: 34px;
+
+  padding: 6px 12px 6px 34px;
+  border-radius: 8px;
+  border: 1px solid #e2e8f0;
+
+  font-size: 13px;
+  font-weight: 500;
+  color: #1e293b;
+
+  background-color: #ffffff;
+
+  /* Encoded SVG search icon */
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill='%2394a3b8' d='M10 2a8 8 0 105.293 14.293l4.707 4.707 1.414-1.414-4.707-4.707A8 8 0 0010 2zm0 2a6 6 0 110 12 6 6 0 010-12z'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: left 10px center;
+  background-size: 16px;
+
+  box-shadow: 0 1px 2px rgba(0,0,0,0.04);
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+/* Hover */
+.search-input:hover {
+  border-color: #93c5fd;
+}
+
+/* Focus */
+.search-input:focus {
+  outline: none;
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 3px rgba(59,130,246,0.15);
+}
+
+/* Placeholder */
+.search-input::placeholder {
+  color: #94a3b8;
+  font-weight: 400;
+}
+
+/* --- Premium Upcoming Shifts Modal --- */
+.modal-overlay {
+    position: fixed; inset: 0; background: rgba(15, 23, 42, 0.7);
+    backdrop-filter: blur(4px); display: none; align-items: center;
+    justify-content: center; z-index: 2000; padding: 20px;
+}
+.modal-content {
+    background: white; width: 100%; max-width: 900px; border-radius: 16px;
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25); overflow: hidden;
+    animation: modalSlide 0.3s ease-out;
+}
+@keyframes modalSlide { from { transform: translateY(30px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+
+.modal-header {
+    padding: 20px 24px; background: #f8fafc; border-bottom: 1px solid #e2e8f0;
+    display: flex; justify-content: space-between; align-items: center;
+}
+.modal-header h2 { font-size: 18px; color: #1e293b; display: flex; align-items: center; gap: 10px; }
+.shift-filter-bar {
+    padding: 12px 24px; background: #fff; border-bottom: 1px solid #f1f5f9;
+    display: flex; gap: 10px; align-items: center;
+}
+.filter-chip {
+    padding: 6px 14px; border-radius: 20px; font-size: 12px; font-weight: 500;
+    cursor: pointer; border: 1px solid #e2e8f0; transition: 0.2s;
+}
+.filter-chip.active { background: #3b82f6; color: white; border-color: #3b82f6; }
+
+.shift-row {
+    display: grid; grid-template-columns: 2fr 2fr 1.5fr 1fr;
+    padding: 16px 24px; border-bottom: 1px solid #f8fafc; align-items: center;
+}
+.shift-row:hover { background: #f1f5f9; }
+.shift-row b { font-size: 14px; color: #1e293b; }
+.shift-row span { font-size: 13px; color: #64748b; }
+.badge-premium {
+    padding: 4px 10px; border-radius: 6px; font-size: 11px; font-weight: 700;
+    text-transform: uppercase; background: #eff6ff; color: #1e62ff;
+}
+
+
+/* ===== Premium Modal ===== */
+.premium-modal {
+  max-width: 920px;
+  border-radius: 18px;
+  overflow: hidden;
+}
+
+/* Header */
+.modal-title {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+.modal-title h2 {
+  font-size: 18px;
+  margin: 0;
+}
+.modal-title span {
+  font-size: 12px;
+  color: #64748b;
+}
+
+/* Toolbar */
+.shift-toolbar {
+  display: flex;
+  justify-content: space-between;
+  padding: 12px 20px;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+/* Chips */
+.chip-group { display: flex; gap: 8px; }
+.chip {
+  padding: 6px 14px;
+  border-radius: 999px;
+  border: 1px solid #e2e8f0;
+  font-size: 12px;
+  cursor: pointer;
+}
+.chip.active {
+  background: #3b82f6;
+  color: white;
+  border-color: #3b82f6;
+}
+
+/* Table */
+.shift-table-header,
+.shift-row {
+  display: grid;
+  grid-template-columns: 2fr 2.2fr 1.5fr 1fr;
+  align-items: center;
+  padding: 14px 20px;
+}
+
+.shift-table-header {
+  font-size: 11px;
+  text-transform: uppercase;
+  color: #64748b;
+  background: #f8fafc;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+.shift-table-body {
+  max-height: 420px;
+  overflow-y: auto;
+}
+
+.shift-row {
+  border-bottom: 1px solid #f1f5f9;
+}
+.shift-row:hover {
+  background: #f8fafc;
+}
+
+/* Badges */
+.badge {
+  display: inline-block;
+  padding: 4px 10px;
+  border-radius: 8px;
+  background: #eff6ff;
+  color: #2563eb;
+  font-size: 11px;
+  font-weight: 600;
+}
+
+/* Actions */
+.actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+}
+.actions i {
+  cursor: pointer;
+  color: #64748b;
+}
+.actions i:hover {
+  color: #3b82f6;
+}
+
+/* Footer */
+.modal-footer {
+  padding: 14px 20px;
+  background: #f8fafc;
+  border-top: 1px solid #e2e8f0;
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+}
+
+
+/* ===== Premium Close Icon (Red Outline) ===== */
+.modal-close {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+
+  background: transparent;
+  border: 2px solid #ef4444;
+
+  color: #ef4444;
+  font-size: 18px;
+  font-weight: 700;
+  line-height: 1;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  cursor: pointer;
+  padding: 0;
+
+  transition: background 0.15s ease, transform 0.15s ease;
+}
+
+/* Hover effect */
+.modal-close:hover {
+  background: rgba(239, 68, 68, 0.08);
+  transform: scale(1.05);
+}
+
+/* Active click */
+.modal-close:active {
+  transform: scale(0.95);
+}
+
+/* Remove default focus outline */
+.modal-close:focus {
+  outline: none;
+}
+
+
+
+/* ===== Phone Popup ===== */
+.phone-modal {
+  max-width: 320px;
+  text-align: center;
+  border-radius: 16px;
+  padding: 26px;
+}
+
+.phone-icon {
+  width: 54px;
+  height: 54px;
+  border-radius: 50%;
+  background: #eff6ff;
+  color: #2563eb;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 12px;
+  font-size: 22px;
+}
+
+.phone-modal h3 {
+  margin: 6px 0;
+  font-size: 20px;
+  letter-spacing: 0.5px;
+}
+
+.phone-modal p {
+  font-size: 12px;
+  color: #64748b;
+  margin-bottom: 20px;
+}
+
+.phone-actions {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+}
+
+.btn-outline {
+  padding: 6px 14px;
+  border-radius: 8px;
+  border: 1px solid #e2e8f0;
+  background: white;
+  cursor: pointer;
+}
+.btn-outline:hover {
+  background: #f8fafc;
+}
+
+/* ===== Profile Modal ===== */
+.profile-modal {
+  max-width: 440px;
+  border-radius: 18px;
+  padding: 24px;
+}
+
+.profile-header {
+  display: flex;
+  gap: 14px;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.avatar-circle {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: #3b82f6;
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 16px;
+}
+
+.profile-header h3 {
+  margin: 0;
+  font-size: 18px;
+}
+.profile-header span {
+  font-size: 12px;
+  color: #64748b;
+}
+
+.profile-info {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+}
+
+.profile-info label {
+  font-size: 11px;
+  color: #94a3b8;
+}
+.profile-info span {
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.pay-rate {
+  color: #16a34a;
+  font-weight: 700;
+}
+
+.profile-actions {
+  margin-top: 22px;
+  text-align: right;
+}
+
+.date-picker-card {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+
+  background: #ffffff;
+  padding: 6px 10px;
+  border-radius: 12px;
+
+  box-shadow:
+    0 6px 20px rgba(0, 0, 0, 0.08),
+    inset 0 1px 0 rgba(255, 255, 255, 0.6);
+
+  border: 1px solid #e2e8f0;
+}
+
+/* Left / Right arrows */
+.date-nav-btn {
+  width: 34px;
+  height: 34px;
+  border-radius: 8px;
+
+  border: 1px solid #e2e8f0;
+  background: #f8fafc;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  cursor: pointer;
+  transition: all 0.2s ease;
+  color: #475569;
+}
+
+.date-nav-btn:hover {
+  background: #eff6ff;
+  border-color: #93c5fd;
+  color: #2563eb;
+}
+
+/* Date display */
+.date-display {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+
+  padding: 6px 14px;
+  border-radius: 10px;
+
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+
+  font-size: 13px;
+  font-weight: 600;
+  color: #1e293b;
+
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.date-display i {
+  color: #2563eb;
+}
+
+.date-display:hover {
+  background: #eff6ff;
+  border-color: #93c5fd;
+}
+
+/* GO button */
+.date-go-btn {
+  height: 34px;
+  padding: 0 16px;
+
+  background: linear-gradient(135deg, #2563eb, #1e40af);
+  color: white;
+
+  border: none;
+  border-radius: 10px;
+
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+
+  cursor: pointer;
+  transition: all 0.2s ease;
+
+  box-shadow: 0 6px 14px rgba(37, 99, 235, 0.35);
+}
+
+.date-go-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 10px 22px rgba(37, 99, 235, 0.45);
+}
+
+.date-go-btn:active {
+  transform: translateY(0);
+}
+
+/* ===== KPI PREMIUM MODAL ===== */
+#kpiGraphModal {
+  background: rgba(15, 23, 42, 0.65);
+  backdrop-filter: blur(6px);
+}
+
+#kpiGraphModal .modal-content {
+  border-radius: 18px;
+  background: linear-gradient(180deg, #ffffff 0%, #f8fafc 100%);
+  box-shadow: 0 30px 70px rgba(0, 0, 0, 0.35);
+  overflow: hidden;
+}
+
+/* Header */
+#kpiGraphModal .modal-header {
+  padding: 18px 24px;
+  background: #f8fafc;
+  border-bottom: 1px solid #e2e8f0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+#kpiModalTitle {
+  font-size: 18px;
+  font-weight: 700;
+  color: #0f172a;
+}
+
+#kpiModalSubtitle {
+  font-size: 12px;
+  color: #64748b;
+}
+
+/* Toggle buttons */
+.chip-group .chip {
+  border-radius: 999px;
+  padding: 6px 14px;
+  font-size: 12px;
+  font-weight: 600;
+  border: 1px solid #e2e8f0;
+  background: white;
+}
+
+.chip-group .chip.active {
+  background: #2563eb;
+  color: white;
+  border-color: #2563eb;
+  box-shadow: 0 6px 16px rgba(37, 99, 235, 0.35);
+}
+
+/* Body */
+#kpiGraphModal .modal-body {
+  padding: 24px;
+}
+
+/* Table polish */
+#kpiTable td {
+  font-size: 13px;
+  color: #334155;
+}
+
+#kpiTable tr:hover {
+  background: #f8fafc;
+}
+
+/* Ensure the KPI Modal body has enough height for the chart */
+#kpiGraphModal .modal-body {
+    min-height: 350px; /* Force minimum height */
+    display: block !important;
+}
+
+#kpiChartView {
+    width: 100%;
+    height: 300px;
+    position: relative;
+}
+
+#kpiChartCanvas {
+    width: 100% !important;
+    height: 100% !important;
+}
+
+
+#kpiTableView {
+    width: 100%;
+    margin-top: 10px;
+    display: none; /* Controlled by JS */
+}
+
+#kpiTable {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+      </style>
+   </head>
+   <body>
+      <header>
+         <div class="header-left">
+            <img src="https://agcdn.altametrics.com/hw_prod_others/common/images/app_icon/zipclock.svg">
+            <div class="nav-item"><i class="bi bi-grid-3x3-gap-fill"></i> My App <i class="bi bi-caret-down-fill" style="font-size:10px"></i></div>
+            <div class="nav-item"><i class="bi bi-house-door"></i> Dashboard</div>
+            <div class="nav-item"><i class="bi bi-clock"></i> Site Clock</div>
+            <div class="nav-item active"><i class="bi bi-geo-alt"></i> 99999 <i class="bi bi-caret-down-fill" style="font-size:10px"></i></div>
+         </div>
+         <div class="header-center">
+            <span><i class="bi bi-cloud-snow"></i> -6°C</span>
+            <span><b>10:25</b><sup>A</sup> America/Toronto</span>
+         </div>
+         <div class="header-right">
+            <div class="store-badge"><i class="bi bi-shop"></i> 99999</div>
+            <i class="bi bi-moon"></i>
+            <i class="bi bi-gear"></i>
+            <i class="bi bi-person-circle" style="font-size:20px;"></i>
+         </div>
+      </header>
+      <aside class="sidebar">
+         <ul class="menu-list">
+            <li><a href="index.html" class="menu-item active"><i class="bi bi-house-door"></i> <span class="menu-label">Dashboard</span></a></li>
+            <li><a href="#" class="menu-item"><i class="bi bi-clock"></i> <span class="menu-label">Site Clock</span></a></li>
+            <li><a href="#" class="menu-item"><i class="bi bi-calendar-check"></i> <span class="menu-label">Punch Management</span></a></li>
+            <li>
+  <a href="Payroll-Management.html" class="menu-item">
+    <i class="bi bi-wallet2"></i>
+    <span class="menu-label">Payroll Management</span>
+  </a>
+</li>
+
+            <li><a href="#" class="menu-item"><i class="bi bi-graph-down"></i> <span class="menu-label">Time Loss Summary</span></a></li>
+            <li><a href="#" class="menu-item"><i class="bi bi-file-earmark-bar-graph"></i> <span class="menu-label">Reports</span></a></li>
+            <li><a href="#" class="menu-item"><i class="bi bi-cpu"></i> <span class="menu-label">Time Clock Devices</span></a></li>
+            <li><a href="#" class="menu-item"><i class="bi bi-people"></i> <span class="menu-label">Employees</span></a></li>
+         </ul>
+         <div class="sidebar-footer">
+            <i class="bi bi-gear" style="color:#a5b4fc; font-size:20px; margin-bottom:10px; display:block;"></i>
+         </div>
+      </aside>
+ <main class="main-content">
+   <div id="dashboardView">
+      <div class="dash-controls">
+         <div class="date-picker-card">
+  
+  <button class="date-nav-btn">
+    <i class="bi bi-chevron-left"></i>
+  </button>
+
+  <div class="date-display">
+    <i class="bi bi-calendar3"></i>
+    <span class="date-text">02/05/2026</span>
+  </div>
+
+  <button class="date-nav-btn">
+    <i class="bi bi-chevron-right"></i>
+  </button>
+
+  <button class="date-go-btn">
+    GO
+  </button>
+
+</div>
+
+         <div style="font-size: 12px; color: var(--text-dim);">Last updated: <b>Wed, Jun 19, 5:43a</b></div>
+      </div>
+
+      <div class="kpi-row">
+
+  <!-- 1️⃣ Employees Currently On Clock -->
+  <div class="kpi-card">
+    <div class="kpi-header">
+      <i class="bi bi-clock-fill kpi-icon blue"></i>
+      <span class="kpi-label">Employees On Clock</span>
+    </div>
+
+    <div class="kpi-main-val">18</div>
+
+    <div class="kpi-trend up">
+      <i class="bi bi-arrow-up"></i>
+      <span class="trend-value">+2</span>
+      <span class="trend-period">since last hour</span>
+    </div>
+
+    <div class="kpi-graph-icon">
+      <svg viewBox="0 0 24 24">
+        <rect x="3" y="11" width="3" height="8" rx="1"></rect>
+        <rect x="9" y="7" width="3" height="12" rx="1"></rect>
+        <rect x="15" y="4" width="3" height="15" rx="1"></rect>
+      </svg>
+    </div>
+
+    <div class="kpi-footer">
+      <div class="kpi-footer-item left">
+        <span class="footer-label">ON BREAK</span>
+        <span class="footer-value">4</span>
+      </div>
+      <div class="kpi-footer-divider"></div>
+      <div class="kpi-footer-item right">
+        <span class="footer-label">NEAR BREAK</span>
+        <span class="footer-value">6</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- 2️⃣ Time Loss Today -->
+  <div class="kpi-card">
+    <div class="kpi-header">
+      <i class="bi bi-exclamation-triangle-fill kpi-icon orange"></i>
+      <span class="kpi-label">Time Loss</span>
+    </div>
+
+    <div class="kpi-main-val">$297.68</div>
+
+    <div class="kpi-trend up">
+      <i class="bi bi-arrow-up"></i>
+      <span class="trend-value">+$42</span>
+      <span class="trend-period">vs yesterday</span>
+    </div>
+
+    <div class="kpi-graph-icon">
+      <svg viewBox="0 0 24 24">
+        <rect x="3" y="11" width="3" height="8" rx="1"></rect>
+        <rect x="9" y="7" width="3" height="12" rx="1"></rect>
+        <rect x="15" y="4" width="3" height="15" rx="1"></rect>
+      </svg>
+    </div>
+
+    <div class="kpi-footer">
+      <div class="kpi-footer-item left">
+        <span class="footer-label">LATE / EARLY</span>
+        <span class="footer-value">$203</span>
+      </div>
+      <div class="kpi-footer-divider"></div>
+      <div class="kpi-footer-item right negative">
+        <span class="footer-label">LONG BREAKS</span>
+        <span class="footer-value">$94</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- 3️⃣ Punches Needing Action -->
+  <div class="kpi-card">
+    <div class="kpi-header">
+      <i class="bi bi-pencil-square kpi-icon purple"></i>
+      <span class="kpi-label">Punches Needing Action</span>
+    </div>
+
+    <div class="kpi-main-val">14</div>
+
+    <div class="kpi-trend down">
+      <i class="bi bi-arrow-down"></i>
+      <span class="trend-value">-3</span>
+      <span class="trend-period">resolved today</span>
+    </div>
+
+    <div class="kpi-graph-icon">
+      <svg viewBox="0 0 24 24">
+        <rect x="3" y="11" width="3" height="8" rx="1"></rect>
+        <rect x="9" y="7" width="3" height="12" rx="1"></rect>
+        <rect x="15" y="4" width="3" height="15" rx="1"></rect>
+      </svg>
+    </div>
+
+    <div class="kpi-footer">
+      <div class="kpi-footer-item left">
+        <span class="footer-label">MISSED IN/OUT</span>
+        <span class="footer-value">11</span>
+      </div>
+      <div class="kpi-footer-divider"></div>
+      <div class="kpi-footer-item right">
+        <span class="footer-label">OLDEST</span>
+        <span class="footer-value">2h 35m</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- 4️⃣ Break Compliance Risk -->
+  <div class="kpi-card">
+    <div class="kpi-header">
+      <i class="bi bi-cup-hot-fill kpi-icon teal"></i>
+      <span class="kpi-label">Break Compliance Risk</span>
+    </div>
+
+    <div class="kpi-main-val">5</div>
+
+    <div class="kpi-trend up">
+      <i class="bi bi-arrow-up"></i>
+      <span class="trend-value">+1</span>
+      <span class="trend-period">last 30m</span>
+    </div>
+
+    <div class="kpi-graph-icon">
+      <svg viewBox="0 0 24 24">
+        <rect x="3" y="11" width="3" height="8" rx="1"></rect>
+        <rect x="9" y="7" width="3" height="12" rx="1"></rect>
+        <rect x="15" y="4" width="3" height="15" rx="1"></rect>
+      </svg>
+    </div>
+
+    <div class="kpi-footer">
+      <div class="kpi-footer-item left">
+        <span class="footer-label">NEXT DUE</span>
+        <span class="footer-value">18m</span>
+      </div>
+      <div class="kpi-footer-divider"></div>
+      <div class="kpi-footer-item right negative">
+        <span class="footer-label">OVERDUE</span>
+        <span class="footer-value">1</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- 5️⃣ Overtime Risk -->
+  <div class="kpi-card">
+    <div class="kpi-header">
+      <i class="bi bi-stopwatch-fill kpi-icon green"></i>
+      <span class="kpi-label">Overtime Risk</span>
+    </div>
+
+    <div class="kpi-main-val">6</div>
+
+    <div class="kpi-trend up">
+      <i class="bi bi-arrow-up"></i>
+      <span class="trend-value">+2</span>
+      <span class="trend-period">this week</span>
+    </div>
+
+    <div class="kpi-graph-icon">
+      <svg viewBox="0 0 24 24">
+        <rect x="3" y="11" width="3" height="8" rx="1"></rect>
+        <rect x="9" y="7" width="3" height="12" rx="1"></rect>
+        <rect x="15" y="4" width="3" height="15" rx="1"></rect>
+      </svg>
+    </div>
+
+    <div class="kpi-footer">
+      <div class="kpi-footer-item left">
+        <span class="footer-label">NEXT OT IN</span>
+        <span class="footer-value">2h 15m</span>
+      </div>
+      <div class="kpi-footer-divider"></div>
+      <div class="kpi-footer-item right">
+        <span class="footer-label">38h+</span>
+        <span class="footer-value">3</span>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+
+      <div class="grouped-metrics-row">
+         <div class="metric-block block-red">
+            <div class="metric-sub-item" onclick="showLiveStatus()" style="cursor: pointer;">
+               <i class="bi bi-clock"></i>
+               <span style="text-decoration: underline; font-weight: 500;">Clocked In</span>
+               <b>6</b>
+            </div>
+            <div class="metric-sub-item" onclick="showLiveStatus()" style="cursor: pointer;">
+               <i class="bi bi-cup-hot"></i>
+               <span style="text-decoration: underline; font-weight: 500;">On Break</span>
+               <b>4</b>
+            </div>
+            <div class="metric-sub-item" onclick="openShifts()" style="cursor: pointer;">
+    <i class="bi bi-calendar-event"></i>
+    <span>Upcoming Shifts</span>
+    <b>10</b>
+</div>
+         </div>
+<div class="metric-block block-purple">
+        <div class="metric-sub-item" onclick="openMetricModal('OT Hours')" style="cursor: pointer;">
+            <i class="bi bi-stopwatch"></i><span>OT Hours</span><b>00:00</b>
+        </div>
+        <div class="metric-sub-item" onclick="openMetricModal('DT Hours')" style="cursor: pointer;">
+            <i class="bi bi-stopwatch-fill"></i><span>DT Hours</span><b>00:00</b>
+        </div>
+        <div class="metric-sub-item" onclick="openMetricModal('Total Hours')" style="cursor: pointer;">
+            <i class="bi bi-clock-fill"></i><span>Total Hours</span><b>100:29</b>
+        </div>
+    </div>
+    <div class="metric-block block-teal">
+        <div class="metric-sub-item" onclick="openMetricModal('Labor Amt')" style="cursor: pointer;">
+            <i class="bi bi-currency-dollar"></i><span>Labor Amt</span><b>2,062</b>
+        </div>
+        <div class="metric-sub-item" onclick="openMetricModal('Actual Sales')" style="cursor: pointer;">
+            <i class="bi bi-graph-up-arrow"></i><span>Actual Sales</span><b>10,321</b>
+        </div>
+        <div class="metric-sub-item" onclick="openMetricModal('Labor %')" style="cursor: pointer;">
+            <i class="bi bi-percent"></i><span>Labor %</span><b>19.98</b>
+        </div>
+    </div>
+         <div class="metric-block block-blue">
+            <div class="metric-sub-item"><i class="bi bi-graph-down"></i><span>Timeloss $</span><b>297.68</b></div>
+            <div class="metric-sub-item"><i class="bi bi-pie-chart"></i><span>Timeloss %</span><b>2.90</b></div>
+         </div>
+      </div>
+
+      <div class="action-grid" style="margin-bottom: 20px; display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+         <div class="action-card">
+            <div class="action-title" style="font-weight: 700; font-size: 14px; margin-bottom: 12px;">Needing Action <span class="badge-count">8</span></div>
+            <div class="alert-banner">
+               <span><i class="bi bi-info-circle"></i> Punches needing acknowledgement <span style="background:rgba(255,255,255,0.3); padding:0 6px; border-radius:10px;">14</span></span>
+               <i class="bi bi-chevron-right"></i>
+            </div>
+            <div style="font-size:12px; font-weight:700; background:#f8fafc; padding:8px; border:1px solid #e2e8f0; border-bottom:none;">Punches for Approval</div>
+            <div class="punch-list">
+               <div class="punch-item">
+                  <div class="emp-info">
+                     <div class="emp-avatar"><img src="https://i.pravatar.cc/150?u=drew1" alt="DR" style="width: 100%; height: 100%; border-radius: 50%; object-fit: cover;"></div>
+                     <div class="emp-details"><b>Angela T</b><span>Clock In - Tue, Apr 29, 05:25 AM : Clock Out - Tue, Apr 29, 05:26 AM</span></div>
+                  </div>
+                  <div class="action-btns">
+                     <button class="btn-icon btn-edit"><i class="bi bi-pencil-square"></i></button>
+                     <button class="btn-icon"><i class="bi bi-hand-thumbs-up"></i></button>
+                  </div>
+               </div>
+               <div class="punch-item">
+                  <div class="emp-info">
+                     <div class="emp-avatar"><img src="https://i.pravatar.cc/150?u=drew2" alt="DR" style="width: 100%; height: 100%; border-radius: 50%; object-fit: cover;"></div>
+                     <div class="emp-details"><b>Adam J</b><span>Clock In - Tue, Apr 29, 05:35 AM : Clock Out - Tue, Apr 29, 05:36 AM</span></div>
+                  </div>
+                  <div class="action-btns">
+                     <button class="btn-icon btn-edit"><i class="bi bi-pencil-square"></i></button>
+                     <button class="btn-icon"><i class="bi bi-hand-thumbs-up"></i></button>
+                  </div>
+               </div>
+            </div>
+         </div>
+         <div class="action-card">
+            <div class="action-title" style="font-weight: 700; font-size: 14px; margin-bottom: 12px;">Awaiting Action from Others <span class="badge-count">1</span></div>
+            <div class="alert-banner">
+               <span><i class="bi bi-info-circle"></i> Pending Acknowledgement <span style="background:rgba(255,255,255,0.3); padding:0 6px; border-radius:10px;">23</span></span>
+               <i class="bi bi-chevron-right"></i>
+            </div>
+         </div>
+      </div>
+
+      <div class="chart-grid">
+         <div class="chart-container">
+            <div class="chart-header"><span class="chart-title">Timekeeping Efficiency <i class="bi bi-calendar-event"></i></span><span class="chart-filter">Actual Vs Scheduled Hours <i class="bi bi-caret-down-fill"></i></span></div>
+            <canvas id="efficiencyChart" height="180"></canvas>
+         </div>
+         <div class="chart-container">
+            <div class="chart-header"><span class="chart-title">Timekeeping Trend</span><span class="chart-filter">Actual Vs Scheduled Hours <i class="bi bi-caret-down-fill"></i></span></div>
+            <canvas id="trendChart" height="180"></canvas>
+         </div>
+      </div>
+
+      <div class="chart-grid">
+         <div class="chart-container">
+            <div class="chart-header"><span class="chart-title">Labor Cost Distribution <i class="bi bi-pie-chart"></i></span><span class="chart-filter">By Department <i class="bi bi-caret-down-fill"></i></span></div>
+            <canvas id="laborDistChart"></canvas>
+         </div>
+         <div class="chart-container">
+            <div class="chart-header"><span class="chart-title">Punch Accuracy Trend <i class="bi bi-check-circle"></i></span><span class="chart-filter">Auto vs. Manual <i class="bi bi-caret-down-fill"></i></span></div>
+            <canvas id="accuracyChart"></canvas>
+         </div>
+      </div>
+
+      <div class="analysis-grid" style="margin-bottom: 20px; display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+         <div class="action-card">
+            <div class="chart-header"><span class="chart-title">Shift Coverage</span></div>
+            <div class="chart-wrapper" style="height: 250px;"><canvas id="coverageChart"></canvas></div>
+         </div>
+         <div class="action-card">
+            <div class="chart-header"><span class="chart-title">Time Loss Reasons</span></div>
+            <div class="chart-wrapper" style="height: 250px;"><canvas id="lossTypeChart"></canvas></div>
+         </div>
+      </div>
+
+      <div class="full-width-section">
+         <div class="action-card">
+            <div class="chart-header"><span class="chart-title"><i class="bi bi-table"></i> Labor Variance by Department</span></div>
+            <table class="analysis-table">
+               <thead><tr><th>Department</th><th>Scheduled</th><th>Actual</th><th>Variance</th><th>Status</th></tr></thead>
+               <tbody>
+                  <tr><td><b>Management</b></td><td>450h</td><td>472h</td><td style="color:red">+22h</td><td><span class="status-pill pill-danger">Over</span></td></tr>
+                  <tr><td><b>Crew</b></td><td>320h</td><td>310h</td><td style="color:green">-10h</td><td><span class="status-pill pill-success">Under</span></td></tr>
+               </tbody>
+            </table>
+         </div>
+      </div>
+   </div>
+
+<div id="liveStatusContainer" style="display:none;background:#f1f5f9;padding:25px;border-radius:16px;">
+
+  <!-- HEADER -->
+<div class="dash-controls" style="margin-bottom:25px;background:white;padding:15px 20px;border-radius:12px;display:flex;justify-content:space-between;align-items:center;">
+
+  <!-- Left: Icon + Title -->
+  <div style="display:flex;align-items:center;gap:15px;">
+    <div style="background:#3b82f6;color:white;width:40px;height:40px;border-radius:10px;display:flex;align-items:center;justify-content:center;">
+      <i class="bi bi-activity"></i>
+    </div>
+    <div>
+      <h2 style="margin:0;font-size:18px;">Live Operations Status</h2>
+    </div>
+  </div>
+
+  <!-- Right: Last updated + Back button -->
+  <div style="display:flex;align-items:center;gap:14px;">
+    <span style="font-size:12px;color:#64748b;white-space:nowrap;">
+      <b>Last updated on</b>&nbsp;Thu, Feb 5, 2026 at 7:35a
+    </span>
+
+    <button class="btn-go" onclick="hideLiveStatus()">
+      <i class="bi bi-arrow-left"></i> Back
+    </button>
+  </div>
+
+</div>
+
+
+  <!-- SUGGEST BREAK + CLOCK OUT -->
+  <div class="analysis-grid" style="grid-template-columns:1fr 1fr;gap:20px;margin-bottom:25px;">
+
+    <!-- SUGGEST BREAK -->
+    <div class="action-card" style="border-top:4px solid #3b82f6;">
+      <div class="action-title">
+        <i class="bi bi-cup-hot-fill" style="color:#3b82f6"></i>
+        Suggest Break <span class="badge-count">7</span>
+      </div>
+
+      <div class="punch-list component-scroll">
+
+        <!-- 1 -->
+        <div class="punch-item">
+          <div class="emp-info">
+            <div class="emp-avatar" style="background:#3b82f6;color:white;">AK</div>
+            <div class="emp-details"><b>Andrew K</b></div>
+          </div>
+          <div>
+            <i class="bi bi-info-circle info-icon" data-tooltip="4h 12m On Shift"></i>
+            <button class="btn-go">Suggest Break</button>
+          </div>
+        </div>
+
+        <!-- 2 -->
+        <div class="punch-item">
+          <div class="emp-info">
+            <div class="emp-avatar" style="background:#6366f1;color:white;">JL</div>
+            <div class="emp-details"><b>Joshua L</b></div>
+          </div>
+          <div>
+            <i class="bi bi-info-circle info-icon" data-tooltip="4h 05m On Shift"></i>
+            <button class="btn-go">Suggest Break</button>
+          </div>
+        </div>
+
+        <!-- 3 -->
+        <div class="punch-item">
+          <div class="emp-info">
+            <div class="emp-avatar" style="background:#0d9488;color:white;">TT</div>
+            <div class="emp-details"><b>Taasil T</b></div>
+          </div>
+          <div>
+            <i class="bi bi-info-circle info-icon" data-tooltip="3h 58m On Shift"></i>
+            <button class="btn-go">Suggest Break</button>
+          </div>
+        </div>
+
+        <!-- 4 -->
+        <div class="punch-item">
+          <div class="emp-info">
+            <div class="emp-avatar" style="background:#1e293b;color:white;">BC</div>
+            <div class="emp-details"><b>Brandon C</b></div>
+          </div>
+          <div>
+            <i class="bi bi-info-circle info-icon" data-tooltip="3h 45m On Shift"></i>
+            <button class="btn-go">Suggest Break</button>
+          </div>
+        </div>
+
+        <!-- 5 -->
+        <div class="punch-item">
+          <div class="emp-info">
+            <div class="emp-avatar" style="background:#f59e0b;color:white;">MS</div>
+            <div class="emp-details"><b>Maria S</b></div>
+          </div>
+          <div>
+            <i class="bi bi-info-circle info-icon" data-tooltip="3h 30m On Shift"></i>
+            <button class="btn-go">Suggest Break</button>
+          </div>
+        </div>
+
+        <!-- 6 -->
+        <div class="punch-item">
+          <div class="emp-info">
+            <div class="emp-avatar" style="background:#ec4899;color:white;">RJ</div>
+            <div class="emp-details"><b>Robert J</b></div>
+          </div>
+          <div>
+            <i class="bi bi-info-circle info-icon" data-tooltip="3h 15m On Shift"></i>
+            <button class="btn-go">Suggest Break</button>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- SUGGEST CLOCK OUT -->
+    <div class="action-card" style="border-top:4px solid #ef4444;">
+      <div class="action-title">
+        <i class="bi bi-clock-history" style="color:#ef4444"></i>
+        Suggest Clock Out <span class="badge-count">6</span>
+      </div>
+
+      <div class="punch-list component-scroll">
+
+        <div class="punch-item" style="background:#fff5f5;">
+          <div class="emp-info">
+            <div class="emp-avatar" style="background:#ef4444;color:white;">AK</div>
+            <div class="emp-details"><b>Andrew K</b></div>
+          </div>
+          <div>
+            <i class="bi bi-info-circle info-icon" data-tooltip="Approaching Overtime"></i>
+            <button class="btn-go" style="background:#ef4444;">Suggest Clock Out</button>
+          </div>
+        </div>
+
+        <div class="punch-item" style="background:#fff5f5;">
+          <div class="emp-info">
+            <div class="emp-avatar" style="background:#1e293b;color:white;">JL</div>
+            <div class="emp-details"><b>Joshua L</b></div>
+          </div>
+          <div>
+            <i class="bi bi-info-circle info-icon" data-tooltip="End of Shift"></i>
+            <button class="btn-go" style="background:#ef4444;">Suggest Clock Out</button>
+          </div>
+        </div>
+
+        <div class="punch-item" style="background:#fff5f5;">
+          <div class="emp-info">
+            <div class="emp-avatar" style="background:#3b82f6;color:white;">TT</div>
+            <div class="emp-details"><b>Taasil T</b></div>
+          </div>
+          <div>
+            <i class="bi bi-info-circle info-icon" data-tooltip="Approaching Overtime"></i>
+            <button class="btn-go" style="background:#ef4444;">Suggest Clock Out</button>
+          </div>
+        </div>
+
+        <div class="punch-item" style="background:#fff5f5;">
+          <div class="emp-info">
+            <div class="emp-avatar" style="background:#0d9488;color:white;">BC</div>
+            <div class="emp-details"><b>Brandon C</b></div>
+          </div>
+          <div>
+            <i class="bi bi-info-circle info-icon" data-tooltip="End of Shift"></i>
+            <button class="btn-go" style="background:#ef4444;">Suggest Clock Out</button>
+          </div>
+        </div>
+
+        <div class="punch-item" style="background:#fff5f5;">
+          <div class="emp-info">
+            <div class="emp-avatar" style="background:#8b5cf6;color:white;">SK</div>
+            <div class="emp-details"><b>Sarah K</b></div>
+          </div>
+          <div>
+            <i class="bi bi-info-circle info-icon" data-tooltip="End of Shift"></i>
+            <button class="btn-go" style="background:#ef4444;">Suggest Clock Out</button>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- CALL EMPLOYEE -->
+  <div class="action-card call-employee-card">
+    <div class="chart-header">
+      <span class="chart-title">
+        <i class="bi bi-telephone" style="color:#0d9488"></i>
+        Call Employee <span class="badge-count">28</span>
+      </span>
+
+      <div style="display:flex;gap:10px;">
+        <input
+  type="text"
+  id="employeeSearch"
+  class="search-input"
+  placeholder="Search..."
+/>
+
+<select id="positionFilter" class="position-select">
+  <option value="">Select Position</option>
+  <option value="Assistant Manager">Assistant Manager</option>
+  <option value="Cashier">Cashier</option>
+  <option value="Co-Manager">Co-Manager</option>
+  <option value="Crew">Crew</option>
+  <option value="Dough">Dough</option>
+  <option value="Floor Supervisor">Floor Supervisor</option>
+  <option value="Kitchen">Kitchen</option>
+</select>
+
+      </div>
+    </div>
+
+    <div class="call-employee-table-wrapper">
+  <table class="analysis-table">
+        <thead>
+          <tr>
+            <th>Employee</th>
+            <th>Availability</th>
+            <th>Weekly Hours</th>
+            <th>Projected Hours to OT</th>
+            <th>Projected Hours to ACA</th>
+            <th>Phone Number</th>
+          </tr>
+        </thead>
+
+        <tbody>
+          <!-- ALL original rows preserved -->
+          <!-- ACA values added safely -->
+         <tr><td><b>Brandon C</b></td><td>Sch 9:30a-4:30p</td><td>03:20</td><td style="color:#ef4444">40:51</td><td>28:15</td><td>(705) 818-6774</td></tr>
+          <tr><td><b>Brandy P</b></td><td>All Day</td><td>03:09</td><td style="color:#ef4444">40:51</td><td>27:40</td><td>(705) 241-1791</td></tr>
+          <tr><td><b>Aaron H</b></td><td>All Day</td><td>00:00</td><td>-</td><td>-</td><td>(705) 955-2436</td></tr>
+          <tr><td><b>Alida N</b></td><td>All Day</td><td>00:00</td><td>-</td><td>-</td><td>(249) 733-4688</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+</div>
+
+<div id="shiftModal" class="modal-overlay">
+  <div class="modal-content premium-modal">
+
+    <!-- HEADER -->
+    <div class="modal-header">
+      <div class="modal-title">
+        <i class="bi bi-calendar-week"></i>
+        <div>
+          <h2>9 Upcoming Shifts</h2>
+          <span>Next scheduled shifts for your store</span>
+        </div>
+      </div>
+
+      <button class="modal-close" onclick="closeShifts()">
+  <span>×</span>
+</button>
+
+    </div>
+
+    <!-- FILTER BAR -->
+    <div class="shift-toolbar">
+  <div class="chip-group">
+  <span class="chip active" data-range="today">Today</span>
+  <span class="chip" data-range="tomorrow">Tomorrow</span>
+  <span class="chip" data-range="week">Next 7 Days</span>
+</div>
+
+
+      <div class="toolbar-actions">
+        <input
+  id="shiftSearchInput"
+  class="search-input"
+  placeholder="Search employee…"
+/>
+
+      </div>
+    </div>
+
+    <!-- TABLE HEADER -->
+    <div class="shift-table-header">
+      <span>Employee</span>
+      <span>Shift Time</span>
+      <span>Position</span>
+      <span class="right">Actions</span>
+    </div>
+
+    <!-- TABLE BODY -->
+    <div class="shift-table-body">
+
+      <!-- ROW 1 -->
+      <div class="shift-row">
+        <b>Christopher Brown</b>
+        <span>Fri, Feb 6 · 6:00a – 2:00p</span>
+        <span class="badge">Shakerboard</span>
+        <div class="actions">
+          <i class="bi bi-telephone"></i>
+          <i class="bi bi-chat-dots"></i>
+          <i class="bi bi-person"></i>
+        </div>
+      </div>
+
+      <div class="shift-row">
+        <b>Andrew Garcia</b>
+        <span>Fri, Feb 6 · 8:00a – 4:00p</span>
+        <span class="badge">Kitchen</span>
+        <div class="actions">
+          <i class="bi bi-telephone"></i>
+          <i class="bi bi-chat-dots"></i>
+          <i class="bi bi-person"></i>
+        </div>
+      </div>
+
+      <div class="shift-row">
+        <b>Andrew Martinez</b>
+        <span>Fri, Feb 6 · 9:00a – 3:00p</span>
+        <span class="badge">Shift Manager</span>
+        <div class="actions">
+          <i class="bi bi-telephone"></i>
+          <i class="bi bi-chat-dots"></i>
+          <i class="bi bi-person"></i>
+        </div>
+      </div>
+
+      <div class="shift-row">
+        <b>Christopher Brown</b>
+        <span>Sat, Feb 7 · 6:00a – 2:00p</span>
+        <span class="badge">Shakerboard</span>
+        <div class="actions">
+          <i class="bi bi-telephone"></i>
+          <i class="bi bi-chat-dots"></i>
+          <i class="bi bi-person"></i>
+        </div>
+      </div>
+
+      <div class="shift-row">
+        <b>Andrew Garcia</b>
+        <span>Sat, Feb 7 · 8:00a – 4:00p</span>
+        <span class="badge">Kitchen</span>
+        <div class="actions">
+          <i class="bi bi-telephone"></i>
+          <i class="bi bi-chat-dots"></i>
+          <i class="bi bi-person"></i>
+        </div>
+      </div>
+
+      <div class="shift-row">
+        <b>Andrew Martinez</b>
+        <span>Sat, Feb 7 · 9:00a – 3:00p</span>
+        <span class="badge">Shift Manager</span>
+        <div class="actions">
+          <i class="bi bi-telephone"></i>
+          <i class="bi bi-chat-dots"></i>
+          <i class="bi bi-person"></i>
+        </div>
+      </div>
+
+      <div class="shift-row">
+        <b>Christopher Brown</b>
+        <span>Sun, Feb 8 · 6:00a – 2:00p</span>
+        <span class="badge">Shakerboard</span>
+        <div class="actions">
+          <i class="bi bi-telephone"></i>
+          <i class="bi bi-chat-dots"></i>
+          <i class="bi bi-person"></i>
+        </div>
+      </div>
+
+      <div class="shift-row">
+        <b>Andrew Garcia</b>
+        <span>Sun, Feb 8 · 8:00a – 4:00p</span>
+        <span class="badge">Kitchen</span>
+        <div class="actions">
+          <i class="bi bi-telephone"></i>
+          <i class="bi bi-chat-dots"></i>
+          <i class="bi bi-person"></i>
+        </div>
+      </div>
+
+      <div class="shift-row">
+        <b>Andrew Martinez</b>
+        <span>Sun, Feb 8 · 9:00a – 3:00p</span>
+        <span class="badge">Shift Manager</span>
+        <div class="actions">
+          <i class="bi bi-telephone"></i>
+          <i class="bi bi-chat-dots"></i>
+          <i class="bi bi-person"></i>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- FOOTER -->
+    <div class="modal-footer">
+      <button class="btn-icon"><i class="bi bi-printer"></i> Print</button>
+      <button class="btn-icon" onclick="exportCSV()">
+  <i class="bi bi-download"></i> Export
+</button>
+      <button class="btn-go">Send Reminders</button>
+    </div>
+
+  </div>
+</div>
+
+<!-- EMPLOYEE PROFILE MODAL -->
+<div id="profileModal" class="modal-overlay">
+  <div class="modal-content profile-modal">
+
+    <div class="profile-header">
+      <div class="avatar-circle" id="avatarInitials"></div>
+      <div>
+        <h3 id="pName"></h3>
+        <span id="pDept"></span>
+      </div>
+    </div>
+
+    <div class="profile-info">
+      <div>
+        <label>Email</label>
+        <span id="pEmail"></span>
+      </div>
+      <div>
+        <label>Phone</label>
+        <span id="pPhone"></span>
+      </div>
+      <div>
+        <label>Department</label>
+        <span id="pDept2"></span>
+      </div>
+      <div>
+        <label>Pay Rate</label>
+        <span class="pay-rate">$<span id="pPay"></span>/hr</span>
+      </div>
+    </div>
+
+    <div class="profile-actions">
+      <button class="btn-go" onclick="closeProfile()">Close</button>
+    </div>
+
+  </div>
+</div>
+
+
+<!-- PHONE NUMBER MODAL -->
+
+<div id="phoneModal" class="modal-overlay">
+  <div class="modal-content phone-modal">
+    <div class="phone-icon">
+      <i class="bi bi-telephone-fill"></i>
+    </div>
+
+    <h3 id="phoneNumber"></h3>
+    <p>Tap to copy the number</p>
+
+    <div class="phone-actions">
+      <button class="btn-outline" onclick="copyPhone()">Copy</button>
+      <button class="btn-go" onclick="closePhone()">Close</button>
+    </div>
+  </div>
+</div>
+
+<!-- Tiles/KPIs Graphs Popup-->
+
+<!-- KPI Graph Modal -->
+<!-- KPI Graph Modal -->
+<div id="kpiGraphModal" class="modal-overlay">
+  <div class="modal-content premium-modal" style="max-width: 1000px; width: 95%;">
+    
+    <div class="modal-header" style="padding: 20px 24px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #f1f5f9;">
+      <div>
+        <h2 id="kpiModalTitle" style="font-size: 22px; font-weight: 700; color: #0f172a; margin-bottom: 4px;">Title</h2>
+        <span id="kpiModalSubtitle" style="font-size: 13px; color: #64748b; display: flex; align-items: center; gap: 6px;">
+          <i class="bi bi-info-circle"></i> Subtitle
+        </span>
+      </div>
+
+      <div class="chip-group" id="viewToggleGroup" style="display: flex; background: #f1f5f9; padding: 4px; border-radius: 12px; gap: 4px;">
+        <button class="chip active" onclick="updateView('bar')" style="border:none; padding: 8px 16px; border-radius: 8px; font-size: 13px; cursor:pointer;"><i class="bi bi-bar-chart"></i> Bar</button>
+        <button class="chip" onclick="updateView('pie')" style="border:none; padding: 8px 16px; border-radius: 8px; font-size: 13px; cursor:pointer;"><i class="bi bi-pie-chart"></i> Pie</button>
+        <button class="chip" onclick="updateView('line')" style="border:none; padding: 8px 16px; border-radius: 8px; font-size: 13px; cursor:pointer;"><i class="bi bi-graph-up"></i> Trend</button>
+        <button class="chip" onclick="updateView('table')" style="border:none; padding: 8px 16px; border-radius: 8px; font-size: 13px; cursor:pointer;"><i class="bi bi-table"></i> Table</button>
+                <div style="width: 1px; background: #cbd5e1; margin: 6px 2px;"></div>
+        <button class="chip" onclick="updateView('insights')" style="border:none; padding: 8px 16px; border-radius: 8px; font-size: 13px; cursor:pointer; font-weight: 600;"><i class="bi bi-lightbulb-fill"></i> Insights</button>      </div>
+
+      <button class="modal-close" onclick="closeKpiModal()" style="font-size: 24px; color: #ef4444; border:none; background:none; cursor:pointer;">&times;</button>
+    </div>
+
+    <div class="modal-body" style="padding: 24px; min-height: 480px; position: relative;">
+      
+      <div id="kpiChartView" class="chart-wrapper" style="height: 420px; width: 100%;">
+        <canvas id="kpiChartCanvas"></canvas>
+      </div>
+
+      <div id="kpiTableView" style="display:none; width: 100%;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+          <h4 style="font-size: 15px; font-weight: 600;">Detailed Breakdown</h4>
+          <input type="text" id="tableSearch" class="search-input" placeholder="Search data points..." onkeyup="filterKpiTable()" style="max-width: 300px;">
+        </div>
+        <div style="max-height: 380px; overflow-y: auto; border-radius: 8px; border: 1px solid #e2e8f0;">
+          <table class="analysis-table" id="kpiTable" style="width: 100%; border-collapse: collapse;"></table>
+        </div>
+      </div>
+
+      <div id="kpiInsightsView" style="display:none; width: 100%;">
+        <div id="aiInsights">
+          </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+
+
+</main>
+      <script>
+
+         new Chart(document.getElementById('efficiencyChart'), {
+             type: 'bar',
+             data: {
+                 labels: ['17/06', '18/06', '19/06', '20/06', '21/06', '22/06', '23/06'],
+                 datasets: [
+                     { label: 'Actual Hours', data: [42, 44, 44, 33, 42, 44, 44], backgroundColor: '#a855f7', barThickness: 15 },
+                     { label: 'Scheduled Hours', data: [36, 40, 33, 33, 36, 36, 36], backgroundColor: '#eab308', barThickness: 15 }
+                 ]
+             },
+             options: {
+    plugins: {
+        datalabels: {
+            anchor: 'end',
+            align: 'top',
+            color: '#475569',
+            font: { size: 10, weight: '600' }
+        },
+        legend: { position: 'bottom' }
+         },
+         
+         scales: {
+         x: {
+             categoryPercentage: 0.6,  // ✅ locks category width
+             barPercentage: 0.55,      // ✅ locks bar width
+             grid: {
+                 display: false
+             }
+         },
+         y: {
+             beginAtZero: true,
+             max: 100,
+             ticks: {
+                 stepSize: 20
+             }
+         }
+         }
+         }
+         
+         });
+         
+         new Chart(document.getElementById('trendChart'), {
+             type: 'bar',
+             data: {
+                 labels: ['17/06', '18/06', '19/06', '20/06', '21/06', '22/06', '23/06'],
+                 datasets: [
+                     { type: 'bar', label: 'Current Actual', data: [42, 44, 44, 33, 42, 44, 44], backgroundColor: '#3b82f6', barThickness: 18, maxBarThickness: 18 },
+                     { type: 'bar', label: 'Current Schduled', data: [36, 40, 33, 33, 36, 36, 36], backgroundColor: '#22c55e', barThickness: 18, maxBarThickness: 18 },
+                     { type: 'line', label: 'Previous Actual', data: [34, 42, 0, 0, 0, 0, 0], borderColor: '#a855f7', tension: 0.1, fill: false },
+                     { type: 'line', label: 'Previous Schedule', data: [34, 40, 34, 33, 36, 36, 36], borderColor: '#f97316', tension: 0.1, fill: false }
+                 ]
+             },
+             options: {
+         responsive: true,
+         maintainAspectRatio: false,   // ✅ allows fixed container control
+         
+         plugins: {
+         legend: {
+             position: 'bottom'
+         }
+         },
+         
+         scales: {
+         x: {
+             categoryPercentage: 0.6,  // ✅ locks category width
+             barPercentage: 0.55,      // ✅ locks bar width
+             grid: {
+                 display: false
+             }
+         },
+         y: {
+             beginAtZero: true,
+             max: 100,
+             ticks: {
+                 stepSize: 20
+             }
+         }
+         }
+         }
+         
+         });
+         
+         // NEW CHART 3: Labor Cost Distribution (Pie)
+         new Chart(document.getElementById('laborDistChart'), {
+         type: 'doughnut',
+         data: {
+         labels: ['Kitchen', 'Front House', 'Delivery', 'Admin'],
+         datasets: [{
+            data: [45, 30, 15, 10],
+            backgroundColor: ['#3b82f6', '#10b981', '#f59e0b', '#6366f1'],
+            borderWidth: 0
+         }]
+         },
+         options: {
+         responsive: true,
+         maintainAspectRatio: false,
+         plugins: { legend: { position: 'bottom' } },
+         cutout: '70%' // Makes it a clean doughnut
+         }
+         });
+         
+         // NEW CHART 4: Punch Accuracy Trend (Line)
+         new Chart(document.getElementById('accuracyChart'), {
+         type: 'line',
+         data: {
+         labels: ['17/06', '18/06', '19/06', '20/06', '21/06', '22/06', '23/06'],
+         datasets: [{
+            label: 'Manual Edits',
+            data: [5, 8, 2, 4, 9, 3, 2],
+            borderColor: '#ef4444',
+            backgroundColor: 'rgba(239, 68, 68, 0.1)',
+            fill: true,
+            tension: 0.4
+         }]
+         },
+         options: {
+         responsive: true,
+         maintainAspectRatio: false,
+         plugins: { legend: { position: 'bottom' } },
+         scales: {
+            y: { beginAtZero: true, grid: { color: '#f1f5f9' } },
+            x: { grid: { display: false } }
+         }
+         }
+         });
+
+         // FIX: Apply to all new and existing charts to stop growth
+const chartOptions = { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom' } } };
+
+new Chart(document.getElementById('coverageChart'), {
+    type: 'line',
+    data: {
+        labels: ['6a', '9a', '12p', '3p', '6p', '9p'],
+        datasets: [
+            { label: 'Staff Needed', data: [5, 10, 15, 12, 20, 10], borderColor: '#cbd5e1', borderDash: [5, 5], fill: false },
+            { label: 'Staff Actual', data: [4, 9, 14, 13, 17, 11], borderColor: '#1e62ff', backgroundColor: 'rgba(30, 98, 255, 0.1)', fill: true, tension: 0.4 }
+        ]
+    },
+    options: chartOptions
+});
+
+new Chart(document.getElementById('lossTypeChart'), {
+    type: 'doughnut',
+    data: {
+        labels: ['Early In', 'Late Out', 'Unauthorized OT'],
+        datasets: [{ data: [40, 30, 30], backgroundColor: ['#f87171', '#fbbf24', '#34d399'] }]
+    },
+    options: { ...chartOptions, cutout: '70%' }
+});
+
+function showLiveStatus() {
+    document.getElementById('dashboardView').style.opacity = '0';
+    setTimeout(() => {
+        document.getElementById('dashboardView').style.display = 'none';
+        document.getElementById('liveStatusContainer').style.display = 'block';
+    }, 200);
+}
+
+function hideLiveStatus() {
+    document.getElementById('liveStatusContainer').style.display = 'none';
+    document.getElementById('dashboardView').style.display = 'block';
+    setTimeout(() => {
+        document.getElementById('dashboardView').style.opacity = '1';
+    }, 50);
+}
+
+document.addEventListener('mousemove', (e) => {
+  const t = e.target.closest('.info-icon');
+  if (!t) return;
+
+  const tooltip = t;
+  tooltip.style.setProperty('--x', e.clientX + 'px');
+  tooltip.style.setProperty('--y', e.clientY + 'px');
+});
+
+// Upcoming Shifts Modal
+
+function openShifts() {
+  document.getElementById('shiftModal').style.display = 'flex';
+}
+function closeShifts() {
+  document.getElementById('shiftModal').style.display = 'none';
+}
+
+// ==========================================
+// 1. SHIFT MANAGEMENT LOGIC
+// ==========================================
+const shiftData = {
+  today: [
+    { name: "Christopher Brown", time: "Fri, Feb 6 · 6:00a–2:00p", pos: "Shakerboard", phone: "705-111-2222", email: "cbrown@store.com", dept: "Ops", pay: 18.5 },
+    { name: "Andrew Garcia", time: "Fri, Feb 6 · 8:00a–4:00p", pos: "Kitchen", phone: "705-222-3333", email: "agarcia@store.com", dept: "Kitchen", pay: 17 },
+    { name: "Andrew Martinez", time: "Fri, Feb 6 · 9:00a–3:00p", pos: "Shift Manager", phone: "705-333-4444", email: "amartinez@store.com", dept: "Mgmt", pay: 24 }
+  ],
+  tomorrow: [
+    { name: "Christopher Brown", time: "Sat, Feb 7 · 6:00a–2:00p", pos: "Shakerboard", phone: "705-111-2222", email: "cbrown@store.com", dept: "Ops", pay: 18.5 },
+    { name: "Andrew Garcia", time: "Sat, Feb 7 · 8:00a–4:00p", pos: "Kitchen", phone: "705-222-3333", email: "agarcia@store.com", dept: "Kitchen", pay: 17 }
+  ],
+  week: [
+    { name: "Andrew Martinez", time: "Sun, Feb 8 · 9:00a–3:00p", pos: "Shift Manager", phone: "705-333-4444", email: "amartinez@store.com", dept: "Mgmt", pay: 24 },
+    { name: "Andrew Garcia", time: "Mon, Feb 9 · 8:00a–4:00p", pos: "Kitchen", phone: "705-222-3333", email: "agarcia@store.com", dept: "Kitchen", pay: 17 }
+  ]
+};
+
+let activeRange = "today";
+let filteredData = [...shiftData.today];
+const shiftBody = document.querySelector(".shift-table-body");
+
+function renderShifts(data) {
+  if (!shiftBody) return;
+  shiftBody.innerHTML = data.map(e => `
+    <div class="shift-row">
+      <b>${e.name}</b>
+      <span>${e.time}</span>
+      <span class="badge">${e.pos}</span>
+      <div class="actions">
+        <i class="bi bi-telephone" onclick="showPhone('${e.phone}')"></i>
+        <i class="bi bi-person" onclick='openProfile(${JSON.stringify(e)})'></i>
+      </div>
+    </div>
+  `).join("");
+}
+
+// Initialize Shifts
+renderShifts(filteredData);
+
+// Shift Filter Listeners (Scoped to shift-toolbar)
+document.querySelectorAll(".shift-toolbar .chip").forEach(chip => {
+  chip.addEventListener("click", () => {
+    document.querySelectorAll(".shift-toolbar .chip").forEach(c => c.classList.remove("active"));
+    chip.classList.add("active");
+    activeRange = chip.dataset.range;
+    if (shiftData[activeRange]) {
+      filteredData = [...shiftData[activeRange]];
+      document.getElementById("shiftSearchInput").value = "";
+      renderShifts(filteredData);
+    }
+  });
+});
+
+document.getElementById("shiftSearchInput").addEventListener("input", function() {
+  const query = this.value.toLowerCase();
+  const base = shiftData[activeRange];
+  filteredData = base.filter(e => e.name.toLowerCase().includes(query));
+  renderShifts(filteredData);
+});
+
+// ==========================================
+// 2. KPI POPUP & CHART LOGIC
+// ==========================================
+// ==========================================
+// PREMIUM KPI MODAL LOGIC (Attractive & Classic)
+// ==========================================
+let kpiChartInstance = null;
+let currentKpiData = null;
+let currentView = 'bar';
+
+// Modern color palette for Chart bars
+const BAR_COLORS = ['#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#06b6d4'];
+
+function updateView(viewType) {
+    currentView = viewType;
+    
+    // UI Button Active States
+    const chips = document.querySelectorAll('#viewToggleGroup .chip');
+    chips.forEach(chip => {
+        chip.classList.remove('active');
+        
+        // Use toLowerCase and includes to handle icons inside the button text
+        const chipText = chip.innerText.toLowerCase();
+        
+        // Special case for 'Trend' which might be labeled 'Trend' or 'Line' in JS
+        if (chipText.includes(viewType) || (viewType === 'line' && chipText.includes('trend'))) {
+            chip.classList.add('active');
+        }
+    });
+
+    // Hide all views first
+    const views = ['kpiChartView', 'kpiTableView', 'kpiInsightsView'];
+    views.forEach(v => {
+        const el = document.getElementById(v);
+        if (el) el.style.display = 'none';
+    });
+
+    // Show selected view
+    if (viewType === 'table') {
+        document.getElementById('kpiTableView').style.display = 'block';
+        renderKpiTable(currentKpiData);
+    } 
+    else if (viewType === 'insights') {
+        document.getElementById('kpiInsightsView').style.display = 'block';
+        generateAdvancedInsights(currentKpiData); 
+    } 
+    else {
+        document.getElementById('kpiChartView').style.display = 'block';
+        renderAdvancedChart(viewType); // viewType is 'bar', 'pie', or 'line'
+    }
+}
+
+function renderAdvancedChart(type) {
+    const canvas = document.getElementById('kpiChartCanvas');
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+    
+    if (kpiChartInstance) kpiChartInstance.destroy();
+
+    // Register the DataLabels plugin
+    Chart.register(ChartDataLabels);
+
+    const isPie = (type === 'pie');
+
+    kpiChartInstance = new Chart(ctx, {
+        type: isPie ? 'doughnut' : (type === 'line' ? 'line' : 'bar'),
+        data: {
+            labels: currentKpiData.labels,
+            datasets: [{
+                label: 'Value',
+                data: currentKpiData.values,
+                backgroundColor: isPie ? ['#4285F4', '#0FB981', '#F59E0B'] : (type === 'line' ? 'rgba(59, 130, 246, 0.1)' : BAR_COLORS),
+                borderColor: type === 'line' ? '#3b82f6' : 'transparent',
+                fill: type === 'line',
+                tension: 0.4,
+                borderRadius: type === 'bar' ? 8 : 0
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: { 
+                    display: true, 
+                    position: 'bottom' 
+                },
+                datalabels: {
+                    display: true,
+                    // --- ONLY CHANGE PIE CHART LABELS ---
+                    color: isPie ? '#ffffff' : '#1e293b', 
+                    anchor: isPie ? 'center' : 'end',
+                    align: isPie ? 'center' : 'top',
+                    font: { 
+                        weight: 'bold', 
+                        size: isPie ? 14 : 11 
+                    },
+                    // Apply shadow ONLY to Pie chart
+                    textShadowColor: isPie ? 'rgba(0, 0, 0, 0.6)' : 'transparent',
+                    textShadowBlur: isPie ? 4 : 0,
+                    formatter: (value) => {
+                        const title = document.getElementById('kpiModalTitle').innerText;
+                        if (title.includes('%')) return value + '%';
+                        if (title.includes('Amt') || title.includes('Sales')) return '$' + value.toLocaleString();
+                        return value;
+                    }
+                }
+            },
+            layout: {
+                padding: isPie ? 10 : { top: 25 }
+            },
+            scales: isPie ? {} : {
+                y: { beginAtZero: true },
+                x: { grid: { display: false } }
+            }
+        }
+    });
+}
+
+function renderKpiTable(data) {
+    const table = document.getElementById("kpiTable");
+    if (!data || !data.table) return;
+
+    // Render Main Data Table
+    let html = `
+        <thead>
+            <tr><th>Category</th><th>Value</th><th>Status</th></tr>
+        </thead>
+        <tbody>
+            ${data.table.map(row => `
+                <tr class="table-hover-row">
+                    <td>${row[0]}</td>
+                    <td><b>${row[1]}</b></td>
+                    <td><span class="status-pill ${['Critical', 'Urgent', 'High'].includes(row[2]) ? 'pill-danger' : 'pill-success'}">${row[2]}</span></td>
+                </tr>
+            `).join('')}
+        </tbody>
+    `;
+    table.innerHTML = html;
+}
+
+function generateAdvancedInsights(data) {
+    const insightDiv = document.getElementById('aiInsights');
+    if (!insightDiv || !data) return;
+
+    const maxVal = Math.max(...data.values);
+    const avgVal = (data.values.reduce((a, b) => a + b, 0) / data.values.length).toFixed(1);
+    const peakLabel = data.labels[data.values.indexOf(maxVal)];
+
+    // Force high-contrast styling for the insight cards
+    insightDiv.innerHTML = `
+        <div style="background: #ffffff; border: 1px solid #e2e8f0; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 12px rgba(0,0,0,0.08); color: #1e293b;">
+            <div style="padding: 15px 20px; background: #f8fafc; border-bottom: 1px solid #e2e8f0;">
+                <h4 style="margin: 0; font-size: 13px; color: #64748b; text-transform: uppercase; letter-spacing: 0.5px; font-weight: 700;">
+                    <i class="bi bi-cpu"></i> AI Analysis Report
+                </h4>
+            </div>
+            <div style="padding: 20px;">
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 20px;">
+                    <div style="background: #eff6ff; padding: 15px; border-radius: 10px; border: 1px solid #dbeafe;">
+                        <span style="display:block; font-size: 11px; color: #1e40af; text-transform: uppercase; font-weight: 700; margin-bottom: 5px;">Peak Performance</span>
+                        <b style="font-size: 18px; color: #1e3a8a;">${peakLabel} (${maxVal})</b>
+                    </div>
+                    <div style="background: #f0fdf4; padding: 15px; border-radius: 10px; border: 1px solid #dcfce7;">
+                        <span style="display:block; font-size: 11px; color: #166534; text-transform: uppercase; font-weight: 700; margin-bottom: 5px;">Daily Average</span>
+                        <b style="font-size: 18px; color: #14532d;">${avgVal}</b>
+                    </div>
+                </div>
+
+                <div style="background: #fffbeb; padding: 15px; border-radius: 10px; border: 1px solid #fef3c7; display: flex; gap: 12px;">
+                    <i class="bi bi-lightbulb-fill" style="color: #d97706; font-size: 20px;"></i>
+                    <div style="font-size: 14px; color: #92400e; line-height: 1.5;">
+                        <b style="display: block; margin-bottom: 4px;">Strategic Recommendation:</b>
+                        Data suggests a significant concentration during the <b>${peakLabel}</b> window. We recommend reviewing shift overlaps at this time to maintain service standards and avoid overtime spikes.
+                    </div>
+                </div>
+            </div>
+        </div>
+    `;
+}
+
+function generateInsights(data) {
+    const panel = document.getElementById('aiInsights');
+    const maxVal = Math.max(...data.values);
+    const maxLabel = data.labels[data.values.indexOf(maxVal)];
+    
+    panel.innerHTML = `
+        <div style="margin-bottom: 12px;">
+            <b style="color: #2563eb;">Peak Observation:</b><br>
+            Highest activity recorded at <b>${maxLabel}</b> with a value of <b>${maxVal}</b>.
+        </div>
+        <div style="margin-bottom: 12px;">
+            <b style="color: #10b981;">Average Stability:</b><br>
+            Current trend shows a mean value of <b>${(data.values.reduce((a,b)=>a+b,0)/data.values.length).toFixed(1)}</b>.
+        </div>
+        <div style="padding: 10px; background: #fff; border-radius: 8px; border: 1px dashed #cbd5e1;">
+            <i class="bi bi-lightbulb" style="color: #f59e0b;"></i> 
+            Focus resources on <b>${maxLabel}</b> to mitigate risk or maximize efficiency.
+        </div>
+    `;
+}
+
+const KPI_SOURCE = {
+  "Employees On Clock": {
+    subtitle: "Hourly staffing distribution",
+    labels: ["6 AM", "8 AM", "10 AM", "12 PM", "2 PM", "4 PM"],
+    values: [7, 11, 18, 20, 16, 10],
+    table: [
+      ["6 AM", "7 Employees", "Low"], ["8 AM", "11 Employees", "Normal"],
+      ["10 AM", "18 Employees", "Peak"], ["12 PM", "20 Employees", "Peak"],
+      ["2 PM", "16 Employees", "Normal"], ["4 PM", "10 Employees", "Low"]
+    ]
+  },
+  "Time Loss": {
+    subtitle: "Cost impact for today",
+    labels: ["Late In", "Early Out", "Long Breaks"],
+    values: [118, 86, 94],
+    table: [
+      ["Late In", "$118", "High"], ["Early Out", "$86", "Medium"], ["Long Breaks", "$94", "High"]
+    ]
+  },
+  "Punches Needing Action": {
+    subtitle: "Pending punch corrections",
+    labels: ["Missed In", "Missed Out", "Edits"],
+    values: [6, 5, 3],
+    table: [
+      ["Missed In", 6, "Urgent"], ["Missed Out", 5, "Urgent"], ["Edits Required", 3, "Normal"]
+    ]
+  },
+  "Break Compliance Risk": {
+    subtitle: "Employees nearing violation",
+    labels: ["<15 min", "15–30 min", "Overdue"],
+    values: [2, 2, 1],
+    table: [
+      ["< 15 min", 2, "Watch"], ["15–30 min", 2, "Risk"], ["Overdue", 1, "Critical"]
+    ]
+  },
+  "Overtime Risk": {
+    subtitle: "Employees nearing overtime",
+    labels: ["36–38 hrs", "38–40 hrs", "40+ hrs"],
+    values: [2, 1, 3],
+    table: [
+      ["36–38 hrs", 2, "Watch"], ["38–40 hrs", 1, "Risk"], ["40+ hrs", 3, "Critical"]
+    ]
+  }
+};
+
+// Open Modal logic
+document.querySelectorAll('.kpi-graph-icon').forEach(icon => {
+  icon.addEventListener('click', function() {
+    const card = this.closest('.kpi-card');
+    const title = card.querySelector('.kpi-label').innerText.trim();
+    
+    // Using the KPI_SOURCE defined in your project
+    if (KPI_SOURCE[title]) {
+      currentKpiData = KPI_SOURCE[title];
+      document.getElementById('kpiModalTitle').innerText = title;
+      document.getElementById('kpiModalSubtitle').innerText = currentKpiData.subtitle;
+      document.getElementById('kpiGraphModal').style.display = 'flex';
+      
+      // FIXED: Initialize both View and Insights on first landing
+      updateView('bar'); 
+      generateAdvancedInsights(currentKpiData); 
+    }
+  });
+});
+
+function closeKpiModal() {
+  document.getElementById('kpiGraphModal').style.display = 'none';
+  if (kpiChartInstance) kpiChartInstance.destroy();
+}
+
+function showKpiChart() {
+  document.getElementById('kpiChartView').style.display = 'block';
+  document.getElementById('kpiTableView').style.display = 'none';
+  
+  const chips = document.querySelectorAll('#kpiGraphModal .chip');
+  chips.forEach(c => c.classList.remove('active'));
+  if(chips[0]) chips[0].classList.add('active');
+
+  setTimeout(() => {
+    const canvas = document.getElementById('kpiChartCanvas');
+    const ctx = canvas.getContext('2d');
+    if (kpiChartInstance) kpiChartInstance.destroy();
+
+    kpiChartInstance = new Chart(ctx, {
+      type: 'bar',
+      data: {
+        labels: currentKpiData.labels,
+        datasets: [{
+          data: currentKpiData.values,
+          backgroundColor: BAR_COLORS.slice(0, currentKpiData.labels.length),
+          borderRadius: 10,
+          barThickness: 38,
+          hoverOpacity: 0.8
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: { display: false },
+          tooltip: {
+            backgroundColor: '#1e293b',
+            titleFont: { size: 14, weight: 'bold' },
+            padding: 12,
+            cornerRadius: 8
+          }
+        },
+        scales: {
+          y: { 
+            beginAtZero: true,
+            grid: { color: 'rgba(0,0,0,0.05)', drawBorder: false },
+            ticks: { color: '#94a3b8' }
+          },
+          x: { 
+            grid: { display: false },
+            ticks: { color: '#64748b', font: { weight: '500' } }
+          }
+        }
+      }
+    });
+  }, 50);
+}
+
+function showKpiTable() {
+  document.getElementById('kpiChartView').style.display = 'none';
+  document.getElementById('kpiTableView').style.display = 'block';
+
+  const chips = document.querySelectorAll('#kpiGraphModal .chip');
+  chips.forEach(c => c.classList.remove('active'));
+  if(chips[1]) chips[1].classList.add('active');
+
+  const table = document.getElementById('kpiTable');
+  table.innerHTML = `
+    <thead>
+      <tr style="background: #f8fafc;">
+        <th style="padding: 15px; text-align: left; color: #64748b; font-size: 12px; text-transform: uppercase;">Category</th>
+        <th style="padding: 15px; text-align: left; color: #64748b; font-size: 12px; text-transform: uppercase;">Value</th>
+        <th style="padding: 15px; text-align: left; color: #64748b; font-size: 12px; text-transform: uppercase;">Status</th>
+      </tr>
+    </thead>
+    <tbody>
+      ${currentKpiData.table.map(row => `
+        <tr class="table-hover-row" style="border-bottom: 1px solid #f1f5f9;">
+          <td style="padding: 15px; font-weight: 500;">${row[0]}</td>
+          <td style="padding: 15px; font-weight: 700; color: #0f172a;">${row[1]}</td>
+          <td style="padding: 15px;">
+            <span class="status-pill ${
+              ['Critical', 'Urgent', 'High'].includes(row[2]) ? 'pill-danger' : 
+              row[2] === 'Peak' ? 'pill-success' : ''
+            }">
+              ${row[2]}
+            </span>
+          </td>
+        </tr>`).join('')}
+    </tbody>`;
+}
+
+// ==========================================
+// 3. UTILITY & PROFILE FUNCTIONS
+// ==========================================
+function showPhone(num) {
+  const phoneModal = document.getElementById("phoneModal");
+  document.getElementById("phoneNumber").innerText = num;
+  phoneModal.style.display = "flex";
+  // Set global activePhone for the copy function
+  window.activePhone = num; 
+}
+
+function copyPhone() {
+  if (window.activePhone) {
+    navigator.clipboard.writeText(window.activePhone);
+    alert("Copied to clipboard");
+  }
+}
+
+function closePhone() {
+  document.getElementById("phoneModal").style.display = "none";
+}
+
+function openProfile(e) {
+  document.getElementById("pName").innerText = e.name;
+  document.getElementById("pEmail").innerText = e.email;
+  document.getElementById("pPhone").innerText = e.phone;
+  document.getElementById("pDept").innerText = e.dept;
+  document.getElementById("pDept2").innerText = e.dept;
+  document.getElementById("pPay").innerText = e.pay;
+
+  const initials = e.name.split(" ").map(x => x[0]).join("");
+  const avatar = document.getElementById("avatarInitials");
+  if (avatar) avatar.innerText = initials;
+
+  document.getElementById("profileModal").style.display = "flex";
+}
+
+function closeProfile() {
+  document.getElementById("profileModal").style.display = "none";
+}
+
+function exportCSV() {
+  let csv = "Employee,Shift Time,Position\n";
+  filteredData.forEach(e => {
+    csv += `${e.name},"${e.time}",${e.pos}\n`;
+  });
+  const blob = new Blob([csv], { type: 'text/csv' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = "upcoming_shifts.csv";
+  a.click();
+}
+
+// OT Hours, DT Hours, Total Hours, Labor Amount, Actual Sales, Labor % Tiles Popup Logic
+
+// Add these to your existing KPI_SOURCE object
+const METRIC_SOURCE = {
+    "OT Hours": {
+        subtitle: "Overtime comparison: Current vs Historical",
+        labels: ["Current Week", "Last Week", "Last Year"],
+        values: [12.5, 8.2, 15.0],
+        table: [
+            ["Current Week", "12.5 hrs", "On Track"],
+            ["Last Week", "8.2 hrs", "Low"],
+            ["Last Year", "15.0 hrs", "High"]
+        ],
+        insight: "OT is up 52% vs last week, but down 16% compared to the same week last year."
+    },
+    "Actual Sales": {
+        subtitle: "Revenue performance across periods",
+        labels: ["Current Week", "Last Week", "Last Year"],
+        values: [10321, 9850, 11200],
+        table: [
+            ["Current Week", "$10,321", "Stable"],
+            ["Last Week", "$9,850", "Watch"],
+            ["Last Year", "$11,200", "Peak"]
+        ],
+        insight: "Sales are showing a steady 4.7% growth week-over-week, though we are $879 behind last year's seasonal peak."
+    },
+    "Labor %": {
+        subtitle: "Labor efficiency ratio",
+        labels: ["Current Week", "Last Week", "Last Year"],
+        values: [19.98, 21.5, 18.2],
+        table: [
+            ["Current Week", "19.98%", "Optimal"],
+            ["Last Week", "21.50%", "High"],
+            ["Last Year", "18.20%", "Optimal"]
+        ],
+        insight: "Current labor % is in the 'Green Zone'. Efficiency has improved by 1.5% compared to last week due to better shift management."
+    }
+    // Note: You can follow this pattern for Labor Amt, DT Hours, and Total Hours
+};
+
+function openMetricModal(metricName) {
+    // If the specific metric isn't in METRIC_SOURCE, use a default template
+    const data = METRIC_SOURCE[metricName] || {
+        subtitle: "Historical data comparison",
+        labels: ["Current Week", "Last Week", "Last Year"],
+        values: [100, 90, 110],
+        table: [[ "Current", "100", "Normal"], ["Last Week", "90", "Normal"], ["Last Year", "110", "Normal"]],
+        insight: "Comparison data for the selected period shows stable trends with minor variances."
+    };
+
+    currentKpiData = data;
+    document.getElementById('kpiModalTitle').innerText = metricName;
+    document.getElementById('kpiModalSubtitle').innerText = data.subtitle;
+    document.getElementById('kpiGraphModal').style.display = 'flex';
+    
+    // Default to Bar View
+    updateView('bar');
+    
+    // Inject the specific insight text into the insights view generator
+    if(data.insight) {
+        // This overrides the automatic generator with our specific metric insight
+        setTimeout(() => {
+            const insightPanel = document.querySelector('#kpiInsightsView span');
+            if(insightPanel) insightPanel.innerHTML = `<b style="display: block; margin-bottom: 4px;">Strategic Recommendation:</b> ${data.insight}`;
+        }, 100);
+    }
+}
+
+      </script>
+   </body>
+</html>
