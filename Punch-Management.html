@@ -111,10 +111,8 @@ thead th {
         /* --- Shift Blocks --- */
 
 .punch-block {
-    background: #dcfce7;
-    border: 1px solid #22c55e;
     border-radius: 6px;
-        padding: 6px 40px 6px 10px;  /* extra right space for icons */
+    padding: 6px 40px 6px 10px;
     height: 44px;
     width: 100%;
     display: flex;
@@ -124,12 +122,19 @@ thead th {
     cursor: pointer;
     font-size: 11px;
     transition: all 0.2s ease;
+    border: 1px solid; /* Border width defined here, color defined by job below */
 }
+
+.punch-block.ASST\.MGR { background-color: #e0f2fe; border-color: #7dd3fc; } 
+.punch-block.SHIFT\.LEADER { background-color: #fef3c7; border-color: #fcd34d; }
+.punch-block.MANAGER { background-color: #f3e8ff; border-color: #d8b4fe; }
+.punch-block.CREW { background-color: #dcfce7; border-color: #86efac; }
+.punch-block.CASHIER { background-color: #fae8ff; border-color: #f5d0fe; }
+
 
 /* Hover Effect (like your 2nd screenshot) */
 .punch-block:hover {
-    background: #b7e4c7;       /* darker green */
-    border-color: #16a34a;     /* stronger border */
+    filter: brightness(0.95);
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
     transform: translateY(-1px);
 }
@@ -1038,6 +1043,13 @@ input:checked + .slider:before { transform: translateX(14px); }
 }
 .range-btn.active { background: #eff6ff; color: #3b82f6; border-color: #3b82f6; }
 
+/* Specific light colors for Job Codes */
+.punch-ASST.MGR { background-color: #e0f2fe; border-color: #7dd3fc; } /* Light Blue */
+.punch-SHIFT.LEADER { background-color: #fef3c7; border-color: #fcd34d; } /* Light Amber */
+.punch-MANAGER { background-color: #f3e8ff; border-color: #d8b4fe; } /* Light Purple */
+.punch-CREW { background-color: #dcfce7; border-color: #86efac; } /* Light Green (Default) */
+.punch-CASHIER { background-color: #fae8ff; border-color: #f5d0fe; } /* Light Pink */
+
     </style>
 </head>
 <body>
@@ -1624,7 +1636,6 @@ function generateRandomShift() {
 }
 
 function initTable() {
-
     const container = document.getElementById('employeeRows');
     container.innerHTML = "";
 
@@ -1637,89 +1648,79 @@ function initTable() {
     }
 
     function generateRandomShift() {
-
         const startHour = Math.floor(Math.random() * 6) + 6; // 6AM–11AM
         const startMin = Math.random() > 0.5 ? 0 : 30;
-
         const duration = Math.floor(Math.random() * 5) + 6; // 6–10 hrs
         const endHour = startHour + duration;
 
         return {
-            clockIn: `${startHour.toString().padStart(2,'0')}:${startMin.toString().padStart(2,'0')}`,
-            clockOut: `${endHour.toString().padStart(2,'0')}:${startMin.toString().padStart(2,'0')}`,
-            display: `${formatTime(startHour,startMin)} - ${formatTime(endHour,startMin)}`,
-            job: jobCodes[Math.floor(Math.random()*jobCodes.length)]
+            clockIn: `${startHour.toString().padStart(2, '0')}:${startMin.toString().padStart(2, '0')}`,
+            clockOut: `${endHour.toString().padStart(2, '0')}:${startMin.toString().padStart(2, '0')}`,
+            display: `${formatTime(startHour, startMin)} - ${formatTime(endHour, startMin)}`,
+            job: jobCodes[Math.floor(Math.random() * jobCodes.length)]
         };
     }
 
     employees.forEach((name, index) => {
-
         const row = document.createElement('div');
         row.className = "grid-row-layout";
-
         const faceId = index + 1;
 
         let rowHtml = `
             <div class="grid-cell">
                 <div class="emp-cell">
                     <img src="https://i.pravatar.cc/150?u=${faceId}" class="avatar">
-<div class="emp-info" onclick="openEmpPopover(event, '${name}')" style="cursor:pointer">
-    <div style="color:#3b82f6">${name}</div>
-    <span>Hrs 00:00 | OT 00:00</span>
-</div>
+                    <div class="emp-info" onclick="openEmpPopover(event, '${name}')" style="cursor:pointer">
+                        <div style="color:#3b82f6">${name}</div>
+                        <span>Hrs 00:00 | OT 00:00</span>
+                    </div>
                 </div>
             </div>
         `;
 
         for (let i = 0; i < 7; i++) {
-
             const hasShift = Math.random() > 0.4;
 
-            // ... inside initTable, within the hasShift loop ...
+            if (hasShift) {
+                const shift = generateRandomShift();
+                const hasBreak = Math.random() > 0.5;
+                const hasManualEdit = Math.random() > 0.85;
 
-// ... inside initTable, within the loop for each employee's 7 days ...
-
-if (hasShift) {
-    const shift = generateRandomShift();
-    const hasBreak = Math.random() > 0.5; 
-    // Randomly decide to show the blue pencil on very few shifts (approx 15%)
-    const hasManualEdit = Math.random() > 0.85; 
-
-    rowHtml += `
-        <div class="grid-cell">
-            <div class="punch-block"
-                data-name="${name}"
-                data-clockin="${shift.clockIn}"
-                data-clockout="${shift.clockOut}"
-                data-job="${shift.job}"
-                onclick="event.stopPropagation(); openEditFromElement(this)">
-                
-                <span class="punch-time">${shift.display}</span>
-                <span class="punch-role">${shift.job}</span>
-
-                ${hasManualEdit ? '<i class="bi bi-pencil-fill" style="position: absolute; top: 4px; right: 8px; color: #3b82f6; font-size: 11px;"></i>' : ''}
-
-                ${hasBreak ? '<i class="bi bi-cup-hot-fill" style="position: absolute; bottom: 4px; right: 8px; color: #ef4444; font-size: 13px;"></i>' : ''}
-
-                <div class="hover-actions">
-                    <div class="icon-btn edit">
-                        <i class="bi bi-pencil-square"></i>
-                    </div>
-                    <div class="icon-btn warning" onclick="showViolationPopup(event)">
-                        <i class="bi bi-exclamation-triangle"></i>
-                    </div>
-                    <div class="icon-btn add" onclick="openAddPunch('${name}')">
-                        <i class="bi bi-plus"></i>
-                    </div>
-                </div>
-            </div>
-        </div>
-    `;
-} else {
+                // Important: Replace spaces with dots to match the multi-class CSS selectors
+                const jobClass = shift.job.replace(/\s+/g, '.');
 
                 rowHtml += `
-                    <div class="grid-cell empty-cell"
-                         onclick="openAddPunch('${name}')">
+                    <div class="grid-cell">
+                        <div class="punch-block ${jobClass}"
+                            data-name="${name}"
+                            data-clockin="${shift.clockIn}"
+                            data-clockout="${shift.clockOut}"
+                            data-job="${shift.job}"
+                            onclick="event.stopPropagation(); openEditFromElement(this)">
+                            
+                            <span class="punch-time">${shift.display}</span>
+                            <span class="punch-role">${shift.job}</span>
+
+                            ${hasManualEdit ? '<i class="bi bi-pencil-fill" style="position: absolute; top: 4px; right: 8px; color: #3b82f6; font-size: 11px;"></i>' : ''}
+                            ${hasBreak ? '<i class="bi bi-cup-hot-fill" style="position: absolute; bottom: 4px; right: 8px; color: #ef4444; font-size: 13px;"></i>' : ''}
+
+                            <div class="hover-actions">
+                                <div class="icon-btn edit">
+                                    <i class="bi bi-pencil-square"></i>
+                                </div>
+                                <div class="icon-btn warning" onclick="showViolationPopup(event)">
+                                    <i class="bi bi-exclamation-triangle"></i>
+                                </div>
+                                <div class="icon-btn add" onclick="openAddPunch('${name}')">
+                                    <i class="bi bi-plus"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            } else {
+                rowHtml += `
+                    <div class="grid-cell empty-cell" onclick="openAddPunch('${name}')">
                         <div class="empty-plus">
                             <i class="bi bi-plus-lg"></i>
                         </div>
@@ -1727,7 +1728,6 @@ if (hasShift) {
                 `;
             }
         }
-
         row.innerHTML = rowHtml;
         container.appendChild(row);
     });
