@@ -1675,42 +1675,47 @@ function initTable() {
 
             const hasShift = Math.random() > 0.4;
 
-            if (hasShift) {
+            // ... inside initTable, within the hasShift loop ...
 
-                const shift = generateRandomShift();
+// ... inside initTable, within the loop for each employee's 7 days ...
 
-                rowHtml += `
-                    <div class="grid-cell">
-                        <div class="punch-block"
-                            data-name="${name}"
-                            data-clockin="${shift.clockIn}"
-                            data-clockout="${shift.clockOut}"
-                            data-job="${shift.job}"
-                            onclick="event.stopPropagation(); openEditFromElement(this)">
-                            
-                            <span class="punch-time">${shift.display}</span>
-                            <span class="punch-role">${shift.job}</span>
+if (hasShift) {
+    const shift = generateRandomShift();
+    const hasBreak = Math.random() > 0.5; 
+    // Randomly decide to show the blue pencil on very few shifts (approx 15%)
+    const hasManualEdit = Math.random() > 0.85; 
 
-                            <div class="hover-actions">
-                                <div class="icon-btn edit">
-                                    <i class="bi bi-pencil-square"></i>
-                                </div>
+    rowHtml += `
+        <div class="grid-cell">
+            <div class="punch-block"
+                data-name="${name}"
+                data-clockin="${shift.clockIn}"
+                data-clockout="${shift.clockOut}"
+                data-job="${shift.job}"
+                onclick="event.stopPropagation(); openEditFromElement(this)">
+                
+                <span class="punch-time">${shift.display}</span>
+                <span class="punch-role">${shift.job}</span>
 
-                                <div class="icon-btn warning"
-                                     onclick="showViolationPopup(event)">
-                                    <i class="bi bi-exclamation-triangle"></i>
-                                </div>
+                ${hasManualEdit ? '<i class="bi bi-pencil-fill" style="position: absolute; top: 4px; right: 8px; color: #3b82f6; font-size: 11px;"></i>' : ''}
 
-                                <div class="icon-btn add"
-                                     onclick="openAddPunch('${name}')">
-                                    <i class="bi bi-plus"></i>
-                                </div>
-                            </div>
-                        </div>
+                ${hasBreak ? '<i class="bi bi-cup-hot-fill" style="position: absolute; bottom: 4px; right: 8px; color: #ef4444; font-size: 13px;"></i>' : ''}
+
+                <div class="hover-actions">
+                    <div class="icon-btn edit">
+                        <i class="bi bi-pencil-square"></i>
                     </div>
-                `;
-
-            } else {
+                    <div class="icon-btn warning" onclick="showViolationPopup(event)">
+                        <i class="bi bi-exclamation-triangle"></i>
+                    </div>
+                    <div class="icon-btn add" onclick="openAddPunch('${name}')">
+                        <i class="bi bi-plus"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    `;
+} else {
 
                 rowHtml += `
                     <div class="grid-cell empty-cell"
