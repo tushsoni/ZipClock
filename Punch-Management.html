@@ -1150,6 +1150,95 @@ input:checked + .slider:before { transform: translateX(14px); }
     color: #94a3b8;
 }
 
+/* Update the specific employee header cell */
+.grid-cell.employee-header {
+    background-color: #f9fafb; /* Solid white background */
+    border-bottom: 1px solid var(--border-color);
+    color: #1e62ff; /* Blue text color matching the 'Employees' label */
+    font-weight: 600;
+    justify-content: flex-start;
+    gap: 8px;
+}
+
+/* Ensure the employee data cells in the rows also match */
+.grid-row-layout .grid-cell:first-child {
+    background-color: #f9fafb; /* Matches the header column */
+    border-right: 1px solid var(--border-color);
+    z-index: 50; /* Keeps it above the scrollable grid if needed */
+}
+
+/* Refined styling for the employee name and info */
+.emp-info div {
+    color: #1e62ff; /* Matching the blue shade from the screenshot */
+    font-size: 13px;
+    font-weight: 600;
+}
+
+
+/* Compact Modal Container */
+.modern-modal {
+    width: 620px; /* Reduced from 720px */
+    border-radius: 12px;
+}
+
+.modern-modal-header {
+    padding: 16px 24px; /* Reduced padding */
+}
+
+.modern-modal-body {
+    padding: 12px 24px 20px 24px; /* Tighter vertical spacing */
+}
+
+/* More Compact Form Grid */
+.form-row {
+    display: grid; 
+    grid-template-columns: 1fr 1fr; 
+    gap: 12px 20px; /* Tighter gap */
+    margin-bottom: 12px; /* Reduced margin */
+}
+
+.form-group {
+    margin-bottom: 0; /* Let grid gap handle spacing */
+}
+
+/* Sleeker Inputs */
+.modern-input {
+    padding: 8px 12px; /* Reduced height */
+    border-radius: 8px;
+    font-size: 13px;
+    border: 1px solid #e2e8f0;
+}
+
+/* Compact Section Dividers */
+.section-divider {
+    margin: 16px 0 10px; /* Reduced margins */
+    font-size: 12px;
+    color: #64748b;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+/* Compact Break Rows */
+.break-row {
+    padding: 8px 12px;
+    gap: 8px;
+    margin-bottom: 8px;
+    background: #f1f5f9; /* Slightly darker to define the area */
+}
+
+/* Modern Footer */
+.modern-modal-footer {
+    padding: 12px 24px;
+    background: #f8fafc; /* Subtle background for footer */
+}
+
+.btn-primary-lg {
+    padding: 8px 24px; /* More standard button size */
+    font-size: 13px;
+}
+
+
+
     </style>
 </head>
 <body>
