@@ -33,7 +33,25 @@
             grid-template-columns: 1fr auto 1fr; align-items: center; padding: 0 15px;
             color: white; position: fixed; top: 0; width: 100%; z-index: 1000;
         }
-        .header-left, .header-center, .header-right { display: flex; align-items: center; gap: 15px; }
+        .header-left {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.header-center {
+    margin: 0 auto;   /* keeps it centered */
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.header-right {
+    margin-left: auto;   /* pushes icons to extreme right */
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
         .app-logo { width: 28px; height: 28px; }
         .nav-link { display: flex; align-items: center; gap: 6px; font-size: 13px; color: #d1d5db; cursor: pointer; }
         .time-box { display: flex; align-items: baseline; gap: 4px; font-size: 14px; }
@@ -1054,6 +1072,84 @@ input:checked + .slider:before { transform: translateX(14px); }
 .punch-CREW { background-color: #dcfce7; border-color: #86efac; } /* Light Green (Default) */
 .punch-CASHIER { background-color: #fae8ff; border-color: #f5d0fe; } /* Light Pink */
 
+/* Green Corner Tag */
+.corner-tag {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 0;
+    height: 0;
+    border-style: solid;
+    border-width: 12px 12px 0 0;
+    border-color: #86efac transparent transparent transparent; /* Success Green */
+    z-index: 5;
+}
+
+.modern-date-nav {
+    display: flex;
+    align-items: center;
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
+    padding: 4px;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+    transition: all 0.2s ease;
+}
+
+.modern-date-nav:hover {
+    border-color: #cbd5e1;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+}
+
+.nav-arrow {
+    background: transparent;
+    border: none;
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 8px;
+    color: #64748b;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.nav-arrow:hover {
+    background: #f1f5f9;
+    color: #1e293b;
+}
+
+.date-display {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 0 16px;
+    cursor: pointer;
+    border-left: 1px solid #f1f5f9;
+    border-right: 1px solid #f1f5f9;
+}
+
+.current-date {
+    font-size: 14px;
+    font-weight: 600;
+    color: #1e293b;
+    letter-spacing: -0.01em;
+}
+
+.calendar-icon {
+    font-size: 15px;
+    color: #3b82f6; /* Modern Blue Accent */
+}
+
+/* Subtle clock icon update for the employee list if needed */
+.bi-clock {
+    font-size: 13px;
+    vertical-align: middle;
+    margin-right: 4px;
+    color: #94a3b8;
+}
+
     </style>
 </head>
 <body>
@@ -1098,12 +1194,20 @@ input:checked + .slider:before { transform: translateX(14px); }
 
     <main class="main-content">
         <div class="toolbar">
-            <div class="date-nav">
-                <i class="bi bi-chevron-left"></i>
-                <span style="font-size: 13px; font-weight: 500;">03/02/2026</span>
-                <i class="bi bi-calendar3"></i>
-                <i class="bi bi-chevron-right"></i>
-            </div>
+<div class="modern-date-nav">
+    <button class="nav-arrow" onclick="changeDate(-1)">
+        <i class="bi bi-chevron-left"></i>
+    </button>
+    
+    <div class="date-display" onclick="toggleDatePicker()">
+        <span class="current-date">03/02/2026</span>
+        <i class="bi bi-calendar3 calendar-icon"></i>
+    </div>
+    
+    <button class="nav-arrow" onclick="changeDate(1)">
+        <i class="bi bi-chevron-right"></i>
+    </button>
+</div>
             
 
 
@@ -1533,7 +1637,7 @@ input:checked + .slider:before { transform: translateX(14px); }
 <div class="modal-overlay" id="punchDetailsModal">
     <div class="modern-modal" style="width: 1000px; max-width: 95vw;">
         <div class="modern-modal-header" style="background:#fff">
-            <h2 id="detailEmpName" style="margin:0; font-size:24px;">AAREN T</h2>
+            <h2 id="detailEmpName" style="margin:0; font-size:24px;">Employee Name</h2>
             <div style="display: flex; gap: 15px; align-items: center;">
                 <span style="background: #f1f5f9; padding: 6px 16px; border-radius: 6px; font-weight: 700; font-size:14px;">Week : 02/24/2025</span>
                 <button class="btn-close-circle" onclick="closeModal('punchDetailsModal')"><i class="bi bi-x-lg"></i></button>
@@ -1546,10 +1650,7 @@ input:checked + .slider:before { transform: translateX(14px); }
                 <div class="kpi-tile" style="background: #ecfdf5;"><b>$277.60</b><span>Est. Labor Dollars</span></div>
                 <div class="kpi-tile" style="background: #fef2f2;"><b>3</b><span>Warnings</span></div>
                 <div class="kpi-tile" style="background: #f7fee7;"><b>0:00</b><span>Overtime</span></div>
-                <div class="kpi-tile" style="background: #f0fdfa;"><b>0:00</b><span>Double Time</span></div>
                 <div class="kpi-tile" style="background: #fff7ed;"><b>18:00</b><span>Scheduled Hours</span></div>
-                <div class="kpi-tile" style="background: #f8fafc;"><b>$0.00</b><span>Misc. Pay</span></div>
-                <div class="kpi-tile" style="background: #f5f3ff;"><b>$0.00</b><span>Special Pay</span></div>
             </div>
 
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
@@ -1563,26 +1664,6 @@ input:checked + .slider:before { transform: translateX(14px); }
                         <span>Show Original Punch</span>
                         <label class="switch"><input type="checkbox" id="showOriginalToggle" onchange="updateDetailView()"><span class="slider round"></span></label>
                     </div>
-                    <button class="icon-btn-blue" onclick="toggleDetailGraphView()">
-                        <i class="bi bi-bar-chart-line-fill"></i>
-                    </button>
-                </div>
-            </div>
-
-            <div id="detailGraphSection" style="display:none; background: #fff; padding: 15px; border: 1px solid #e2e8f0; border-radius: 8px; margin-bottom: 15px;">
-                <div style="display: flex; justify-content: center; gap: 6px; margin-bottom: 15px;">
-                    <button class="range-btn active" onclick="updateRange(this, '7D')">7 D</button>
-                    <button class="range-btn" onclick="updateRange(this, '1M')">1 M</button>
-                    <button class="range-btn" onclick="updateRange(this, '3M')">3 M</button>
-                    <button class="range-btn" onclick="updateRange(this, '6M')">6 M</button>
-                    <button class="range-btn" onclick="updateRange(this, '1Y')">1 Y</button>
-                </div>
-                <div style="display: flex; gap: 20px; height: 220px; align-items: center;">
-                    <div style="flex: 1.5; height: 100%;"><canvas id="rangeBarChart"></canvas></div>
-                    <div style="flex: 1; height: 100%; position: relative;">
-                        <canvas id="violationPieChart"></canvas>
-                        <div style="position: absolute; top:52%; left:40%; transform:translate(-50%,-50%); font-size: 20px; font-weight: 700;">3</div>
-                    </div>
                 </div>
             </div>
 
@@ -1590,7 +1671,7 @@ input:checked + .slider:before { transform: translateX(14px); }
                 <table class="kpi-table" style="width: 100%; border-collapse: collapse;">
                     <thead style="position: sticky; top: 0; background: #f8fafc; z-index: 10;">
                         <tr>
-                            <th style="text-align:left; padding-left:15px; width:22%;">ACTUAL</th>
+                            <th style="text-align:left; padding-left:15px; width:25%;">ACTUAL</th>
                             <th>JOB CODE</th>
                             <th>HOURS</th>
                             <th>LABOR $</th>
@@ -1598,7 +1679,8 @@ input:checked + .slider:before { transform: translateX(14px); }
                             <th>SCHEDULE</th>
                         </tr>
                     </thead>
-                    <tbody id="detailTableBody"></tbody>
+                    <tbody id="detailTableBody">
+                        </tbody>
                 </table>
             </div>
         </div>
@@ -1652,9 +1734,9 @@ function initTable() {
     }
 
     function generateRandomShift() {
-        const startHour = Math.floor(Math.random() * 6) + 6; // 6AM–11AM
+        const startHour = Math.floor(Math.random() * 6) + 6;
         const startMin = Math.random() > 0.5 ? 0 : 30;
-        const duration = Math.floor(Math.random() * 5) + 6; // 6–10 hrs
+        const duration = Math.floor(Math.random() * 5) + 6;
         const endHour = startHour + duration;
 
         return {
@@ -1670,13 +1752,32 @@ function initTable() {
         row.className = "grid-row-layout";
         const faceId = index + 1;
 
+        // Apply green tag to the first 6 employees
+        const hasGreenTag = index < 6;
+        
+        // Randomize Stats
+        const totalHrs = Math.floor(Math.random() * 40).toString().padStart(2, '0');
+        const otHrs = (Math.random() > 0.4 ? Math.floor(Math.random() * 8) : 0).toString().padStart(2, '0');
+        
+        // Warning Logic (60% chance)
+        const hasWarning = Math.random() > 0.4;
+
         let rowHtml = `
-            <div class="grid-cell">
-                <div class="emp-cell">
+            <div class="grid-cell" style="position: relative;">
+                ${hasGreenTag ? '<div class="corner-tag"></div>' : ''}
+                <div class="emp-cell" style="width: 100%;">
                     <img src="https://i.pravatar.cc/150?u=${faceId}" class="avatar">
-                    <div class="emp-info" onclick="openEmpPopover(event, '${name}')" style="cursor:pointer">
-                        <div style="color:#3b82f6">${name}</div>
-                        <span>Hrs 00:00 | OT 00:00</span>
+                    <div class="emp-info" onclick="openEmpPopover(event, '${name}')" style="cursor:pointer; flex: 1; position: relative; padding-right: 25px;">
+                        <div style="color:#3b82f6; font-weight: 600;">${name}</div>
+                        <span style="font-size: 11px; color: #9ca3af;">
+                           <i class="bi bi-clock" style="font-size: 10px;"></i> Hrs ${totalHrs}:00 | OT ${otHrs}:00
+                        </span>
+                        
+                        ${hasWarning ? `
+                            <i class="bi bi-exclamation-triangle-fill" 
+                               style="color: #ef4444; font-size: 14px; position: absolute; right: 5px; top: 50%; transform: translateY(-50%); cursor: pointer;" 
+                               onclick="event.stopPropagation(); showViolationPopup(event)"></i>
+                        ` : ''}
                     </div>
                 </div>
             </div>
@@ -1684,52 +1785,33 @@ function initTable() {
 
         for (let i = 0; i < 7; i++) {
             const hasShift = Math.random() > 0.4;
-
             if (hasShift) {
                 const shift = generateRandomShift();
                 const hasBreak = Math.random() > 0.5;
                 const hasManualEdit = Math.random() > 0.85;
-
-                // Important: Replace spaces with dots to match the multi-class CSS selectors
                 const jobClass = shift.job.replace(/\s+/g, '.');
 
                 rowHtml += `
-                    <div class="grid-cell">
-                        <div class="punch-block ${jobClass}"
-                            data-name="${name}"
-                            data-clockin="${shift.clockIn}"
-                            data-clockout="${shift.clockOut}"
-                            data-job="${shift.job}"
-                            onclick="event.stopPropagation(); openEditFromElement(this)">
-                            
-                            <span class="punch-time">${shift.display}</span>
-                            <span class="punch-role">${shift.job}</span>
-
-                            ${hasManualEdit ? '<i class="bi bi-pencil-fill" style="position: absolute; top: 4px; right: 8px; color: #3b82f6; font-size: 11px;"></i>' : ''}
-                            ${hasBreak ? '<i class="bi bi-cup-hot-fill" style="position: absolute; bottom: 4px; right: 8px; color: #ef4444; font-size: 13px;"></i>' : ''}
-
-                            <div class="hover-actions">
-                                <div class="icon-btn edit">
-                                    <i class="bi bi-pencil-square"></i>
-                                </div>
-                                <div class="icon-btn warning" onclick="showViolationPopup(event)">
-                                    <i class="bi bi-exclamation-triangle"></i>
-                                </div>
-                                <div class="icon-btn add" onclick="openAddPunch('${name}')">
-                                    <i class="bi bi-plus"></i>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                `;
+    <div class="grid-cell">
+        <div class="punch-block ${jobClass}" 
+             data-name="${name}" 
+             data-clockin="${shift.clockIn}" 
+             data-clockout="${shift.clockOut}" 
+             data-job="${shift.job}" 
+             onclick="event.stopPropagation(); openEditFromElement(this)">
+            <span class="punch-time">${shift.display}</span>
+            <span class="punch-role">${shift.job}</span>
+            ${hasManualEdit ? '<i class="bi bi-pencil-fill" style="position: absolute; top: 4px; right: 8px; color: #3b82f6; font-size: 11px;"></i>' : ''}
+            ${hasBreak ? '<i class="bi bi-cup-hot-fill" style="position: absolute; bottom: 4px; right: 8px; color: #ef4444; font-size: 13px;"></i>' : ''}
+            <div class="hover-actions">
+                <div class="icon-btn edit"><i class="bi bi-pencil-square"></i></div>
+                <div class="icon-btn warning" onclick="showViolationPopup(event)"><i class="bi bi-exclamation-triangle"></i></div>
+                <div class="icon-btn add" onclick="openAddPunch('${name}')"><i class="bi bi-plus"></i></div>
+            </div>
+        </div>
+    </div>`;
             } else {
-                rowHtml += `
-                    <div class="grid-cell empty-cell" onclick="openAddPunch('${name}')">
-                        <div class="empty-plus">
-                            <i class="bi bi-plus-lg"></i>
-                        </div>
-                    </div>
-                `;
+                rowHtml += `<div class="grid-cell empty-cell" onclick="openAddPunch('${name}')"><div class="empty-plus"><i class="bi bi-plus-lg"></i></div></div>`;
             }
         }
         row.innerHTML = rowHtml;
@@ -1761,12 +1843,15 @@ function openAddPunch(name) {
 
     toggleModal('punchModal');
 }
+
 function openEditFromElement(element) {
-    const name = element.dataset.name;
+    // This pulls the string from the data-name attribute you just added
+    const name = element.dataset.name; 
     const clockIn = element.dataset.clockin;
     const clockOut = element.dataset.clockout;
     const job = element.dataset.job;
 
+    // Updates the heading text to "Approve Punch (Employee Name)"
     document.getElementById('modalTitle').innerText = `Approve Punch (${name})`;
     document.getElementById('modalSubmitBtn').innerText = 'Approve';
     
@@ -1774,12 +1859,10 @@ function openEditFromElement(element) {
     document.getElementById('modalClockIn').value = clockIn;
     document.getElementById('modalClockOut').value = clockOut;
     
-    // Clear previous breaks
     document.getElementById('breakContainer').innerHTML = '';
 
     toggleModal('punchModal');
 }
-
 
 
         function toggleModal(id) {
@@ -1819,14 +1902,16 @@ function openEditFromElement(element) {
 
 function showViolationPopup(e) {
     e.stopPropagation();
-
     const popup = document.getElementById("violationPopup");
     popup.style.display = "block";
 
-    const rect = e.target.closest(".punch-block").getBoundingClientRect();
+    // Detect if click came from employee cell or punch block
+    const isEmpCell = e.target.closest(".emp-info");
+    const rect = (isEmpCell || e.target.closest(".punch-block")).getBoundingClientRect();
 
-    popup.style.top = (window.scrollY + rect.top - popup.offsetHeight - 12) + "px";
-    popup.style.left = (window.scrollX + rect.left + 20) + "px";
+    // Position above the element
+    popup.style.top = (window.scrollY + rect.top - popup.offsetHeight - 10) + "px";
+    popup.style.left = (window.scrollX + rect.left + 10) + "px";
 }
 
 function closeViolationPopup() {
@@ -2051,22 +2136,20 @@ function openEditEmployee() {
 function openPunchDetails() {
     closePopover();
     const name = document.getElementById('popoverEmpName').innerText;
-    document.getElementById('detailEmpName').innerText = name;
+    const detailEmpName = document.getElementById('detailEmpName');
     
-    // Inject Dummy Rows
-    const list = document.getElementById('punchDetailList');
-    list.innerHTML = `
-        <div class="detail-row detail-row-header">
-            <div>Actual / Day</div><div>Job Code</div><div>Hours</div><div>Labor $</div><div>Schedule</div>
-        </div>
-        <div class="detail-row">
-            <div><b>Mon - 02/24</b><br>07:02 - 11:06</div><div>CREW PERSON</div><div>4:04</div><div>$65.07</div><div>07:00 - 11:00</div>
-        </div>
-        <div class="detail-row meal-row">
-            <div style="color: #64748b; padding-left: 10px;"><i>09:54 - 10:29 (Meal)</i></div><div>-</div><div>0:35</div><div>-</div><div>-</div>
-        </div>
-    `;
-    toggleModal('punchDetailsModal');
+    if (detailEmpName) {
+        detailEmpName.innerText = name;
+    }
+
+    // Ensure table is populated before showing the modal
+    updateDetailView(); 
+    
+    // Show the modal
+    const modal = document.getElementById('punchDetailsModal');
+    if (modal) {
+        modal.style.display = 'flex';
+    }
 }
 
 function toggleBreaks(cb) {
@@ -2129,46 +2212,45 @@ function openPunchDetails() {
 
 function updateDetailView() {
     const tbody = document.getElementById('detailTableBody');
-    if (!tbody) return; // Fixes the "null innerHTML" error
+    if (!tbody) return; // Exit if the ID isn't found in your HTML
 
-    const hideBreaks = document.getElementById('hideBreaksToggle').checked;
-    const showOriginal = document.getElementById('showOriginalToggle').checked;
+    const hideBreaks = document.getElementById('hideBreaksToggle')?.checked || false;
+    const showOriginal = document.getElementById('showOriginalToggle')?.checked || false;
 
+    // Sample data to simulate the screenshots
     const fullWeekData = [
         { day: 'Monday - 02/24/2025', act: '07:02 - 11:06', hrs: '4:04', lab: '$65.07', store: '00032', sch: '07:00 - 11:00' },
-        { day: 'Tuesday - 02/25/2025', act: '07:00 - 11:09', hrs: '4:09', lab: '$66.40', store: '00032', sch: '07:00 - 11:00' },
         { day: 'Wednesday - 02/26/2025', act: '06:01 - 11:11', hrs: '4:35', lab: '$73.33', store: '00032', sch: '06:00 - 11:00', meal: '09:54 - 10:29 (Meal)' },
-        { day: 'Thursday - 02/27/2025', act: '---', hrs: '0:00', lab: '$0.00', store: '00032', sch: 'OFF' },
-        { day: 'Friday - 02/28/2025', act: '08:00 - 12:30', hrs: '4:30', lab: '$72.80', store: '00032', sch: '08:00 - 13:00' },
-        { day: 'Saturday - 03/01/2025', act: '---', hrs: '0:00', lab: '$0.00', store: '00032', sch: 'OFF' },
-        { day: 'Sunday - 03/02/2025', act: '---', hrs: '0:00', lab: '$0.00', store: '00032', sch: 'OFF' }
+        { day: 'Friday - 02/28/2025', act: '08:00 - 12:30', hrs: '4:30', lab: '$72.80', store: '00032', sch: '08:00 - 13:00' }
     ];
 
     let html = '';
     fullWeekData.forEach(row => {
-        // Daily Header Row (Screenshot Style)
-        html += `<tr style="background:#f1f5f9; font-weight:700;"><td colspan="6" style="text-align:left; padding-left:15px; font-size:12px; border-bottom:1px solid #e2e8f0;">${row.day} | ${row.hrs} Hrs</td></tr>`;
+        // Daily Header Header
+        html += `<tr style="background:#f1f5f9; font-weight:700;"><td colspan="6" style="text-align:left; padding-left:15px; font-size:12px; border-bottom:1px solid #e2e8f0; height:35px;">${row.day} | ${row.hrs} Hrs</td></tr>`;
         
         // Data Row
         html += `<tr style="border-bottom: 1px solid #f1f5f9;">
-            <td style="text-align:left; padding-left:15px; font-size:13px;">
-                ${row.act} ${showOriginal && row.act !== '---' ? `<div style="color:#3b82f6; font-size:11px; margin-top:2px;">Original: ${row.act}</div>` : ''}
+            <td style="text-align:left; padding-left:15px; font-size:13px; padding: 12px 8px;">
+                ${row.act} 
+                ${showOriginal && row.act !== '---' ? `<div style="color:#3b82f6; font-size:11px; margin-top:2px;">Original: ${row.act}</div>` : ''}
             </td>
-            <td style="font-size:12px; color:#64748b;">${row.act === '---' ? '-' : '650 - CREW PERSON'}</td>
+            <td style="font-size:12px; color:#64748b;">650 - CREW PERSON</td>
             <td style="font-size:12px;">${row.hrs}</td>
             <td style="font-size:12px;">${row.lab}</td>
             <td style="font-size:12px;">${row.store}</td>
             <td style="font-size:12px;">${row.sch}</td>
         </tr>`;
 
-        // Meal Row (Screenshot 1 Style)
+        // Meal Row
         if (row.meal && !hideBreaks) {
-            html += `<tr style="color:#64748b; font-style:italic; font-size:12px;">
-                <td style="text-align:left; padding-left:30px;">${row.meal}</td>
+            html += `<tr style="color:#64748b; font-style:italic; font-size:12px; background: #fff;">
+                <td style="text-align:left; padding-left:30px; padding: 8px;">${row.meal}</td>
                 <td>-</td><td>0:35</td><td>-</td><td>-</td><td>-</td>
             </tr>`;
         }
     });
+    
     tbody.innerHTML = html;
 }
 
