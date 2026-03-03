@@ -1055,10 +1055,26 @@ input:checked + .slider:before { transform: translateX(14px); }
 
 
 .icon-btn-blue {
-    width: 32px; height: 32px; border-radius: 6px; background: #3b82f6; 
-    color: white; border: none; cursor: pointer; display: flex; 
-    align-items: center; justify-content: center; font-size: 16px;
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
+    background: #eff6ff; /* Soft blue background */
+    color: #3b82f6; /* Theme blue icon */
+    border: 1px solid #dbeafe;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+    transition: all 0.2s ease;
 }
+
+.icon-btn-blue:hover {
+    background: #3b82f6;
+    color: #ffffff;
+    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.2);
+}
+
 .range-btn {
     border: 1px solid #e2e8f0; background: #fff; padding: 4px 14px; 
     border-radius: 15px; font-size: 11px; font-weight: 600; cursor: pointer; color: #64748b;
@@ -1237,7 +1253,120 @@ input:checked + .slider:before { transform: translateX(14px); }
     font-size: 13px;
 }
 
+/* Modern Action Popover Styling */
+#employeePopover {
+    width: 340px !important;
+    background: #ffffff;
+    border: none !important;
+    border-radius: 16px !important;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1) !important;
+    overflow: hidden;
+}
 
+.popover-header {
+    padding: 20px;
+    background: #f8fafc;
+    border-bottom: 1px solid #f1f5f9;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.popover-header h4 {
+    margin: 0;
+    font-size: 16px;
+    color: #1e293b;
+    font-weight: 700;
+}
+
+/* Updated Tile Grid */
+.popover-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    padding: 20px;
+}
+
+.popover-tile {
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
+    padding: 18px 10px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.popover-tile:hover {
+    border-color: #3b82f6;
+    background: #eff6ff;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.08);
+}
+
+.popover-tile i {
+    font-size: 22px;
+}
+
+/* Large detail tile */
+.popover-tile.full-width {
+    grid-column: span 2;
+    flex-direction: row;
+    justify-content: center;
+    padding: 15px;
+}
+
+/* Footer details */
+.popover-footer {
+    padding: 15px 20px;
+    background: #ffffff;
+    border-top: 1px solid #f1f5f9;
+}
+
+.footer-info {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.label-pill {
+    background: #1375d6;
+    padding: 4px 10px;
+    border-radius: 6px;
+    font-size: 11px;
+    font-weight: 700;
+    color: #ffffff;
+}
+
+.original-punch-label {
+    display: block;
+    color: #3b82f6;
+    font-size: 10px;
+    font-weight: 600;
+    margin-top: 2px;
+    background: #eff6ff;
+    padding: 2px 4px;
+    border-radius: 4px;
+    width: fit-content;
+}
+
+
+/* Yellow Break Pill Styling */
+.break-pill-label {
+    display: inline-block;
+    color: #b45309; /* Darker amber text for readability */
+    font-size: 10px;
+    font-weight: 600;
+    margin-top: 4px;
+    background: #fef3c7; /* Soft Yellow background */
+    padding: 2px 8px;
+    border-radius: 4px;
+    width: fit-content;
+    border: 1px solid #fcd34d;
+}
 
     </style>
 </head>
@@ -1698,28 +1827,32 @@ input:checked + .slider:before { transform: translateX(14px); }
 </div>
 
 
-<div id="employeePopover" class="violation-popup" style="width: 320px; padding: 0; overflow: hidden; border-radius: 12px;">
-    <div style="padding: 15px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #eee;">
-        <h4 id="popoverEmpName" style="margin: 0;">Mark C</h4>
-        <i class="bi bi-x-lg" style="cursor: pointer;" onclick="closePopover()"></i>
+<div id="employeePopover" class="violation-popup">
+    <div class="popover-header">
+        <h4 id="popoverEmpName">Aaron H</h4>
+        <i class="bi bi-x-lg" style="cursor: pointer; color: #94a3b8;" onclick="closePopover()"></i>
     </div>
-    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; padding: 15px; background: #f8fafc;">
+
+    <div class="popover-grid">
         <div class="popover-tile" onclick="openEditEmployee()">
             <i class="bi bi-pencil-square" style="color: #3b82f6;"></i>
-            <span>Edit Employee</span>
+            <span style="font-size: 12px; font-weight: 600; color: #475569;">Edit Employee</span>
         </div>
         <div class="popover-tile">
             <i class="bi bi-currency-dollar" style="color: #ef4444;"></i>
-            <span>Adjust Pay Rate</span>
+            <span style="font-size: 12px; font-weight: 600; color: #475569;">Adjust Pay</span>
         </div>
-        <div class="popover-tile" onclick="openPunchDetails()" style="grid-column: span 2;">
+        <div class="popover-tile full-width" onclick="openPunchDetails()">
             <i class="bi bi-clock-history" style="color: #10b981;"></i>
-            <span>Punch Details</span>
+            <span style="font-size: 13px; font-weight: 600; color: #475569; margin-left: 8px;">View Punch Details</span>
         </div>
     </div>
-    <div style="padding: 12px 20px; font-size: 13px;">
-        <div style="color: #64748b; margin-bottom: 4px;">Pay Rate: <b style="color: #3b82f6;">$ 27.50</b></div>
-        <div style="font-weight: 600;">Job Code: <span style="font-weight: 400; background: #f1f5f9; padding: 2px 8px; border-radius: 4px; margin-left: 5px;">MANAGER</span></div>
+
+    <div class="popover-footer">
+        <div class="footer-info">
+            <span style="font-size: 12px; color: #64748b;">Rate: <b style="color: #3b82f6;">$ 27.50</b></span>
+            <span class="label-pill">MANAGER</span>
+        </div>
     </div>
 </div>
 
@@ -1733,51 +1866,77 @@ input:checked + .slider:before { transform: translateX(14px); }
             </div>
         </div>
         
-        <div class="modern-modal-body" style="padding: 15px;">
-            <div style="display: flex; gap: 4px; margin-bottom: 20px; overflow-x: auto; padding-bottom: 5px;">
-                <div class="kpi-tile" style="background: #eef2ff;"><b>17:21</b><span>Labor Hours</span></div>
-                <div class="kpi-tile" style="background: #ecfdf5;"><b>$277.60</b><span>Est. Labor Dollars</span></div>
-                <div class="kpi-tile" style="background: #fef2f2;"><b>3</b><span>Warnings</span></div>
-                <div class="kpi-tile" style="background: #f7fee7;"><b>0:00</b><span>Overtime</span></div>
-                <div class="kpi-tile" style="background: #fff7ed;"><b>18:00</b><span>Scheduled Hours</span></div>
-            </div>
+<div class="modern-modal-body" style="padding: 15px;">
+    <div style="display: flex; gap: 4px; margin-bottom: 20px; overflow-x: auto; padding-bottom: 5px;">
+        <div class="kpi-tile" style="background: #eef2ff;"><b>17:21</b><span>Labor Hours</span></div>
+        <div class="kpi-tile" style="background: #ecfdf5;"><b>$277.60</b><span>Est. Labor Dollars</span></div>
+        <div class="kpi-tile" style="background: #fef2f2;"><b>3</b><span>Warnings</span></div>
+        <div class="kpi-tile" style="background: #f7fee7;"><b>0:00</b><span>Overtime</span></div>
+        <div class="kpi-tile" style="background: #fff7ed;"><b>18:00</b><span>Scheduled Hours</span></div>
+    </div>
 
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
-                <h4 style="margin:0; font-size:15px; color:#1e293b;">Shift Detail</h4>
-                <div style="display: flex; align-items: center; gap: 12px;">
-                    <div style="display: flex; align-items: center; gap: 6px; font-size: 11px; font-weight: 600;">
-                        <span>Hide Breaks</span>
-                        <label class="switch"><input type="checkbox" id="hideBreaksToggle" onchange="updateDetailView()"><span class="slider round"></span></label>
-                    </div>
-                    <div style="display: flex; align-items: center; gap: 6px; font-size: 11px; font-weight: 600;">
-                        <span>Show Original Punch</span>
-                        <label class="switch"><input type="checkbox" id="showOriginalToggle" onchange="updateDetailView()"><span class="slider round"></span></label>
-                    </div>
-                </div>
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+        <h4 style="margin:0; font-size:15px; color:#1e293b;">Shift Detail</h4>
+        <div style="display: flex; align-items: center; gap: 12px;">
+            <div style="display: flex; align-items: center; gap: 6px; font-size: 11px; font-weight: 600;">
+                <span>Hide Breaks</span>
+                <label class="switch"><input type="checkbox" id="hideBreaksToggle" onchange="updateDetailView()"><span class="slider round"></span></label>
             </div>
+            <div style="display: flex; align-items: center; gap: 6px; font-size: 11px; font-weight: 600;">
+                <span>Show Original Punch</span>
+                <label class="switch"><input type="checkbox" id="showOriginalToggle" onchange="updateDetailView()"><span class="slider round"></span></label>
+            </div>
+            <button class="icon-btn-blue" onclick="toggleDetailGraphView()" title="Toggle Graph View" style="margin-left: 8px;">
+                <i class="bi bi-bar-chart-line"></i>
+            </button>
+        </div>
+    </div>
 
-            <div style="max-height: 400px; overflow-y: auto; border: 1px solid #e2e8f0; border-radius: 6px;">
-                <table class="kpi-table" style="width: 100%; border-collapse: collapse;">
-                    <thead style="position: sticky; top: 0; background: #f8fafc; z-index: 10;">
-                        <tr>
-                            <th style="text-align:left; padding-left:15px; width:25%;">ACTUAL</th>
-                            <th>JOB CODE</th>
-                            <th>HOURS</th>
-                            <th>LABOR $</th>
-                            <th>STORE NO.</th>
-                            <th>SCHEDULE</th>
-                        </tr>
-                    </thead>
-                    <tbody id="detailTableBody">
-                        </tbody>
-                </table>
+    <div id="detailGraphSection" style="display: none; background: #fff; padding: 20px; border: 1px solid #e2e8f0; border-radius: 8px; margin-bottom: 15px;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+            <div style="display: flex; gap: 8px;">
+                <button class="range-btn active" onclick="updateRange(this, '7D')">7 D</button>
+                <button class="range-btn" onclick="updateRange(this, '1M')">1 M</button>
+                <button class="range-btn" onclick="updateRange(this, '3M')">3 M</button>
+                <button class="range-btn" onclick="updateRange(this, '6M')">6 M</button>
+                <button class="range-btn" onclick="updateRange(this, '1Y')">1 Y</button>
+            </div>
+            <div style="font-size: 13px; font-weight: 700; color: #1e293b;">Total Hours: <span style="color: #3b82f6;">17.21</span></div>
+        </div>
+        
+        <div style="display: grid; grid-template-columns: 2fr 1.2fr; gap: 20px;">
+            <div style="height: 250px;">
+                <canvas id="rangeBarChart"></canvas>
+            </div>
+            <div style="height: 250px;">
+                <canvas id="violationPieChart"></canvas>
             </div>
         </div>
+    </div>
+
+    <div id="detailTableContainer" style="max-height: 400px; overflow-y: auto; border: 1px solid #e2e8f0; border-radius: 6px;">
+        <table class="kpi-table" style="width: 100%; border-collapse: collapse;">
+            <thead style="position: sticky; top: 0; background: #f8fafc; z-index: 10;">
+                <tr>
+                    <th style="text-align:left; padding-left:15px; width:25%;">ACTUAL</th>
+                    <th>JOB CODE</th>
+                    <th>HOURS</th>
+                    <th>LABOR $</th>
+                    <th>STORE NO.</th>
+                    <th>SCHEDULE</th>
+                </tr>
+            </thead>
+            <tbody id="detailTableBody"></tbody>
+        </table>
+    </div>
+</div>
         <div class="modern-modal-footer">
             <button class="btn-primary-lg" onclick="closeModal('punchDetailsModal')">OK</button>
         </div>
     </div>
 </div>
+
+
 
     <script>
         const employees = [
@@ -2301,28 +2460,95 @@ function openPunchDetails() {
 
 function updateDetailView() {
     const tbody = document.getElementById('detailTableBody');
-    if (!tbody) return; // Exit if the ID isn't found in your HTML
+    if (!tbody) return;
 
     const hideBreaks = document.getElementById('hideBreaksToggle')?.checked || false;
     const showOriginal = document.getElementById('showOriginalToggle')?.checked || false;
 
-    // Sample data to simulate the screenshots
+    // Simulated data with Original Punch values
     const fullWeekData = [
-        { day: 'Monday - 02/24/2025', act: '07:02 - 11:06', hrs: '4:04', lab: '$65.07', store: '00032', sch: '07:00 - 11:00' },
-        { day: 'Wednesday - 02/26/2025', act: '06:01 - 11:11', hrs: '4:35', lab: '$73.33', store: '00032', sch: '06:00 - 11:00', meal: '09:54 - 10:29 (Meal)' },
-        { day: 'Friday - 02/28/2025', act: '08:00 - 12:30', hrs: '4:30', lab: '$72.80', store: '00032', sch: '08:00 - 13:00' }
+        { 
+            day: 'Monday - 02/24/2025', 
+            act: '07:02 - 11:06', 
+            orig: '07:00 - 11:00',
+            hrs: '4:04', 
+            lab: '$65.07', 
+            store: '00032', 
+            sch: '07:00 - 11:00',
+            meal: '07:30 - 08:30 (Meal)'        
+        },
+        { 
+            day: 'Tuesday - 02/25/2025', 
+            act: '08:00 - 14:00', 
+            orig: '08:00 - 14:00',
+            hrs: '6:00', 
+            lab: '$96.00', 
+            store: '00032', 
+            sch: '08:00 - 14:00',
+            meal: '13:00 - 13:30 (Meal)' 
+        },
+        { 
+            day: 'Wednesday - 02/26/2025', 
+            act: '06:01 - 11:11', 
+            orig: '06:15 - 11:15',
+            hrs: '4:35', 
+            lab: '$73.33', 
+            store: '00032', 
+            sch: '06:00 - 11:00', 
+            meal: '09:54 - 10:29 (Meal)' 
+        },
+        { 
+            day: 'Thursday - 02/27/2025', 
+            act: '07:30 - 15:30', 
+            orig: '07:30 - 15:30',
+            hrs: '8:00', 
+            lab: '$128.00', 
+            store: '00032', 
+            sch: '07:30 - 15:30' 
+        },
+        { 
+            day: 'Friday - 02/28/2025', 
+            act: '09:00 - 17:00', 
+            orig: '09:00 - 17:00',
+            hrs: '8:00', 
+            lab: '$128.00', 
+            store: '00032', 
+            sch: '09:00 - 17:00',
+            meal: '12:00 - 12:30 (Meal)'
+        },
+        { 
+            day: 'Saturday - 03/01/2025', 
+            act: '10:00 - 14:00', 
+            orig: '10:00 - 14:00',
+            hrs: '4:00', 
+            lab: '$64.00', 
+            store: '00032', 
+            sch: '10:00 - 14:00' 
+        },
+        { 
+            day: 'Sunday - 03/02/2025', 
+            act: 'Off', 
+            orig: '-', 
+            hrs: '0:00', 
+            lab: '$0.00', 
+            store: '00032', 
+            sch: 'Off' 
+        }
     ];
 
     let html = '';
     fullWeekData.forEach(row => {
-        // Daily Header Header
-        html += `<tr style="background:#f1f5f9; font-weight:700;"><td colspan="6" style="text-align:left; padding-left:15px; font-size:12px; border-bottom:1px solid #e2e8f0; height:35px;">${row.day} | ${row.hrs} Hrs</td></tr>`;
+        // Date Header Row
+        html += `<tr style="background:#f1f5f9; font-weight:700;"><td colspan="6" style="text-align:left; padding-left:15px; font-size:12px; height:35px;">${row.day} | ${row.hrs} Hrs</td></tr>`;
         
-        // Data Row
+        // Punch Data Row
         html += `<tr style="border-bottom: 1px solid #f1f5f9;">
-            <td style="text-align:left; padding-left:15px; font-size:13px; padding: 12px 8px;">
-                ${row.act} 
-                ${showOriginal && row.act !== '---' ? `<div style="color:#3b82f6; font-size:11px; margin-top:2px;">Original: ${row.act}</div>` : ''}
+            <td style="text-align:left; padding-left:15px; padding: 12px 8px;">
+                <div style="font-size:13px; font-weight: 600;">${row.act}</div>
+                
+                ${showOriginal && row.orig !== '-' ? `<div class="original-punch-label">Original: ${row.orig}</div>` : ''}
+                
+                ${row.meal && !hideBreaks ? `<div class="break-pill-label">Break: ${row.meal}</div>` : ''}
             </td>
             <td style="font-size:12px; color:#64748b;">650 - CREW PERSON</td>
             <td style="font-size:12px;">${row.hrs}</td>
@@ -2330,26 +2556,27 @@ function updateDetailView() {
             <td style="font-size:12px;">${row.store}</td>
             <td style="font-size:12px;">${row.sch}</td>
         </tr>`;
-
-        // Meal Row
-        if (row.meal && !hideBreaks) {
-            html += `<tr style="color:#64748b; font-style:italic; font-size:12px; background: #fff;">
-                <td style="text-align:left; padding-left:30px; padding: 8px;">${row.meal}</td>
-                <td>-</td><td>0:35</td><td>-</td><td>-</td><td>-</td>
-            </tr>`;
-        }
     });
     
     tbody.innerHTML = html;
 }
 
 function toggleDetailGraphView() {
-    const section = document.getElementById('detailGraphSection');
-    const isHidden = section.style.display === 'none';
-    section.style.display = isHidden ? 'block' : 'none';
+    const tableContainer = document.getElementById('detailTableContainer');
+    const graphSection = document.getElementById('detailGraphSection');
+    const icon = document.querySelector('.icon-btn-blue i');
     
-    if (isHidden && !detailBarChart) {
-        initDetailCharts();
+    if (graphSection.style.display === 'none' || graphSection.style.display === '') {
+        // Switch to Graph
+        tableContainer.style.display = 'none';
+        graphSection.style.display = 'block';
+        icon.className = 'bi bi-table'; // Change icon to table to show "go back"
+        if (!detailBarChart) initDetailCharts(); 
+    } else {
+        // Switch to Table
+        tableContainer.style.display = 'block';
+        graphSection.style.display = 'none';
+        icon.className = 'bi bi-bar-chart-line'; // Change back to graph icon
     }
 }
 
