@@ -82,7 +82,7 @@
         }
         .date-nav { display: flex; align-items: center; gap: 10px; border: 1px solid var(--border-color); padding: 5px 12px; border-radius: 4px; }
         .action-btns { display: flex; gap: 8px; }
-        .btn { padding: 6px 14px; border-radius: 20px; border: none; font-size: 12px; font-weight: 500; cursor: pointer; display: flex; align-items: center; gap: 6px; }
+        .btn { padding: 6px 14px; border-radius: 20px; border: none; font-size: 14px; font-weight: 500; cursor: pointer; display: flex; align-items: center; gap: 6px; }
         .btn-outline { border: 1px solid var(--border-color); background: white; }
         .btn-green { background: #10b981; color: white; }
         .btn-blue { background: var(--accent-blue); color: white; }
@@ -163,12 +163,12 @@ thead th {
 
 .punch-time {
     font-weight: 600;
-    font-size: 11px;
+    font-size: 13px;
     margin-bottom: 1px;
 }
 
 .punch-role {
-    font-size: 9px;
+    font-size: 11px;
     line-height: 1;
 }
 
@@ -243,17 +243,18 @@ thead th {
     padding: 8px 20px;
     background: #fdfdfd;
     border-bottom: 1px solid #f0f0f0;
+    font-size: 16px;
 }
 
 .weekly-summary-label {
-    font-size: 13px;
+    font-size: 15px;
     font-weight: 500;
     color: #374151;
     text-align: left;
 }
 
 .weekly-summary-totals {
-    font-size: 12px;
+    font-size: 14px;
     font-weight: 500;
     color: #374151;
     text-align: center; /* Centers the text within the middle column */
@@ -276,7 +277,7 @@ thead th {
 
 .daily-summary-toggle-btn {
     padding: 10px 15px;
-    font-size: 13px;
+    font-size: 15px;
     font-weight: 600;
     color: #374151;
     display: flex;
@@ -285,7 +286,7 @@ thead th {
 
 .daily-time-cell {
     padding: 10px 5px;
-    font-size: 11px;
+    font-size: 13px;
     font-weight: 600;
     text-align: center;
     color: #374151;
@@ -349,7 +350,7 @@ thead th {
 
 .summary-cell {
     padding: 8px 10px;
-    font-size: 11px;
+    font-size: 13px;
     border-right: 1px solid #f3f4f6;
     white-space: nowrap;
     text-align: center;
@@ -433,7 +434,7 @@ thead th {
 }
 
 .header-cell i {
-    font-size: 14px;
+    font-size: 18px;
     cursor: pointer;
 }
 
@@ -481,6 +482,7 @@ thead th {
     display: flex;
     align-items: center;
     position: relative;
+    font-size: 15px;
 }
 
 .grid-cell:last-child {
@@ -1186,7 +1188,7 @@ input:checked + .slider:before { transform: translateX(14px); }
 /* Refined styling for the employee name and info */
 .emp-info div {
     color: #1e62ff; /* Matching the blue shade from the screenshot */
-    font-size: 13px;
+    font-size: 15px;
     font-weight: 600;
 }
 
@@ -2123,7 +2125,7 @@ function initTable() {
                     <img src="https://i.pravatar.cc/150?u=${faceId}" class="avatar">
                     <div class="emp-info" onclick="openEmpPopover(event, '${name}')" style="cursor:pointer; flex: 1; position: relative; padding-right: 25px;">
                         <div style="color:#3b82f6; font-weight: 600;">${name}</div>
-                        <span style="font-size: 11px; color: #9ca3af;">
+                        <span style="font-size: 13px; color: #9ca3af;">
                            <i class="bi bi-clock" style="font-size: 10px;"></i> Hrs ${totalHrs}:00 | OT ${otHrs}:00
                         </span>
                         
