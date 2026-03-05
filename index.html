@@ -340,7 +340,7 @@
         margin-bottom: 5px;
       }
       .metric-sub-item span {
-        font-size: 10px;
+        font-size: 14px;
         text-decoration: underline;
         display: block;
         margin-bottom: 2px;
@@ -373,12 +373,12 @@
         margin-bottom: 15px;
       }
       .chart-title {
-        font-size: 14px;
+        font-size: 16px;
         font-weight: 700;
         color: #334155;
       }
       .chart-filter {
-        font-size: 12px;
+        font-size: 14px;
         border: 1px solid #e2e8f0;
         padding: 2px 8px;
         border-radius: 4px;
@@ -457,8 +457,9 @@
         display: block;
       }
       .emp-details span {
-        font-size: 11px;
+        font-size: 13px;
         color: #64748b;
+        font-weight: 500;
       }
       .action-btns {
         display: flex;
@@ -547,7 +548,7 @@
       }
       /* Labels */
       .footer-label {
-        font-size: 9px;
+        font-size: 11px;
         letter-spacing: 0.12em;
         text-transform: uppercase;
         font-weight: 600;
@@ -612,7 +613,7 @@
       }
       /* Title text */
       .kpi-label {
-        font-size: 12px;
+        font-size: 14px;
         font-weight: 500;
         color: #64748b;
         line-height: 1;
@@ -683,8 +684,9 @@
       }
       /* Secondary text */
       .kpi-trend span:last-child {
-        font-weight: 500;
+        font-weight: 800;
         color: inherit;
+        font-size: 14px;
       }
 
       /* FIX: Prevents charts from growing continuously */
@@ -2227,7 +2229,7 @@
           <div class="action-card">
             <div
               class="action-title"
-              style="font-weight: 700; font-size: 14px; margin-bottom: 12px"
+              style="font-weight: 700; font-size: 16px; margin-bottom: 12px"
             >
               Needing Action <span class="badge-count">8</span>
             </div>
@@ -2326,7 +2328,7 @@
           <div class="action-card">
             <div
               class="action-title"
-              style="font-weight: 700; font-size: 14px; margin-bottom: 12px"
+              style="font-weight: 700; font-size: 16px; margin-bottom: 12px"
             >
               Awaiting Action from Others <span class="badge-count">1</span>
             </div>
@@ -2354,7 +2356,7 @@
                 >Timekeeping Efficiency
                 <i class="bi bi-calendar-event"></i></span
               ><span class="chart-filter"
-                >Actual Vs Scheduled Hours <i class="bi bi-caret-down-fill"></i
+                >Actual Vs Scheduled Hours <i class="bi"></i
               ></span>
             </div>
             <canvas id="efficiencyChart" height="180"></canvas>
@@ -2363,7 +2365,7 @@
             <div class="chart-header">
               <span class="chart-title">Timekeeping Trend</span
               ><span class="chart-filter"
-                >Actual Vs Scheduled Hours <i class="bi bi-caret-down-fill"></i
+                >Actual Vs Scheduled Hours <i class="bi"></i
               ></span>
             </div>
             <canvas id="trendChart" height="180"></canvas>
@@ -2376,7 +2378,7 @@
               <span class="chart-title"
                 >Labor Cost Distribution <i class="bi bi-pie-chart"></i></span
               ><span class="chart-filter"
-                >By Department <i class="bi bi-caret-down-fill"></i
+                >By Department <i class="bi"></i
               ></span>
             </div>
             <canvas id="laborDistChart"></canvas>
@@ -2386,7 +2388,7 @@
               <span class="chart-title"
                 >Punch Accuracy Trend <i class="bi bi-check-circle"></i></span
               ><span class="chart-filter"
-                >Auto vs. Manual <i class="bi bi-caret-down-fill"></i
+                >Auto vs. Manual <i class="bi"></i
               ></span>
             </div>
             <canvas id="accuracyChart"></canvas>
@@ -3274,18 +3276,37 @@
       </div>
     </main>
     <script>
+// 1. GLOBAL PREMIUM CHART OPTIONS (Handles Hover Tooltips for all)
+      const chartOptions = {
+        responsive: true,
+        maintainAspectRatio: false,
+        interaction: {
+          mode: 'index',
+          intersect: false,
+        },
+        plugins: {
+          legend: { 
+            position: "bottom",
+            labels: { boxWidth: 12, usePointStyle: true, font: { size: 11 } }
+          },
+          tooltip: {
+            enabled: true,
+            backgroundColor: 'rgba(15, 23, 42, 0.9)',
+            titleFont: { size: 13, weight: 'bold' },
+            bodyFont: { size: 12 },
+            padding: 10,
+            cornerRadius: 8,
+            displayColors: true
+          },
+          datalabels: { display: false } // Hover tooltips take priority for a clean look
+        }
+      };
+
+      // 2. EFFICIENCY CHART
       new Chart(document.getElementById("efficiencyChart"), {
         type: "bar",
         data: {
-          labels: [
-            "17/06",
-            "18/06",
-            "19/06",
-            "20/06",
-            "21/06",
-            "22/06",
-            "23/06",
-          ],
+          labels: ["17/06", "18/06", "19/06", "20/06", "21/06", "22/06", "23/06"],
           datasets: [
             {
               label: "Actual Hours",
@@ -3302,47 +3323,29 @@
           ],
         },
         options: {
+          ...chartOptions,
           plugins: {
+            ...chartOptions.plugins,
             datalabels: {
+              display: true, // Keeping labels on for this specific bar chart as requested
               anchor: "end",
               align: "top",
               color: "#475569",
               font: { size: 10, weight: "600" },
-            },
-            legend: { position: "bottom" },
+            }
           },
-
           scales: {
-            x: {
-              categoryPercentage: 0.6, // ✅ locks category width
-              barPercentage: 0.55, // ✅ locks bar width
-              grid: {
-                display: false,
-              },
-            },
-            y: {
-              beginAtZero: true,
-              max: 100,
-              ticks: {
-                stepSize: 20,
-              },
-            },
+            x: { categoryPercentage: 0.6, barPercentage: 0.55, grid: { display: false } },
+            y: { beginAtZero: true, max: 100, ticks: { stepSize: 20 } },
           },
         },
       });
 
+      // 3. TREND CHART
       new Chart(document.getElementById("trendChart"), {
         type: "bar",
         data: {
-          labels: [
-            "17/06",
-            "18/06",
-            "19/06",
-            "20/06",
-            "21/06",
-            "22/06",
-            "23/06",
-          ],
+          labels: ["17/06", "18/06", "19/06", "20/06", "21/06", "22/06", "23/06"],
           datasets: [
             {
               type: "bar",
@@ -3354,7 +3357,7 @@
             },
             {
               type: "bar",
-              label: "Current Schduled",
+              label: "Current Scheduled",
               data: [36, 40, 33, 33, 36, 36, 36],
               backgroundColor: "#22c55e",
               barThickness: 18,
@@ -3379,83 +3382,47 @@
           ],
         },
         options: {
-          responsive: true,
-          maintainAspectRatio: false, // ✅ allows fixed container control
-
-          plugins: {
-            legend: {
-              position: "bottom",
-            },
-          },
-
+          ...chartOptions,
           scales: {
-            x: {
-              categoryPercentage: 0.6, // ✅ locks category width
-              barPercentage: 0.55, // ✅ locks bar width
-              grid: {
-                display: false,
-              },
-            },
-            y: {
-              beginAtZero: true,
-              max: 100,
-              ticks: {
-                stepSize: 20,
-              },
-            },
+            x: { categoryPercentage: 0.6, barPercentage: 0.55, grid: { display: false } },
+            y: { beginAtZero: true, max: 100, ticks: { stepSize: 20 } },
           },
         },
       });
 
-      // NEW CHART 3: Labor Cost Distribution (Pie)
+      // 4. LABOR COST DISTRIBUTION (Pie/Doughnut)
       new Chart(document.getElementById("laborDistChart"), {
         type: "doughnut",
         data: {
           labels: ["Kitchen", "Front House", "Delivery", "Admin"],
-          datasets: [
-            {
-              data: [45, 30, 15, 10],
-              backgroundColor: ["#3b82f6", "#10b981", "#f59e0b", "#6366f1"],
-              borderWidth: 0,
-            },
-          ],
+          datasets: [{
+            data: [45, 30, 15, 10],
+            backgroundColor: ["#3b82f6", "#10b981", "#f59e0b", "#6366f1"],
+            borderWidth: 0,
+          }],
         },
         options: {
-          responsive: true,
-          maintainAspectRatio: false,
-          plugins: { legend: { position: "bottom" } },
-          cutout: "70%", // Makes it a clean doughnut
+          ...chartOptions,
+          cutout: "70%",
         },
       });
 
-      // NEW CHART 4: Punch Accuracy Trend (Line)
+      // 5. PUNCH ACCURACY TREND (Line)
       new Chart(document.getElementById("accuracyChart"), {
         type: "line",
         data: {
-          labels: [
-            "17/06",
-            "18/06",
-            "19/06",
-            "20/06",
-            "21/06",
-            "22/06",
-            "23/06",
-          ],
-          datasets: [
-            {
-              label: "Manual Edits",
-              data: [5, 8, 2, 4, 9, 3, 2],
-              borderColor: "#ef4444",
-              backgroundColor: "rgba(239, 68, 68, 0.1)",
-              fill: true,
-              tension: 0.4,
-            },
-          ],
+          labels: ["17/06", "18/06", "19/06", "20/06", "21/06", "22/06", "23/06"],
+          datasets: [{
+            label: "Manual Edits",
+            data: [5, 8, 2, 4, 9, 3, 2],
+            borderColor: "#ef4444",
+            backgroundColor: "rgba(239, 68, 68, 0.1)",
+            fill: true,
+            tension: 0.4,
+          }],
         },
         options: {
-          responsive: true,
-          maintainAspectRatio: false,
-          plugins: { legend: { position: "bottom" } },
+          ...chartOptions,
           scales: {
             y: { beginAtZero: true, grid: { color: "#f1f5f9" } },
             x: { grid: { display: false } },
@@ -3463,13 +3430,7 @@
         },
       });
 
-      // FIX: Apply to all new and existing charts to stop growth
-      const chartOptions = {
-        responsive: true,
-        maintainAspectRatio: false,
-        plugins: { legend: { position: "bottom" } },
-      };
-
+      // 6. SHIFT COVERAGE (Line)
       new Chart(document.getElementById("coverageChart"), {
         type: "line",
         data: {
@@ -3495,18 +3456,20 @@
         options: chartOptions,
       });
 
+      // 7. TIME LOSS REASONS (Doughnut)
       new Chart(document.getElementById("lossTypeChart"), {
         type: "doughnut",
         data: {
-          labels: ["Early In", "Late Out", "Unauthorized OT"],
-          datasets: [
-            {
-              data: [40, 30, 30],
-              backgroundColor: ["#f87171", "#fbbf24", "#34d399"],
-            },
-          ],
+          labels: ["Early In", "Late Out", "OT"],
+          datasets: [{
+            data: [40, 30, 30],
+            backgroundColor: ["#f87171", "#fbbf24", "#34d399"],
+          }],
         },
-        options: { ...chartOptions, cutout: "70%" },
+        options: { 
+          ...chartOptions, 
+          cutout: "70%" 
+        },
       });
 
       function showLiveStatus() {
