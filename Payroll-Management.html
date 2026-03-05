@@ -4355,12 +4355,7 @@
         </div>
     </div>
 </div>
-                  <div class="search-bar-container">
-                     <div class="search-wrapper">
-                        <input type="text" placeholder="Search Employees...">
-                        <i class="bi bi-search"></i>
-                     </div>
-                  </div>
+
                   <div class="payroll-table-container">
                      <table class="hourly-data-table">
                         <thead>
@@ -4375,7 +4370,19 @@
                               <th>Cash Tip ($)</th>
                               <th>Total Tip ($)</th>
                               <th>Time Loss Hrs | Pay ($)</th>
-                              <th>Action(s)</th>
+                              <th class="actions-header">
+   <span>Action(s)</span>
+   <i class="bi bi-search action-search-icon"
+      title="Search Employee"
+      onclick="toggleActionSearch()"></i>
+   <!-- hidden search input -->
+   <input
+      type="text"
+      id="actionSearchInput"
+      placeholder="Search employee..."
+      onkeyup="filterByEmployee(this.value)"
+      />
+</th>
                            </tr>
                         </thead>
                         <tbody id="hourlyTableBody"></tbody>
@@ -4403,12 +4410,7 @@
       </div>
    </div>
 
-   <div class="search-bar-container">
-      <div class="search-wrapper">
-         <input type="text" placeholder="Search Terminated Employees..." onkeyup="filterTermination(this.value)">
-         <i class="bi bi-search"></i>
-      </div>
-   </div>
+
 
    <div class="payroll-table-container">
       <table class="hourly-data-table">
@@ -4421,7 +4423,19 @@
                <th>Premium Pay ($)</th>
                <th>Total Tip ($)</th>
                <th>Payroll Status</th>
-               <th style="text-align:center">Action(s)</th>
+               <th class="actions-header">
+   <span>Action(s)</span>
+   <i class="bi bi-search action-search-icon"
+      title="Search Employee"
+      onclick="toggleActionSearch()"></i>
+   <!-- hidden search input -->
+   <input
+      type="text"
+      id="actionSearchInput"
+      placeholder="Search employee..."
+      onkeyup="filterByEmployee(this.value)"
+      />
+</th>
             </tr>
          </thead>
          <tbody id="terminationTableBody">
