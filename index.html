@@ -415,7 +415,7 @@
         color: white;
         padding: 10px 15px;
         border-radius: 6px;
-        font-size: 13px;
+        font-size: 15px;
         display: flex;
         justify-content: space-between;
         align-items: center;
@@ -453,11 +453,11 @@
         font-weight: bold;
       }
       .emp-details b {
-        font-size: 12px;
+        font-size: 14px;
         display: block;
       }
       .emp-details span {
-        font-size: 13px;
+        font-size: 14px;
         color: #64748b;
         font-weight: 500;
       }
@@ -760,13 +760,13 @@
 
       /* Text styling */
       .emp-details b {
-        font-size: 13px;
+        font-size: 14px;
         color: #334155;
         margin-bottom: 2px;
       }
 
       .emp-details span {
-        font-size: 12px;
+        font-size: 13px;
         color: #94a3b8; /* Lighter grey for the time string */
       }
 
@@ -2199,7 +2199,7 @@
             </div>
             <div
               style="
-                font-size: 12px;
+                font-size: 14px;
                 font-weight: 700;
                 background: #f8fafc;
                 padding: 8px;
@@ -3215,136 +3215,193 @@
     </main>
     <script>
 // 1. GLOBAL PREMIUM CHART OPTIONS (Handles Hover Tooltips for all)
-      const chartOptions = {
-        responsive: true,
-        maintainAspectRatio: false,
-        interaction: {
-          mode: 'index',
-          intersect: false,
-        },
-        plugins: {
-          legend: { 
-            position: "bottom",
-            labels: { boxWidth: 12, usePointStyle: true, font: { size: 11 } }
-          },
-          tooltip: {
-            enabled: true,
-            backgroundColor: 'rgba(15, 23, 42, 0.9)',
-            titleFont: { size: 13, weight: 'bold' },
-            bodyFont: { size: 12 },
-            padding: 10,
-            cornerRadius: 8,
-            displayColors: true
-          },
-          datalabels: { display: false } // Hover tooltips take priority for a clean look
-        }
-      };
+const chartOptions = {
+  responsive: true,
+  maintainAspectRatio: false,
+  layout: {
+    padding: { top: 20, bottom: 10, left: 10, right: 10 }
+  },
+  plugins: {
+    legend: {
+      position: "bottom",
+      align: "center",
+      labels: {
+        usePointStyle: true,
+        pointStyle: 'circle',
+        padding: 25,
+        font: { size: 12, weight: '600', family: "'Roboto', sans-serif" },
+        color: '#64748b'
+      }
+    },
+    tooltip: {
+      backgroundColor: 'rgba(15, 23, 42, 0.9)',
+      padding: 12,
+      cornerRadius: 8,
+      titleFont: { size: 13 },
+      bodyFont: { size: 13 },
+      displayColors: true
+    }
+  },
+  scales: {
+    x: { grid: { display: false }, ticks: { color: '#94a3b8', font: { weight: '500' } } },
+    y: { 
+      beginAtZero: true, 
+      border: { display: false },
+      grid: { color: 'rgba(226, 232, 240, 0.6)', drawBorder: false }, 
+      ticks: { color: '#94a3b8', stepSize: 20 } 
+    }
+  }
+};
 
       // 2. EFFICIENCY CHART
-      new Chart(document.getElementById("efficiencyChart"), {
-        type: "bar",
-        data: {
-          labels: ["17/06", "18/06", "19/06", "20/06", "21/06", "22/06", "23/06"],
-          datasets: [
-            {
-              label: "Actual Hours",
-              data: [42, 44, 44, 33, 42, 44, 44],
-              backgroundColor: "#a855f7",
-              barThickness: 15,
-            },
-            {
-              label: "Scheduled Hours",
-              data: [36, 40, 33, 33, 36, 36, 36],
-              backgroundColor: "#eab308",
-              barThickness: 15,
-            },
-          ],
-        },
-        options: {
-          ...chartOptions,
-          plugins: {
-            ...chartOptions.plugins,
-            datalabels: {
-              display: true, // Keeping labels on for this specific bar chart as requested
-              anchor: "end",
-              align: "top",
-              color: "#475569",
-              font: { size: 10, weight: "600" },
-            }
-          },
-          scales: {
-            x: { categoryPercentage: 0.6, barPercentage: 0.55, grid: { display: false } },
-            y: { beginAtZero: true, max: 100, ticks: { stepSize: 20 } },
-          },
-        },
-      });
+// 2. EFFICIENCY CHART (Redesigned: Larger Bars & Modern Colors)
+const ctxEff = document.getElementById("efficiencyChart").getContext("2d");
+
+// Creating smooth gradients for a premium feel
+const gradActualEff = ctxEff.createLinearGradient(0, 0, 0, 400);
+gradActualEff.addColorStop(0, '#8b5cf6'); // Modern Purple
+gradActualEff.addColorStop(1, '#a78bfa');
+
+const gradSchedEff = ctxEff.createLinearGradient(0, 0, 0, 400);
+gradSchedEff.addColorStop(0, '#f59e0b'); // Modern Amber
+gradSchedEff.addColorStop(1, '#fbbf24');
+
+new Chart(ctxEff, {
+  type: "bar",
+  data: {
+    labels: ["17/06", "18/06", "19/06", "20/06", "21/06", "22/06", "23/06"],
+    datasets: [
+      {
+        label: "Actual Hours",
+        data: [42, 44, 44, 33, 42, 44, 44],
+        backgroundColor: gradActualEff,
+        borderRadius: 4,
+        barThickness: 24, // Increased width
+      },
+      {
+        label: "Scheduled Hours",
+        data: [36, 40, 33, 33, 36, 36, 36],
+        backgroundColor: gradSchedEff,
+        borderRadius: 4,
+        barThickness: 24, // Increased width
+      },
+    ],
+  },
+  options: {
+    ...chartOptions,
+    scales: {
+      ...chartOptions.scales,
+      x: {
+        ...chartOptions.scales.x,
+        categoryPercentage: 0.8, // More space for the bars
+        barPercentage: 0.9      // Reduces gap between paired bars
+      }
+    }
+  },
+});
 
       // 3. TREND CHART
-      new Chart(document.getElementById("trendChart"), {
-        type: "bar",
-        data: {
-          labels: ["17/06", "18/06", "19/06", "20/06", "21/06", "22/06", "23/06"],
-          datasets: [
-            {
-              type: "bar",
-              label: "Current Actual",
-              data: [42, 44, 44, 33, 42, 44, 44],
-              backgroundColor: "#3b82f6",
-              barThickness: 18,
-              maxBarThickness: 18,
-            },
-            {
-              type: "bar",
-              label: "Current Scheduled",
-              data: [36, 40, 33, 33, 36, 36, 36],
-              backgroundColor: "#22c55e",
-              barThickness: 18,
-              maxBarThickness: 18,
-            },
-            {
-              type: "line",
-              label: "Previous Actual",
-              data: [34, 42, 0, 0, 0, 0, 0],
-              borderColor: "#a855f7",
-              tension: 0.1,
-              fill: false,
-            },
-            {
-              type: "line",
-              label: "Previous Schedule",
-              data: [34, 40, 34, 33, 36, 36, 36],
-              borderColor: "#f97316",
-              tension: 0.1,
-              fill: false,
-            },
-          ],
-        },
-        options: {
-          ...chartOptions,
-          scales: {
-            x: { categoryPercentage: 0.6, barPercentage: 0.55, grid: { display: false } },
-            y: { beginAtZero: true, max: 100, ticks: { stepSize: 20 } },
-          },
-        },
-      });
+// 3. TREND CHART (Redesigned: Wide Bars & Clean Overlays)
+const ctxTrend = document.getElementById("trendChart").getContext("2d");
 
+new Chart(ctxTrend, {
+  type: "bar",
+  data: {
+    labels: ["17/06", "18/06", "19/06", "20/06", "21/06", "22/06", "23/06"],
+    datasets: [
+      {
+        label: "Current Actual",
+        data: [42, 44, 44, 33, 42, 44, 44],
+        backgroundColor: '#3b82f6', // Vivid Blue
+        borderRadius: 4,
+        barThickness: 20, // Increased width
+        order: 2
+      },
+      {
+        label: "Current Scheduled",
+        data: [36, 40, 33, 33, 36, 36, 36],
+        backgroundColor: '#10b981', // Emerald Green
+        borderRadius: 4,
+        barThickness: 20, // Increased width
+        order: 2
+      },
+      {
+        type: "line",
+        label: "Previous Actual",
+        data: [34, 42, 0, 0, 0, 0, 0],
+        borderColor: '#a855f7',
+        borderWidth: 3,
+        pointRadius: 3,
+        pointBackgroundColor: '#fff',
+        tension: 0.4,
+        fill: false,
+        order: 1
+      },
+      {
+        type: "line",
+        label: "Previous Schedule",
+        data: [34, 40, 34, 33, 36, 36, 36],
+        borderColor: '#f97316',
+        borderWidth: 3,
+        pointRadius: 3,
+        pointBackgroundColor: '#fff',
+        tension: 0.4,
+        fill: false,
+        order: 1
+      },
+    ],
+  },
+  options: {
+    ...chartOptions,
+    scales: {
+      ...chartOptions.scales,
+      x: {
+        ...chartOptions.scales.x,
+        categoryPercentage: 0.85,
+        barPercentage: 0.9
+      }
+    }
+  },
+});
       // 4. LABOR COST DISTRIBUTION (Pie/Doughnut)
-      new Chart(document.getElementById("laborDistChart"), {
-        type: "doughnut",
-        data: {
-          labels: ["Kitchen", "Front House", "Delivery", "Admin"],
-          datasets: [{
-            data: [45, 30, 15, 10],
-            backgroundColor: ["#3b82f6", "#10b981", "#f59e0b", "#6366f1"],
-            borderWidth: 0,
-          }],
-        },
-        options: {
-          ...chartOptions,
-          cutout: "70%",
-        },
-      });
-
+// 4. LABOR COST DISTRIBUTION (Clean & Colorful)
+// 4. LABOR COST DISTRIBUTION (Clean with Percentage Tooltips)
+new Chart(document.getElementById("laborDistChart"), {
+  type: "doughnut",
+  data: {
+    labels: ["Kitchen", "Front House", "Delivery", "Admin"],
+    datasets: [{
+      data: [45, 30, 15, 10],
+      backgroundColor: ["#3b82f6", "#10b981", "#f59e0b", "#6366f1"],
+      hoverOffset: 15,
+      borderWidth: 0,
+    }],
+  },
+  options: {
+    ...chartOptions,
+    cutout: "75%", 
+    scales: {
+      x: { display: false }, // Removes 0, 1, 2 axis labels
+      y: { display: false }  // Removes 0, 1, 2 axis labels
+    },
+    plugins: {
+      ...chartOptions.plugins,
+      legend: {
+        ...chartOptions.plugins.legend,
+        position: 'bottom',
+      },
+      tooltip: {
+        callbacks: {
+          label: function(context) {
+            let label = context.label || '';
+            let value = context.raw || 0;
+            return `${label}: ${value}%`; // Shows % on hover
+          }
+        }
+      }
+    }
+  },
+});
       // 5. PUNCH ACCURACY TREND (Line)
 new Chart(document.getElementById("accuracyChart"), {
   type: 'bar',
@@ -3400,46 +3457,124 @@ new Chart(document.getElementById("accuracyChart"), {
 });
 
       // 6. SHIFT COVERAGE (Line)
-      new Chart(document.getElementById("coverageChart"), {
-        type: "line",
-        data: {
-          labels: ["6a", "9a", "12p", "3p", "6p", "9p"],
-          datasets: [
-            {
-              label: "Staff Needed",
-              data: [5, 10, 15, 12, 20, 10],
-              borderColor: "#cbd5e1",
-              borderDash: [5, 5],
-              fill: false,
-            },
-            {
-              label: "Staff Actual",
-              data: [4, 9, 14, 13, 17, 11],
-              borderColor: "#1e62ff",
-              backgroundColor: "rgba(30, 98, 255, 0.1)",
-              fill: true,
-              tension: 0.4,
-            },
-          ],
-        },
-        options: chartOptions,
-      });
+// 6. SHIFT COVERAGE (Full Replacement: Colorful, Pretty, and Bottom-Centered Legend)
+const ctxCoverage = document.getElementById("coverageChart").getContext("2d");
+
+// Create a professional area gradient for the 'Actual' staff
+const fillGradient = ctxCoverage.createLinearGradient(0, 0, 0, 300);
+fillGradient.addColorStop(0, "rgba(59, 130, 246, 0.4)"); // Soft Blue top
+fillGradient.addColorStop(1, "rgba(59, 130, 246, 0.0)"); // Fade to transparent
+
+new Chart(ctxCoverage, {
+  type: "line",
+  data: {
+    labels: ["6a", "9a", "12p", "3p", "6p", "9p"],
+    datasets: [
+      {
+        label: "Staff Needed",
+        data: [2, 22, 13, 9, 12, 18],
+        borderColor: "#f59e0b", // Warm Amber
+        borderWidth: 2,
+        borderDash: [6, 4], // Elegant dashed line
+        pointBackgroundColor: "#fff",
+        pointBorderColor: "#f59e0b",
+        pointRadius: 4,
+        fill: false,
+      },
+      {
+        label: "Staff Actual",
+        data: [4, 9, 14, 13, 17, 11],
+        borderColor: "#3b82f6", // Vivid Blue
+        borderWidth: 4,
+        backgroundColor: fillGradient,
+        fill: true,
+        tension: 0.45, // Smooth modern curves
+        pointBackgroundColor: "#3b82f6",
+        pointBorderColor: "#fff",
+        pointBorderWidth: 2,
+        pointRadius: 6,
+        pointHoverRadius: 8,
+      },
+    ],
+  },
+  options: {
+    ...chartOptions,
+    plugins: {
+      ...chartOptions.plugins,
+      legend: {
+        display: true,
+        position: 'bottom', // Legend at the bottom
+        align: 'center',    // Centered legend
+        labels: {
+          usePointStyle: true, // Circular legend icons
+          padding: 25,        // Spacing between legend and chart
+          font: { 
+            size: 12, 
+            weight: '600' 
+          },
+          color: '#475569'
+        }
+      }
+    },
+    scales: {
+      x: {
+        grid: { display: false },
+        ticks: { 
+          font: { weight: '600' }, 
+          color: '#64748b' 
+        }
+      },
+      y: {
+        beginAtZero: true,
+        grid: { color: "rgba(226, 232, 240, 0.6)" },
+        ticks: { 
+          stepSize: 5,
+          color: '#64748b'
+        }
+      }
+    }
+  },
+});
 
       // 7. TIME LOSS REASONS (Doughnut)
-      new Chart(document.getElementById("lossTypeChart"), {
-        type: "doughnut",
-        data: {
-          labels: ["Early In", "Late Out", "OT"],
-          datasets: [{
-            data: [40, 30, 30],
-            backgroundColor: ["#f87171", "#fbbf24", "#34d399"],
-          }],
-        },
-        options: { 
-          ...chartOptions, 
-          cutout: "70%" 
-        },
-      });
+// 7. TIME LOSS REASONS (Clean & Colorful)
+// 7. TIME LOSS REASONS (With Percentage Tooltips)
+new Chart(document.getElementById("lossTypeChart"), {
+  type: "doughnut",
+  data: {
+    labels: ["Early In", "Late Out", "OT"],
+    datasets: [{
+      data: [40, 30, 30],
+      backgroundColor: ["#f87171", "#fbbf24", "#34d399"],
+      hoverOffset: 15,
+      borderWidth: 0,
+    }],
+  },
+  options: {
+    ...chartOptions,
+    cutout: "75%",
+    scales: {
+      x: { display: false },
+      y: { display: false }
+    },
+    plugins: {
+      ...chartOptions.plugins,
+      legend: {
+        ...chartOptions.plugins.legend,
+        position: 'bottom',
+      },
+      tooltip: {
+        callbacks: {
+          label: function(context) {
+            let label = context.label || '';
+            let value = context.raw || 0;
+            return `${label}: ${value}%`; // Appends the % symbol
+          }
+        }
+      }
+    }
+  },
+});
 
       function showLiveStatus() {
         document.getElementById("dashboardView").style.opacity = "0";
