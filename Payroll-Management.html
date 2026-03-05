@@ -3437,6 +3437,300 @@
 }
 
 
+/* Container for the graph to hold axes and grid */
+.chart-viewport-modern {
+    display: grid;
+    grid-template-columns: 60px 1fr; /* Space for Y-axis */
+    grid-template-rows: 1fr 30px;    /* Space for X-axis */
+    height: 220px;
+    padding: 10px;
+    position: relative;
+    background: #ffffff;
+}
+
+/* The Grid Background with horizontal lines */
+.chart-grid-bg {
+    grid-column: 2;
+    grid-row: 1;
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-around;
+    border-left: 2px solid #e2e8f0;
+    border-bottom: 2px solid #e2e8f0;
+    /* Subtle horizontal lines using gradient */
+    background-image: linear-gradient(#f1f5f9 1px, transparent 1px);
+    background-size: 100% 25%; 
+    padding: 0 10px;
+}
+
+.y-axis-labels {
+    grid-column: 1;
+    grid-row: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: flex-end;
+    padding-right: 12px;
+    font-size: 11px;
+    font-weight: 700;
+    color: #94a3b8;
+}
+
+.x-axis-labels {
+    grid-column: 2;
+    grid-row: 2;
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    font-size: 11px;
+    font-weight: 700;
+    color: #64748b;
+    padding-top: 5px;
+}
+
+
+/* Professional Summary Strip Container */
+.pay-summary-row {
+    display: flex;
+    align-items: center;
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
+    padding: 0;
+    margin-bottom: 24px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.02);
+    overflow: hidden;
+}
+
+/* Individual Metric Sections */
+.pay-metric-section {
+    flex: 1;
+    padding: 16px 24px;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+}
+
+/* Subtle Vertical Dividers */
+.pay-metric-section:not(:last-child)::after {
+    content: "";
+    position: absolute;
+    right: 0;
+    top: 20%;
+    height: 60%;
+    width: 1px;
+    background: #e2e8f0;
+}
+
+.pay-metric-label {
+    font-size: 11px;
+    font-weight: 700;
+    color: #64748b;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: 4px;
+}
+
+.pay-metric-value {
+    font-size: 20px;
+    font-weight: 800;
+    color: #0f172a;
+}
+
+/* Specialized Styling for the Total */
+.pay-metric-section.total-highlight {
+    background: linear-gradient(to right, #f8faff, #eff6ff);
+    border-left: 2px solid #3b82f6;
+    flex: 1.2;
+}
+
+.pay-metric-section.total-highlight .pay-metric-label {
+    color: #2563eb;
+}
+
+.pay-metric-section.total-highlight .pay-metric-value {
+    color: #1d4ed8;
+    font-size: 24px;
+}
+
+/* Small Math Operational Signs */
+.math-sign {
+    color: #94a3b8;
+    font-size: 14px;
+    font-weight: 800;
+    padding: 0 5px;
+}
+
+/* --- Professional AI Insights Redesign --- */
+.payroll-ai-panel {
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 16px;
+    padding: 24px;
+    margin-top: 24px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.03);
+}
+
+.ai-panel-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    padding-bottom: 15px;
+    border-bottom: 1px solid #f1f5f9;
+}
+
+.ai-header-left {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.ai-icon-hex {
+    width: 40px;
+    height: 40px;
+    background: linear-gradient(135deg, #6366f1, #4338ca);
+    color: white;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+    box-shadow: 0 4px 10px rgba(99, 102, 241, 0.3);
+}
+
+.ai-title {
+    font-size: 16px;
+    font-weight: 800;
+    color: #0f172a;
+    letter-spacing: -0.01em;
+}
+
+.ai-subtitle {
+    font-size: 12px;
+    color: #64748b;
+}
+
+/* Individual Insight Cards */
+.ai-insights-list {
+    list-style: none;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.ai-insight-item {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 14px 20px;
+    border-radius: 12px;
+    border: 1px solid transparent;
+    transition: transform 0.2s ease;
+}
+
+.ai-insight-item:hover {
+    transform: translateX(4px);
+}
+
+.ai-insight-item i {
+    font-size: 18px;
+    flex-shrink: 0;
+}
+
+.ai-insight-text {
+    font-size: 14px;
+    font-weight: 500;
+    color: #334155;
+    line-height: 1.4;
+}
+
+.ai-insight-text b {
+    color: #0f172a;
+    font-weight: 700;
+}
+
+/* Color Themes for Insights */
+.insight-warning {
+    background-color: #fffaf5;
+    border-color: #ffedd5;
+}
+.insight-warning i { color: #f59e0b; }
+
+.insight-info {
+    background-color: #f8fafc;
+    border-color: #e2e8f0;
+}
+.insight-info i { color: #64748b; }
+
+.insight-success {
+    background-color: #f0fdf4;
+    border-color: #dcfce7;
+}
+.insight-success i { color: #22c55e; }
+
+
+/* --- Side-by-Side Layout Container --- */
+.insights-risk-container {
+    display: flex;
+    gap: 24px;
+    margin-top: 24px;
+    align-items: stretch;
+}
+
+.insights-risk-container > div {
+    flex: 1; /* Equal width for both parts */
+}
+
+/* --- Risk Specific Overrides (Matching AI Style) --- */
+.risk-panel {
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 16px;
+    padding: 24px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.03);
+}
+
+.risk-icon-hex {
+    width: 40px;
+    height: 40px;
+    background: linear-gradient(135deg, #ef4444, #b91c1c);
+    color: white;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+    box-shadow: 0 4px 10px rgba(239, 68, 68, 0.2);
+}
+
+.risk-badge-pill {
+    background: #fff7ed;
+    color: #c2410c;
+    border: 1px solid #fed7aa;
+    font-size: 11px;
+    font-weight: 700;
+    padding: 4px 12px;
+    border-radius: 999px;
+}
+
+.insight-risk-item {
+    background-color: #fff5f5;
+    border: 1px solid #fee2e2;
+}
+
+.insight-risk-item i {
+    color: #ef4444;
+}
+
+/* Responsive stack for mobile */
+@media (max-width: 1024px) {
+    .insights-risk-container {
+        flex-direction: column;
+    }
+}
+
 
       </style>
    </head>
@@ -3557,32 +3851,26 @@
                      <div class="panel-title panel-title-premium">
                         Payroll <span id="activePeriod">01/27/2026 - 02/02/2026</span>
                      </div>
-                     <div style="display: flex; align-items: center; gap: 20px;">
-                        <div class="report-dropdown-wrapper">
-                           <button class="btn-report-trigger" onclick="toggleReportMenu(event)">
-                           <i class="bi bi-printer"></i>
-                           <i class="bi bi-caret-down-fill" style="font-size: 8px;"></i>
-                           </button>
-                           <div id="reportMenu" class="report-menu hidden">
-                              <div class="report-item">
-                                 <i class="bi bi-wallet2"></i> <span>Payroll Report</span>
-                              </div>
-                              <div class="report-item">
-                                 <i class="bi bi-cash-stack"></i> <span>Extra Pay Report</span>
-                              </div>
-                              <div class="report-item">
-                                 <i class="bi bi-calendar2-x"></i> <span>Time Off Report</span>
-                              </div>
-                              <div class="report-item">
-                                 <i class="bi bi-shield-check"></i> <span>Audit Trail Report</span>
-                              </div>
-                           </div>
-                        </div>
-                        <button class="btn-back-modern" onclick="showLandingView()">
-                        <i class="bi bi-arrow-left" style="font-size: 18px;"></i> 
-                        Back
-                        </button>
-                     </div>
+<div style="display: flex; align-items: center; gap: 20px;">
+   
+   <div id="headerFinalizeContainer" class="hidden">
+      <button class="btn-finalize" style="padding: 8px 20px; font-size: 14px;">
+         Finalize
+      </button>
+   </div>
+
+   <div class="report-dropdown-wrapper">
+      <button class="btn-report-trigger" onclick="toggleReportMenu(event)">
+         <i class="bi bi-printer"></i>
+         <i class="bi bi-caret-down-fill" style="font-size: 8px;"></i>
+      </button>
+      </div>
+   
+   <button class="btn-back-modern" onclick="showLandingView()">
+      <i class="bi bi-arrow-left" style="font-size: 18px;"></i> 
+      Back
+   </button>
+</div>
                   </div>
                </div>
                <br> 
@@ -3621,32 +3909,38 @@
                <div id="submitPayrollView" class="tab-view hidden">
                   <br>
                   <!-- ===== PAY SUMMARY STRIP (FROM SCREENSHOT) ===== -->
-                  <div class="pay-summary-row">
-                     <div class="pay-tile">
-                        <b id="regPay">$7,900.00</b>
-                        <span>Regular Pay</span>
-                     </div>
-                     <div class="math-icon">+</div>
-                     <div class="pay-tile">
-                        <b id="otPay">$50.00</b>
-                        <span>OT Pay</span>
-                     </div>
-                     <div class="math-icon">+</div>
-                     <div class="pay-tile">
-                        <b id="dtPay">$10.00</b>
-                        <span>DT Pay</span>
-                     </div>
-                     <div class="math-icon">+</div>
-                     <div class="pay-tile">
-                        <b id="extraPay">$27.74</b>
-                        <span>Extra Pay</span>
-                     </div>
-                     <div class="math-icon equals">=</div>
-                     <div class="pay-tile total">
-                        <b id="totalPay">$7,987.74</b>
-                        <span>Payroll Amount</span>
-                     </div>
-                  </div>
+<div class="pay-summary-row">
+   <div class="pay-metric-section">
+      <span class="pay-metric-label">Regular Pay</span>
+      <b class="pay-metric-value" id="regPay">$7,900.00</b>
+   </div>
+   
+   <div class="math-sign">+</div>
+   
+   <div class="pay-metric-section">
+      <span class="pay-metric-label">OT Pay</span>
+      <b class="pay-metric-value" id="otPay">$50.00</b>
+   </div>
+   
+   <div class="math-sign">+</div>
+   
+   <div class="pay-metric-section">
+      <span class="pay-metric-label">DT Pay</span>
+      <b class="pay-metric-value" id="dtPay">$10.00</b>
+   </div>
+   
+   <div class="math-sign">+</div>
+   
+   <div class="pay-metric-section">
+      <span class="pay-metric-label">Extra Pay</span>
+      <b class="pay-metric-value" id="extraPay">$27.74</b>
+   </div>
+   
+   <div class="pay-metric-section total-highlight">
+      <span class="pay-metric-label">Payroll Amount</span>
+      <b class="pay-metric-value" id="totalPay">$7,987.74</b>
+   </div>
+</div>
                   <!-- ===== EMPLOYEE + FINALIZE BAR ===== -->
                   <div class="submit-action-panel">
                      <div class="employee-info">
@@ -3685,23 +3979,37 @@
                      <!-- AI INSIGHTS -->
                      <!-- ===== PAYROLL AI INSIGHTS CARD ===== -->
                      <!-- ===== PAYROLL AI INSIGHTS ===== -->
-                     <div class="payroll-ai-panel">
-                        <div class="ai-panel-header">
-                           <div class="ai-header-left">
-                              <div class="ai-icon">
-                                 <i class="bi bi-stars"></i>
-                              </div>
-                              <div>
-                                 <div class="ai-title">Payroll AI Insights</div>
-                                 <div class="ai-subtitle">Automated analysis based on current payroll data</div>
-                              </div>
-                           </div>
-                           <div class="ai-badge">AI Generated</div>
-                        </div>
-                        <ul class="ai-insights-list" id="aiInsightsList">
-                           <!-- Dynamic insights will be injected here -->
-                        </ul>
-                     </div>
+<div class="payroll-ai-panel">
+    <div class="ai-panel-header">
+        <div class="ai-header-left">
+            <div class="ai-icon-hex">
+                <i class="bi bi-stars"></i>
+            </div>
+            <div>
+                <div class="ai-title">Payroll AI Insights</div>
+                <div class="ai-subtitle">Automated anomaly detection and period analysis</div>
+            </div>
+        </div>
+        <div class="ai-badge">AI Generated</div>
+    </div>
+    
+    <div class="ai-insights-list" id="aiInsightsList">
+        <div class="ai-insight-item insight-warning">
+            <i class="bi bi-clock-history"></i>
+            <span class="ai-insight-text">Overtime contributes <b>11.2%</b> of total payroll.</span>
+        </div>
+        
+        <div class="ai-insight-item insight-info">
+            <i class="bi bi-cash-stack"></i>
+            <span class="ai-insight-text">Extra pay accounts for <b>6.7%</b> of payroll.</span>
+        </div>
+        
+        <div class="ai-insight-item insight-success">
+            <i class="bi bi-check2-circle"></i>
+            <span class="ai-insight-text">All punches are finalized with <b>no critical issues</b>.</span>
+        </div>
+    </div>
+</div>
                      <!-- KPI GRID -->
                      <div class="insight-metric-row">
                         <!-- Total Hours -->
@@ -3739,6 +4047,8 @@
                      </div>
                      <!-- CHART PLACEHOLDERS -->
                      <!-- ===== INSIGHTS CHARTS ===== -->
+
+
                      <div class="insights-charts" style="display: grid; grid-template-columns: 1fr 1fr; gap: 24px; padding: 24px;">
                         <div class="premium-chart-card">
                            <div class="chart-header">
@@ -3788,6 +4098,8 @@
                            </div>
                         </div>
                      </div>
+
+
                      <!-- ===== PAYROLL RISK SUMMARY ===== -->
                      <div class="payroll-risk-panel">
                         <div class="risk-header">
@@ -3815,6 +4127,7 @@
                            </div>
                         </div>
                      </div>
+                     
                      <div class="insight-metric-row">
                         <div class="metric-card highlight-blue">
                            <div class="metric-label">Top Cost Driver</div>
@@ -3882,52 +4195,6 @@
                               <li class="positive">
                                  <i class="bi bi-check-circle-fill"></i>
                                  No missing punches detected
-                              </li>
-                           </ul>
-                        </div>
-                        <!-- Hidden Cost Signals -->
-                        <div class="ai-insights-card">
-                           <div class="ai-insights-header">
-                              <div class="ai-title">
-                                 <i class="bi bi-lightbulb"></i>
-                                 Hidden Cost Signals
-                              </div>
-                           </div>
-                           <ul class="ai-insights-list">
-                              <li>
-                                 <i class="bi bi-info-circle"></i>
-                                 High-cost employees worked mostly <b>low-volume shifts</b>
-                              </li>
-                              <li>
-                                 <i class="bi bi-info-circle"></i>
-                                 OT clustered on <b>Friday evenings</b>
-                              </li>
-                              <li class="positive">
-                                 <i class="bi bi-check-circle-fill"></i>
-                                 No excessive DT patterns detected
-                              </li>
-                           </ul>
-                        </div>
-                        <!-- Payroll Confidence Meter -->
-                        <div class="ai-insights-card">
-                           <div class="ai-insights-header">
-                              <div class="ai-title">
-                                 <i class="bi bi-speedometer2"></i>
-                                 Payroll Confidence Meter
-                              </div>
-                           </div>
-                           <ul class="ai-insights-list">
-                              <li class="positive">
-                                 <i class="bi bi-check-circle-fill"></i>
-                                 Data completeness: <b>100%</b>
-                              </li>
-                              <li class="positive">
-                                 <i class="bi bi-check-circle-fill"></i>
-                                 Risk exposure: <b>Low</b>
-                              </li>
-                              <li>
-                                 <i class="bi bi-exclamation-circle"></i>
-                                 Recommendation: <b>Finalize with note</b>
                               </li>
                            </ul>
                         </div>
@@ -5566,73 +5833,89 @@
          }
          
          
-         function buildPayrollInsights() {
-         // Refresh global metrics and AI cards
-         if (typeof populateInsightKPIs === "function") populateInsightKPIs();
-         if (typeof buildAIPayrollInsights === "function") buildAIPayrollInsights();
-         
-         // Preparation: Using demo-optimized values for visual impact
-         const payroll = {
-         regular: 864.31,
-         ot: 424.75, // Increased for demo visibility
-         dt: 248.50, // Increased for demo visibility
-         extra: 375.00 // Increased for demo visibility
-         };
-         
-         const colors = {
-         regular: '#3b82f6', 
-         ot: '#f59e0b',      
-         dt: '#ef4444',      
-         extra: '#8b5cf6'    
-         };
-         
-         /* ===========================================
-         CHART 1: PAYROLL BREAKDOWN (PRO SCALE)
-         =========================================== */
-         const breakdownChart = document.getElementById('payrollBarChart');
-         if (breakdownChart) {
-         breakdownChart.innerHTML = '';
-         // Lowering the multiplier from 1.15 to 1.05 to make bars taller
-         const maxVal = Math.max(...Object.values(payroll)) * 1.05; 
-         
-         Object.entries(payroll).forEach(([key, val]) => {
-            const barWrapper = document.createElement('div');
-            barWrapper.className = 'bar-wrapper';
-            const height = (val / maxVal) * 100;
-            
-            barWrapper.innerHTML = `
-                <span class="bar-value-label" style="font-weight:800; margin-bottom:10px;">$${val.toFixed(2)}</span>
-                <div class="bar" style="height: ${height}%; background-color: ${colors[key]}; width: 55px; border-radius: 12px 12px 4px 4px; box-shadow: 0 4px 12px -2px ${colors[key]}44;"></div>
-                <span class="bar-name-label" style="margin-top:12px; font-weight:700;">${key.toUpperCase()}</span>
-            `;
-            breakdownChart.appendChild(barWrapper);
-         });
-         }
-         
-         /* ===========================================
-         CHART 2: SVG DONUT (AUTOLOAD FIX)
-         =========================================== */
-         const total = Object.values(payroll).reduce((a, b) => a + b, 0);
-         const svg = document.getElementById('payrollSvg');
-         const centerVal = document.getElementById('donutCenterValue');
-         const centerLabel = document.getElementById('donutCenterLabel');
-         
-         if (svg) {
-         centerVal.innerText = `$${total.toFixed(2)}`;
-         centerLabel.innerText = 'Total';
-         svg.innerHTML = ''; 
-         let currentPercent = 0;
-         const palette = ['#3b82f6', '#22c55e', '#f59e0b', '#8b5cf6'];
-         
-         // Demo distribution
-         const dist = [
+function buildPayrollInsights() {
+    // Refresh global metrics and AI cards
+    if (typeof populateInsightKPIs === "function") populateInsightKPIs();
+    if (typeof buildAIPayrollInsights === "function") buildAIPayrollInsights();
+
+    // Preparation: Using demo-optimized values for visual impact
+    const payroll = {
+        regular: 864.31,
+        ot: 424.75,
+        dt: 248.50,
+        extra: 375.00
+    };
+
+    const colors = {
+        regular: '#3b82f6',
+        ot: '#f59e0b',
+        dt: '#ef4444',
+        extra: '#8b5cf6'
+    };
+
+    /* ===========================================
+    CHART 1: PAYROLL BREAKDOWN (WITH AXES & GRID)
+    =========================================== */
+    const breakdownChart = document.getElementById('payrollBarChart');
+    if (breakdownChart) {
+        // Calculate dynamic scale
+        const maxVal = 1000; // Fixed top scale for consistent look
+
+        breakdownChart.innerHTML = `
+            <div style="display: grid; grid-template-columns: 50px 1fr; grid-template-rows: 1fr 30px; height: 100%; width: 100%; background: #fff;">
+                
+                <div style="display: flex; flex-direction: column; justify-content: space-between; align-items: flex-end; padding-right: 12px; font-size: 11px; font-weight: 700; color: #94a3b8; padding-bottom: 2px;">
+                    <span>$1k</span>
+                    <span>$750</span>
+                    <span>$500</span>
+                    <span>$250</span>
+                    <span>$0</span>
+                </div>
+
+                <div style="position: relative; border-left: 2px solid #e2e8f0; border-bottom: 2px solid #e2e8f0; background-image: linear-gradient(#f1f5f9 1px, transparent 1px); background-size: 100% 25%; display: flex; align-items: flex-end; justify-content: space-around; padding: 0 10px;">
+                    ${Object.entries(payroll).map(([key, val]) => {
+                        const height = (val / maxVal) * 100;
+                        return `
+                            <div style="display: flex; flex-direction: column; align-items: center; justify-content: flex-end; height: 100%; flex: 1; z-index: 1;">
+                                <span style="font-size: 11px; font-weight: 800; color: #1e293b; margin-bottom: 8px;">$${val.toFixed(2)}</span>
+                                <div class="bar" style="height: ${height}%; background: ${colors[key]}; width: 45px; border-radius: 6px 6px 0 0; box-shadow: 0 4px 12px -2px ${colors[key]}44; transition: height 0.5s ease;"></div>
+                            </div>
+                        `;
+                    }).join('')}
+                </div>
+
+                <div></div>
+
+                <div style="display: flex; justify-content: space-around; align-items: center; font-size: 11px; font-weight: 700; color: #64748b; padding-top: 8px;">
+                    ${Object.keys(payroll).map(key => `<span>${key.toUpperCase()}</span>`).join('')}
+                </div>
+            </div>
+        `;
+    }
+
+    /* ===========================================
+    CHART 2: SVG DONUT (DISTRIBUTION)
+    =========================================== */
+    const total = Object.values(payroll).reduce((a, b) => a + b, 0);
+    const svg = document.getElementById('payrollSvg');
+    const centerVal = document.getElementById('donutCenterValue');
+    const centerLabel = document.getElementById('donutCenterLabel');
+
+    if (svg) {
+        centerVal.innerText = `$${total.toFixed(2)}`;
+        centerLabel.innerText = 'Total';
+        svg.innerHTML = '';
+        let currentPercent = 0;
+        const palette = ['#3b82f6', '#22c55e', '#f59e0b', '#8b5cf6'];
+
+        const dist = [
             { label: 'Andrew K', value: total * 0.4 },
             { label: 'Sarah M', value: total * 0.3 },
             { label: 'Andrew R', value: total * 0.2 },
             { label: 'Others', value: total * 0.1 }
-         ];
-         
-         dist.forEach((emp, i) => {
+        ];
+
+        dist.forEach((emp, i) => {
             const percent = (emp.value / total) * 100;
             const segment = document.createElementNS("http://www.w3.org/2000/svg", "circle");
             segment.setAttribute("class", "donut-segment");
@@ -5640,7 +5923,7 @@
             segment.setAttribute("stroke", palette[i % palette.length]);
             segment.setAttribute("stroke-dasharray", `${percent} ${100 - percent}`);
             segment.setAttribute("stroke-dashoffset", -currentPercent);
-            
+
             segment.addEventListener('mouseenter', () => {
                 centerVal.innerText = `$${emp.value.toFixed(2)}`;
                 centerLabel.innerText = emp.label;
@@ -5651,71 +5934,73 @@
             });
             svg.appendChild(segment);
             currentPercent += percent;
-         });
-         }
-         
-         /* ===========================================
-         CHART 3: PAYROLL VS LAST PERIOD (PRO SCALE)
-         =========================================== */
-         const compareChart = document.querySelector('.compare-bar-chart');
-         if (compareChart) {
-         compareChart.innerHTML = '';
-         const compareData = [
+        });
+    }
+
+    /* ===========================================
+    CHART 3: PAYROLL VS LAST PERIOD (WITH AXES)
+    =========================================== */
+    const compareChart = document.querySelector('.compare-bar-chart');
+    if (compareChart) {
+        const compareData = [
             { label: 'Reg', cur: 4200, prev: 4600 },
             { label: 'OT', cur: 2200, prev: 1800 },
             { label: 'DT', cur: 1500, prev: 1200 },
             { label: 'Extra', cur: 1800, prev: 1100 }
-         ];
-         
-         // Tight maxVal for taller appearance
-         const maxCompare = 4800; 
-         
-         compareData.forEach(item => {
-            const col = document.createElement('div');
-            col.className = 'compare-col';
-            col.style.cssText = "display: flex; flex-direction: column; align-items: center; justify-content: flex-end; height: 100%; flex: 1;";
-            
-            col.innerHTML = `
-                <div style="display: flex; gap: 10px; align-items: flex-end; height: 180px; margin-bottom: 12px;">
-                    <div style="display: flex; flex-direction: column; align-items: center; justify-content: flex-end; height: 100%;">
-                        <span style="font-size: 10px; font-weight: 800; color: #3b82f6; margin-bottom: 4px;">$${(item.cur/1000).toFixed(1)}k</span>
-                        <div class="bar" style="height: ${(item.cur/maxCompare)*100}%; width: 24px; background: #3b82f6; border-radius: 6px 6px 0 0;"></div>
-                    </div>
-                    <div style="display: flex; flex-direction: column; align-items: center; justify-content: flex-end; height: 100%;">
-                        <span style="font-size: 10px; font-weight: 800; color: #10b981; margin-bottom: 4px;">$${(item.prev/1000).toFixed(1)}k</span>
-                        <div class="bar" style="height: ${(item.prev/maxCompare)*100}%; width: 24px; background: #10b981; border-radius: 6px 6px 0 0;"></div>
-                    </div>
+        ];
+        const maxCompare = 5000;
+
+        compareChart.innerHTML = `
+            <div style="display: grid; grid-template-columns: 45px 1fr; grid-template-rows: 1fr 25px; height: 100%; width: 100%;">
+                <div style="display: flex; flex-direction: column; justify-content: space-between; align-items: flex-end; padding-right: 10px; font-size: 10px; font-weight: 700; color: #94a3b8; padding-bottom: 2px;">
+                    <span>$5k</span><span>$2.5k</span><span>$0</span>
                 </div>
-                <span style="font-size: 11px; font-weight: 800; color: #64748b;">${item.label}</span>
-            `;
-            compareChart.appendChild(col);
-         });
-         }
-         
-         /* ===========================================
-         CHART 4: COST PER EMPLOYEE (PRO SCALE)
-         =========================================== */
-         const efficiencyChart = document.querySelector('.efficiency-chart');
-         if (efficiencyChart) {
-         efficiencyChart.innerHTML = '';
-         const effData = { current: 987, last: 1120 };
-         const maxEff = 1200;
-         efficiencyChart.innerHTML = `
-            <div style="display: flex; align-items: flex-end; gap: 60px; height: 100%; justify-content: center;">
-                <div style="text-align: center; display: flex; flex-direction: column; align-items: center; justify-content: flex-end; height: 100%;">
-                    <b style="font-size: 16px; font-weight: 900; margin-bottom: 8px; color: #3b82f6;">$${effData.current}</b>
-                    <div style="height: ${(effData.current/maxEff)*160}px; width: 65px; background: #3b82f6; border-radius: 12px 12px 0 0; box-shadow: 0 4px 15px rgba(59,130,246,0.3);"></div>
-                    <span style="font-size: 12px; font-weight: 700; color: #64748b; margin-top: 10px;">This Period</span>
+                <div style="position: relative; border-left: 2px solid #e2e8f0; border-bottom: 2px solid #e2e8f0; background-image: linear-gradient(#f1f5f9 1px, transparent 1px); background-size: 100% 50%; display: flex; align-items: flex-end; justify-content: space-around; padding: 0 5px;">
+                    ${compareData.map(item => `
+                        <div style="display: flex; align-items: flex-end; gap: 4px; height: 100%;">
+                            <div class="bar" style="height: ${(item.cur / maxCompare) * 100}%; width: 18px; background: #3b82f6; border-radius: 4px 4px 0 0;"></div>
+                            <div class="bar" style="height: ${(item.prev / maxCompare) * 100}%; width: 18px; background: #10b981; border-radius: 4px 4px 0 0;"></div>
+                        </div>
+                    `).join('')}
                 </div>
-                <div style="text-align: center; display: flex; flex-direction: column; align-items: center; justify-content: flex-end; height: 100%;">
-                    <b style="font-size: 16px; font-weight: 900; margin-bottom: 8px; color: #10b981;">$${effData.last}</b>
-                    <div style="height: ${(effData.last/maxEff)*160}px; width: 65px; background: #10b981; border-radius: 12px 12px 0 0; box-shadow: 0 4px 15px rgba(16,185,129,0.3);"></div>
-                    <span style="font-size: 12px; font-weight: 700; color: #64748b; margin-top: 10px;">Last Period</span>
+                <div></div>
+                <div style="display: flex; justify-content: space-around; align-items: center; font-size: 11px; font-weight: 700; color: #64748b;">
+                    ${compareData.map(d => `<span>${d.label}</span>`).join('')}
                 </div>
             </div>
-         `;
-         }
-         }
+        `;
+    }
+
+    /* ===========================================
+    CHART 4: COST PER EMPLOYEE (WITH GRID)
+    =========================================== */
+    const efficiencyChart = document.querySelector('.efficiency-chart');
+    if (efficiencyChart) {
+        const effData = { current: 987, last: 1120 };
+        const maxEff = 1500;
+        efficiencyChart.innerHTML = `
+            <div style="display: grid; grid-template-columns: 45px 1fr; grid-template-rows: 1fr 25px; height: 100%; width: 100%;">
+                <div style="display: flex; flex-direction: column; justify-content: space-between; align-items: flex-end; padding-right: 10px; font-size: 10px; font-weight: 700; color: #94a3b8; padding-bottom: 2px;">
+                    <span>$1.5k</span><span>$750</span><span>$0</span>
+                </div>
+                <div style="position: relative; border-left: 2px solid #e2e8f0; border-bottom: 2px solid #e2e8f0; background-image: linear-gradient(#f1f5f9 1px, transparent 1px); background-size: 100% 50%; display: flex; align-items: flex-end; justify-content: space-evenly; padding: 0 20px;">
+                    <div style="display: flex; flex-direction: column; align-items: center; justify-content: flex-end; height: 100%;">
+                        <b style="font-size: 13px; margin-bottom: 4px; color: #3b82f6;">$${effData.current}</b>
+                        <div style="height: ${(effData.current / maxEff) * 100}%; width: 50px; background: #3b82f6; border-radius: 8px 8px 0 0; box-shadow: 0 4px 12px rgba(59,130,246,0.3);"></div>
+                    </div>
+                    <div style="display: flex; flex-direction: column; align-items: center; justify-content: flex-end; height: 100%;">
+                        <b style="font-size: 13px; margin-bottom: 4px; color: #10b981;">$${effData.last}</b>
+                        <div style="height: ${(effData.last / maxEff) * 100}%; width: 50px; background: #10b981; border-radius: 8px 8px 0 0; box-shadow: 0 4px 12px rgba(16,185,129,0.3);"></div>
+                    </div>
+                </div>
+                <div></div>
+                <div style="display: flex; justify-content: space-around; font-size: 11px; font-weight: 700; color: #64748b; padding-top: 5px;">
+                    <span>THIS PERIOD</span><span>LAST PERIOD</span>
+                </div>
+            </div>
+        `;
+    }
+}
          
          
          function populateSubmitPayrollTiles() {
@@ -5874,20 +6159,27 @@
          renderAIPayrollInsights(insights);
          }   
          
-         function renderAIPayrollInsights(insights) {
-         const list = document.getElementById('aiInsightsList');
-         list.innerHTML = '';
-         
-         insights.forEach(insight => {
-         const li = document.createElement('li');
-         li.className = insight.type || '';
-         li.innerHTML = `
-         <i class="bi ${insight.icon}"></i>
-         <span>${insight.text}</span>
-         `;
-         list.appendChild(li);
-         });
-         }
+function renderAIPayrollInsights(insights) {
+    const list = document.getElementById('aiInsightsList');
+    list.innerHTML = '';
+    
+    insights.forEach(insight => {
+        // Map types to professional CSS classes
+        const themeClass = insight.type === 'positive' ? 'insight-success' : 
+                           insight.type === 'warning' ? 'insight-warning' : 'insight-info';
+        
+        const icon = insight.type === 'positive' ? 'bi-check2-circle' : 
+                     insight.type === 'warning' ? 'bi-exclamation-triangle' : 'bi-info-circle';
+
+        const item = document.createElement('div');
+        item.className = `ai-insight-item ${themeClass}`;
+        item.innerHTML = `
+            <i class="bi ${icon}"></i>
+            <span class="ai-insight-text">${insight.text}</span>
+        `;
+        list.appendChild(item);
+    });
+}
          
          
          
@@ -5903,83 +6195,102 @@
              document.getElementById('landingScreen').classList.remove('hidden');
          }
          
-         function setActiveStep(element, tab) {
-         
-         /* ===============================
-         1. ACTIVATE STEPPER UI
-         =============================== */
-         document.querySelectorAll('.step-item')
-         .forEach(step => step.classList.remove('active'));
-         element.classList.add('active');
-         
-         
-         /* ===============================
-         2. HIDE ALL TAB VIEWS (RESET)
-         =============================== */
-         const views = [
-         'fixIssuesView',
-         'extraPayView',
-         'hourlyView',
-         'submitPayrollView'   // 🔑 NEW
-         ];
-         
-         views.forEach(id => {
-         const el = document.getElementById(id);
-         if (el) el.classList.add('hidden');
-         });
-         
-         
-         /* ===============================
-         3. FIX ISSUES TAB
-         =============================== */
-         if (tab === 'fix') {
-         document.getElementById('fixIssuesView')
-         .classList.remove('hidden');
-         }
-         
-         
-         /* ===============================
-         4. EXTRA PAY TAB
-         =============================== */
-         if (tab === 'extra') {
-         document.getElementById('extraPayView')
-         .classList.remove('hidden');
-         
-         if (typeof renderExtraPay === 'function') {
-         renderExtraPay();
-         }
-         }
-         
-         
-         /* ===============================
-         5. REVIEW HOURLY PUNCHES TAB
-         (KEEP YOUR KPI LOGIC SAFE)
-         =============================== */
-         if (tab === 'hourly') {
-         const hourlyView = document.getElementById('hourlyView');
-         hourlyView.classList.remove('hidden');
-         
-         // 🔑 Ensure KPIs calculate AFTER render
-         setTimeout(() => {
-         if (typeof updateHourlyPunchKPIs === 'function') {
-         updateHourlyPunchKPIs();
-         }
-         }, 0);
-         }
-         
-         
-         /* ===============================
-         6. SUBMIT PAYROLL TAB  ⭐ NEW
-         =============================== */
-         if (tab === 'submit') {
-         document.getElementById('submitPayrollView').classList.remove('hidden');
-         populateSubmitPayrollTiles();
-         
-         const insights = document.getElementById('payrollInsights');
-         if (insights) insights.classList.add('hidden');
-         }
-         
-         }
+function setActiveStep(element, tab) {
+    /* ===========================================
+    1. ACTIVATE STEPPER UI
+    =========================================== */
+    document.querySelectorAll('.step-item')
+        .forEach(step => step.classList.remove('active'));
+    element.classList.add('active');
+
+    /* ===========================================
+    2. HEADER FINALIZATION LOGIC
+    =========================================== */
+    // Only show the header Finalize button when on the 'submit' tab
+    const headerFinalize = document.getElementById('headerFinalizeContainer');
+    if (headerFinalize) {
+        if (tab === 'submit') {
+            headerFinalize.classList.remove('hidden');
+        } else {
+            headerFinalize.classList.add('hidden');
+        }
+    }
+
+    /* ===========================================
+    3. HIDE ALL TAB VIEWS (RESET)
+    =========================================== */
+    const views = [
+        'fixIssuesView',
+        'extraPayView',
+        'hourlyView',
+        'terminationView',
+        'submitPayrollView'
+    ];
+
+    views.forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.classList.add('hidden');
+    });
+
+    /* ===========================================
+    4. TAB SPECIFIC LOGIC
+    =========================================== */
+    
+    // FIX ISSUES
+    if (tab === 'fix') {
+        document.getElementById('fixIssuesView').classList.remove('hidden');
+    }
+
+    // EXTRA PAY
+    if (tab === 'extra') {
+        document.getElementById('extraPayView').classList.remove('hidden');
+        if (typeof renderExtraPay === 'function') {
+            renderExtraPay();
+        }
+    }
+
+    // REVIEW HOURLY PUNCHES
+    if (tab === 'hourly') {
+        const hourlyView = document.getElementById('hourlyView');
+        if (hourlyView) {
+            hourlyView.classList.remove('hidden');
+            // Ensure KPIs calculate AFTER render
+            setTimeout(() => {
+                if (typeof updateHourlyPunchKPIs === 'function') {
+                    updateHourlyPunchKPIs();
+                }
+            }, 0);
+        }
+    }
+
+    // TERMINATION SETTLEMENT
+    if (tab === 'termination') {
+        const termView = document.getElementById('terminationView');
+        if (termView) termView.classList.remove('hidden');
+    }
+
+    // SUBMIT PAYROLL
+    if (tab === 'submit') {
+        const submitView = document.getElementById('submitPayrollView');
+        if (submitView) {
+            submitView.classList.remove('hidden');
+            
+            // Populate the summary values
+            if (typeof populateSubmitPayrollTiles === 'function') {
+                populateSubmitPayrollTiles();
+            }
+
+            // Hide insights initially until toggled
+            const insights = document.getElementById('payrollInsights');
+            if (insights) insights.classList.add('hidden');
+
+            // Build graphs with axes and grids
+            if (typeof buildPayrollInsights === 'function') {
+                buildPayrollInsights();
+            }
+        }
+    }
+}
          
          
          
