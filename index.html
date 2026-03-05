@@ -1964,17 +1964,6 @@
               </svg>
             </div>
 
-            <div class="kpi-footer">
-              <div class="kpi-footer-item left">
-                <span class="footer-label">ON BREAK</span>
-                <span class="footer-value">4</span>
-              </div>
-              <div class="kpi-footer-divider"></div>
-              <div class="kpi-footer-item right">
-                <span class="footer-label">NEAR BREAK</span>
-                <span class="footer-value">6</span>
-              </div>
-            </div>
           </div>
 
           <!-- 2️⃣ Time Loss Today -->
@@ -2000,17 +1989,7 @@
               </svg>
             </div>
 
-            <div class="kpi-footer">
-              <div class="kpi-footer-item left">
-                <span class="footer-label">LATE / EARLY</span>
-                <span class="footer-value">$203</span>
-              </div>
-              <div class="kpi-footer-divider"></div>
-              <div class="kpi-footer-item right negative">
-                <span class="footer-label">LONG BREAKS</span>
-                <span class="footer-value">$94</span>
-              </div>
-            </div>
+
           </div>
 
           <!-- 3️⃣ Punches Needing Action -->
@@ -2036,17 +2015,7 @@
               </svg>
             </div>
 
-            <div class="kpi-footer">
-              <div class="kpi-footer-item left">
-                <span class="footer-label">MISSED IN/OUT</span>
-                <span class="footer-value">11</span>
-              </div>
-              <div class="kpi-footer-divider"></div>
-              <div class="kpi-footer-item right">
-                <span class="footer-label">OLDEST</span>
-                <span class="footer-value">2h 35m</span>
-              </div>
-            </div>
+
           </div>
 
           <!-- 4️⃣ Break Compliance Risk -->
@@ -2072,17 +2041,7 @@
               </svg>
             </div>
 
-            <div class="kpi-footer">
-              <div class="kpi-footer-item left">
-                <span class="footer-label">NEXT DUE</span>
-                <span class="footer-value">18m</span>
-              </div>
-              <div class="kpi-footer-divider"></div>
-              <div class="kpi-footer-item right negative">
-                <span class="footer-label">OVERDUE</span>
-                <span class="footer-value">1</span>
-              </div>
-            </div>
+
           </div>
 
           <!-- 5️⃣ Overtime Risk -->
@@ -2108,17 +2067,7 @@
               </svg>
             </div>
 
-            <div class="kpi-footer">
-              <div class="kpi-footer-item left">
-                <span class="footer-label">NEXT OT IN</span>
-                <span class="footer-value">2h 15m</span>
-              </div>
-              <div class="kpi-footer-divider"></div>
-              <div class="kpi-footer-item right">
-                <span class="footer-label">38h+</span>
-                <span class="footer-value">3</span>
-              </div>
-            </div>
+
           </div>
         </div>
 
@@ -2354,19 +2303,14 @@
             <div class="chart-header">
               <span class="chart-title"
                 >Timekeeping Efficiency
-                <i class="bi bi-calendar-event"></i></span
-              ><span class="chart-filter"
-                >Actual Vs Scheduled Hours <i class="bi"></i
-              ></span>
+                </span>
             </div>
             <canvas id="efficiencyChart" height="180"></canvas>
           </div>
           <div class="chart-container">
             <div class="chart-header">
               <span class="chart-title">Timekeeping Trend</span
-              ><span class="chart-filter"
-                >Actual Vs Scheduled Hours <i class="bi"></i
-              ></span>
+              >
             </div>
             <canvas id="trendChart" height="180"></canvas>
           </div>
@@ -2376,23 +2320,17 @@
           <div class="chart-container">
             <div class="chart-header">
               <span class="chart-title"
-                >Labor Cost Distribution <i class="bi bi-pie-chart"></i></span
-              ><span class="chart-filter"
-                >By Department <i class="bi"></i
-              ></span>
+                >Labor Cost Distribution</span
+              >
             </div>
             <canvas id="laborDistChart"></canvas>
           </div>
-          <div class="chart-container">
-            <div class="chart-header">
-              <span class="chart-title"
-                >Punch Accuracy Trend <i class="bi bi-check-circle"></i></span
-              ><span class="chart-filter"
-                >Auto vs. Manual <i class="bi"></i
-              ></span>
-            </div>
-            <canvas id="accuracyChart"></canvas>
-          </div>
+<div class="chart-container">
+  <div class="chart-header">
+    <span class="chart-title">Labor Cost vs. Sales Trend</span>
+  </div>
+  <canvas id="accuracyChart"></canvas>
+</div>
         </div>
 
         <div
@@ -3408,27 +3346,58 @@
       });
 
       // 5. PUNCH ACCURACY TREND (Line)
-      new Chart(document.getElementById("accuracyChart"), {
-        type: "line",
-        data: {
-          labels: ["17/06", "18/06", "19/06", "20/06", "21/06", "22/06", "23/06"],
-          datasets: [{
-            label: "Manual Edits",
-            data: [5, 8, 2, 4, 9, 3, 2],
-            borderColor: "#ef4444",
-            backgroundColor: "rgba(239, 68, 68, 0.1)",
-            fill: true,
-            tension: 0.4,
-          }],
-        },
-        options: {
-          ...chartOptions,
-          scales: {
-            y: { beginAtZero: true, grid: { color: "#f1f5f9" } },
-            x: { grid: { display: false } },
-          },
-        },
-      });
+new Chart(document.getElementById("accuracyChart"), {
+  type: 'bar',
+  data: {
+    labels: ["17/06", "18/06", "19/06", "20/06", "21/06", "22/06", "23/06"],
+    datasets: [
+      {
+        label: "Actual Sales ($)",
+        data: [1200, 1500, 1100, 900, 1600, 1450, 1300],
+        backgroundColor: "rgba(34, 197, 94, 0.2)", // Light Green Bar
+        borderColor: "#22c55e",
+        borderWidth: 1,
+        yAxisID: 'ySales',
+        order: 2
+      },
+      {
+        label: "Labor Cost ($)",
+        data: [250, 310, 240, 220, 340, 300, 280],
+        type: 'line',
+        borderColor: "#ef4444", // Red Line
+        backgroundColor: "#ef4444",
+        borderWidth: 3,
+        pointRadius: 4,
+        tension: 0.4,
+        yAxisID: 'yLabor',
+        order: 1
+      }
+    ]
+  },
+  options: {
+    ...chartOptions,
+    scales: {
+      x: {
+        grid: { display: false }
+      },
+      ySales: {
+        type: 'linear',
+        display: true,
+        position: 'left',
+        title: { display: true, text: 'Sales ($)', color: '#22c55e', font: { weight: 'bold' } },
+        beginAtZero: true
+      },
+      yLabor: {
+        type: 'linear',
+        display: true,
+        position: 'right',
+        title: { display: true, text: 'Labor ($)', color: '#ef4444', font: { weight: 'bold' } },
+        beginAtZero: true,
+        grid: { drawOnChartArea: false } // Prevents grid lines from overlapping
+      }
+    }
+  }
+});
 
       // 6. SHIFT COVERAGE (Line)
       new Chart(document.getElementById("coverageChart"), {
@@ -4060,31 +4029,33 @@
         });
       }
 
-      function renderKpiTable(data) {
-        const table = document.getElementById("kpiTable");
-        if (!data || !data.table) return;
+function renderKpiTable(data) {
+  const table = document.getElementById("kpiTable");
+  if (!data || !data.table) return;
 
-        // Render Main Data Table
-        let html = `
-        <thead>
-            <tr><th>Category</th><th>Value</th><th>Status</th></tr>
-        </thead>
-        <tbody>
-            ${data.table
-              .map(
-                (row) => `
-                <tr class="table-hover-row">
-                    <td>${row[0]}</td>
-                    <td><b>${row[1]}</b></td>
-                    <td><span class="status-pill ${["Critical", "Urgent", "High"].includes(row[2]) ? "pill-danger" : "pill-success"}">${row[2]}</span></td>
-                </tr>
-            `,
-              )
-              .join("")}
-        </tbody>
-    `;
-        table.innerHTML = html;
-      }
+  // Render Main Data Table (Status Column Removed)
+  let html = `
+  <thead>
+      <tr>
+          <th>Category</th>
+          <th>Value</th>
+      </tr>
+  </thead>
+  <tbody>
+      ${data.table
+        .map(
+          (row) => `
+          <tr class="table-hover-row">
+              <td>${row[0]}</td>
+              <td><b>${row[1]}</b></td>
+          </tr>
+      `,
+        )
+        .join("")}
+  </tbody>
+`;
+  table.innerHTML = html;
+}
 
       function generateAdvancedInsights(data) {
         const insightDiv = document.getElementById("aiInsights");
@@ -4289,46 +4260,34 @@
         }, 50);
       }
 
-      function showKpiTable() {
-        document.getElementById("kpiChartView").style.display = "none";
-        document.getElementById("kpiTableView").style.display = "block";
+function showKpiTable() {
+  document.getElementById("kpiChartView").style.display = "none";
+  document.getElementById("kpiTableView").style.display = "block";
 
-        const chips = document.querySelectorAll("#kpiGraphModal .chip");
-        chips.forEach((c) => c.classList.remove("active"));
-        if (chips[1]) chips[1].classList.add("active");
+  const chips = document.querySelectorAll("#kpiGraphModal .chip");
+  chips.forEach((c) => c.classList.remove("active"));
+  if (chips[1]) chips[1].classList.add("active");
 
-        const table = document.getElementById("kpiTable");
-        table.innerHTML = `
-    <thead>
-      <tr style="background: #f8fafc;">
-        <th style="padding: 15px; text-align: left; color: #64748b; font-size: 12px; text-transform: uppercase;">Category</th>
-        <th style="padding: 15px; text-align: left; color: #64748b; font-size: 12px; text-transform: uppercase;">Value</th>
-        <th style="padding: 15px; text-align: left; color: #64748b; font-size: 12px; text-transform: uppercase;">Status</th>
-      </tr>
-    </thead>
-    <tbody>
-      ${currentKpiData.table
-        .map(
-          (row) => `
-        <tr class="table-hover-row" style="border-bottom: 1px solid #f1f5f9;">
-          <td style="padding: 15px; font-weight: 500;">${row[0]}</td>
-          <td style="padding: 15px; font-weight: 700; color: #0f172a;">${row[1]}</td>
-          <td style="padding: 15px;">
-            <span class="status-pill ${
-              ["Critical", "Urgent", "High"].includes(row[2])
-                ? "pill-danger"
-                : row[2] === "Peak"
-                  ? "pill-success"
-                  : ""
-            }">
-              ${row[2]}
-            </span>
-          </td>
-        </tr>`,
-        )
-        .join("")}
-    </tbody>`;
-      }
+  const table = document.getElementById("kpiTable");
+  table.innerHTML = `
+<thead>
+<tr style="background: #f8fafc;">
+  <th style="padding: 15px; text-align: left; color: #64748b; font-size: 12px; text-transform: uppercase;">Category</th>
+  <th style="padding: 15px; text-align: left; color: #64748b; font-size: 12px; text-transform: uppercase;">Value</th>
+</tr>
+</thead>
+<tbody>
+${currentKpiData.table
+  .map(
+    (row) => `
+  <tr class="table-hover-row" style="border-bottom: 1px solid #f1f5f9;">
+    <td style="padding: 15px; font-weight: 500;">${row[0]}</td>
+    <td style="padding: 15px; font-weight: 700; color: #0f172a;">${row[1]}</td>
+  </tr>`,
+  )
+  .join("")}
+</tbody>`;
+}
 
       // ==========================================
       // 3. UTILITY & PROFILE FUNCTIONS
