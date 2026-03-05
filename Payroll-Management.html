@@ -3,7 +3,7 @@
    <head>
       <meta charset="UTF-8">
       <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-      <title>Zip Clock Redesign</title>
+      <title>Payroll Management</title>
       <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
       <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
       <style>
@@ -972,10 +972,92 @@
          /* GRID */
 .fix-kpi-grid {
     display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 16px; /* Reduced from 20px for a more compact look */
-    margin-bottom: 20px;
+    /* Centers the entire grid of tiles */
+    justify-content: center; 
+    /* Defines a flexible column layout that won't exceed 4 columns */
+    grid-template-columns: repeat(auto-fit, minmax(200px, 260px)); 
+    gap: 20px;
+    margin-bottom: 25px;
+    width: 100%;
 }
+.labor-card, .fix-kpi-card {
+    position: relative;
+    flex: 0 1 280px; /* Slightly wider to accommodate horizontal trend */
+    min-height: 90px; /* Significantly decreased height */
+    padding: 16px;
+    background: #ffffff;
+    border-radius: 12px;
+    border: 1px solid #e2e8f0;
+    border-top: 4px solid #3b82f6 !important; /* Blue accent */
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    transition: all 0.2s ease;
+    cursor: pointer;
+}
+
+.labor-card:hover {
+    transform: translateY(-3px);
+    border-color: #2563eb;
+    box-shadow: 0 10px 15px -3px rgba(37, 99, 235, 0.1);
+}
+
+.labor-header {
+    text-align: center;
+    margin-bottom: 4px;
+}
+
+.labor-value {
+    font-size: 20px;
+    font-weight: 800;
+    color: #0f172a;
+    margin: 0 !important;
+}
+
+.labor-value-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px; /* Gap between value and trend */
+}
+
+.labor-title {
+    font-size: 11px;
+    font-weight: 700;
+    color: #64748b;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+
+.labor-icon, .fix-kpi-top i {
+    position: absolute;
+    top: 10px;
+    right: 12px;
+    font-size: 14px;
+    color: #94a3b8;
+    background: transparent !important;
+}
+
+.labor-trend {
+    padding: 2px 8px;
+    border-radius: 6px;
+    font-size: 11px;
+    font-weight: 700;
+    white-space: nowrap;
+}
+
+.labor-trend.up { background: #dcfce7; color: #166534; }
+.labor-trend.down { background: #fee2e2; color: #dc2626; }
+
+/* Remove all Footer elements permanently */
+.labor-footer, .v-sep, .kpi-divider, .footer-item {
+    display: none !important;
+}
+
+
+
          /* CARD */
          .fix-kpi-card {
          background: #ffffff;
@@ -3196,11 +3278,165 @@
 
 /* Adjust grid spacing for the shorter tiles */
 .fix-kpi-grid {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 16px;
-    margin-bottom: 20px;
+    display: flex;
+    justify-content: center; 
+    align-items: center;
+    gap: 16px; /* Tighter gap for compact look */
+    margin-bottom: 25px;
+    width: 100%;
+    flex-wrap: wrap;
 }
+
+/* Modern Chart Grid & Tooltip */
+.trend-grid-container {
+    position: relative;
+    height: 100%;
+    width: 100%;
+    display: grid;
+    grid-template-columns: 60px 1fr;
+    grid-template-rows: 1fr 30px;
+    /* Grid lines for numeric increments */
+    background-image: linear-gradient(#f1f5f9 1px, transparent 1px);
+    background-size: 100% 20%; 
+}
+
+.chart-tooltip {
+    position: absolute;
+    background: #1e293b;
+    color: #fff;
+    padding: 8px 12px;
+    border-radius: 6px;
+    font-size: 12px;
+    pointer-events: none;
+    z-index: 100;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    display: none;
+}
+
+.axis-label {
+    font-size: 11px;
+    font-weight: 700;
+    color: #94a3b8;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.y-axis-label-text {
+    position: absolute;
+    left: -40px;
+    top: 50%;
+    transform: rotate(-90deg);
+    white-space: nowrap;
+}
+
+/* Hover Effect for Bars */
+.eye-bar {
+    transition: all 0.2s ease;
+    cursor: pointer;
+}
+
+.eye-bar:hover {
+    filter: brightness(1.2);
+    transform: scaleX(1.1);
+}
+
+/* Full-Screen Graph Layout */
+.trend-full-container {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+.trend-grid-container {
+    position: relative;
+    flex: 1; /* Take all available vertical space */
+    display: grid;
+    grid-template-columns: 60px 1fr;
+    grid-template-rows: 1fr 40px;
+    background-image: linear-gradient(#f1f5f9 1px, transparent 1px);
+    background-size: 100% 20%; /* 5 horizontal grid lines */
+    padding: 20px 20px 0 0;
+}
+
+/* Axis Labels and Units */
+.axis-label-main {
+    font-size: 10px;
+    font-weight: 800;
+    color: #64748b;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+}
+
+.y-axis-wrapper {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: flex-end;
+    padding-right: 12px;
+    border-right: 2px solid #e2e8f0;
+}
+
+.y-axis-number {
+    font-size: 11px;
+    font-weight: 700;
+    color: #94a3b8;
+}
+
+/* Hover Tooltip - Positioned relative to the viewport */
+.chart-tooltip {
+    position: fixed;
+    background: #1e293b;
+    color: #fff;
+    padding: 12px;
+    border-radius: 8px;
+    font-size: 13px;
+    pointer-events: none;
+    z-index: 3000;
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.3);
+    display: none;
+    min-width: 150px;
+}
+
+/* Compact Modal & Tooltip Scaling */
+.trend-modal-compact {
+    width: 750px !important;
+    height: 550px !important;
+    max-width: 95vw;
+}
+
+.bar-group {
+    transition: background 0.2s ease;
+    padding: 0 10px;
+    border-radius: 8px 8px 0 0;
+    cursor: pointer;
+}
+
+.bar-group:hover {
+    background: rgba(241, 245, 249, 0.8); /* Highlight the entire week on hover */
+}
+
+.chart-tooltip {
+    position: fixed;
+    background: #1e293b;
+    color: #fff;
+    padding: 12px;
+    border-radius: 8px;
+    font-size: 13px;
+    pointer-events: none;
+    z-index: 3000;
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.3);
+    display: none;
+    min-width: 140px;
+}
+
+.tooltip-row {
+    display: flex;
+    justify-content: space-between;
+    gap: 15px;
+    margin-top: 4px;
+}
+
+
 
       </style>
    </head>
@@ -3783,87 +4019,75 @@
                </div>
                <!--- Hourly Review Punches-->
                <div id="hourlyView" class="tab-view">
-                  <div class="fix-kpi-grid">
-                     <!-- REGULAR HRS | PAY -->
-                     <div class="labor-card" onclick="openHourlyPunchModal('regular')">
-                        <div class="labor-header">
-                           <div class="labor-title">
-                              <i class="bi bi-graph-up"></i>
-                              Regular Hrs | Pay ($)
-                           </div>
-                           <div class="labor-icon icon-green">
-                              <i class="bi bi-clock"></i>
-                           </div>
-                        </div>
-                        <div class="labor-value" id="kpiRegularHrsPay">
-                           120.00 | $460.00
-                        </div>
-                        <div class="labor-trend up">
-                           <i class="bi bi-arrow-up"></i>
-                           +6.5% this week
-                        </div>
-                     </div>
-                     <!-- TOTAL HRS | PAY -->
-                     <div class="labor-card" onclick="openHourlyPunchModal('total')">
-                        <div class="labor-header">
-                           <div class="labor-title">
-                              <i class="bi bi-graph-up"></i>
-                              Total Hrs | Pay ($)
-                           </div>
-                           <div class="labor-icon icon-blue">
-                              <i class="bi bi-hourglass-split"></i>
-                           </div>
-                        </div>
-                        <div class="labor-value" id="kpiTotalHrsPay">
-                           150.00 | $600.00
-                        </div>
-                        <div class="labor-trend up">
-                           <i class="bi bi-arrow-up"></i>
-                           +4.2% this week
-                        </div>
+<div class="fix-kpi-grid">
+    <div class="labor-card accent-green" onclick="openHourlyPunchModal('regular')">
+        <div class="labor-header">
+            <div class="labor-title">
+                Regular Hrs | Pay ($)
+            </div>
+            <div class="labor-icon icon-green">
+                <i class="bi bi-clock"></i>
+            </div>
+        </div>
+        <div class="labor-value-container">
+            <div class="labor-value" id="kpiRegularHrsPay">120.00 | $460.00</div>
+            <div class="labor-trend up">
+                <i class="bi bi-arrow-up"></i> 6.5%
+            </div>
+        </div>
+    </div>
 
-                     </div>
-                     <!-- TIME LOSS HRS | PAY -->
-                     <div class="labor-card" onclick="openHourlyPunchModal('loss')">
-                        <div class="labor-header">
-                           <div class="labor-title">
-                              <i class="bi bi-graph-up"></i>
-                              Time Loss Hrs | Pay ($)
-                           </div>
-                           <div class="labor-icon icon-orange">
-                              <i class="bi bi-exclamation-triangle"></i>
-                           </div>
-                        </div>
-                        <div class="labor-value" id="kpiLossHrsPay">
-                           25.00 | $150.00
-                        </div>
-                        <div class="labor-trend up">
-                           <i class="bi bi-arrow-up"></i>
-                           +9.1% this week
-                        </div>
+    <div class="labor-card accent-blue" onclick="openHourlyPunchModal('total')">
+        <div class="labor-header">
+            <div class="labor-title">
+                Total Hrs | Pay ($)
+            </div>
+            <div class="labor-icon icon-blue">
+                <i class="bi bi-hourglass-split"></i>
+            </div>
+        </div>
+        <div class="labor-value-container">
+            <div class="labor-value" id="kpiTotalHrsPay">150.00 | $600.00</div>
+            <div class="labor-trend up">
+                <i class="bi bi-arrow-up"></i> 4.2%
+            </div>
+        </div>
+    </div>
 
-                     </div>
-                     <!-- HIGHEST TIME LOSS -->
-                     <div class="labor-card" onclick="openHourlyPunchModal('highest')">
-                        <div class="labor-header">
-                           <div class="labor-title">
-                              <i class="bi bi-graph-up"></i>
-                              Highest Time Loss
-                           </div>
-                           <div class="labor-icon icon-purple">
-                              <i class="bi bi-graph-up"></i>
-                           </div>
-                        </div>
-                        <div class="labor-value" id="kpiHighestLossEmp">
-                           Andrew R 
-                        </div>
-                        <div class="labor-trend down">
-                           <i class="bi bi-arrow-down"></i>
-                           −2.3% this week
-                        </div>
+    <div class="labor-card accent-orange" onclick="openHourlyPunchModal('loss')">
+        <div class="labor-header">
+            <div class="labor-title">
+                Time Loss Hrs | Pay ($)
+            </div>
+            <div class="labor-icon icon-orange">
+                <i class="bi bi-exclamation-triangle"></i>
+            </div>
+        </div>
+        <div class="labor-value-container">
+            <div class="labor-value" id="kpiLossHrsPay">25.00 | $150.00</div>
+            <div class="labor-trend up">
+                <i class="bi bi-arrow-up"></i> 9.1%
+            </div>
+        </div>
+    </div>
 
-                     </div>
-                  </div>
+    <div class="labor-card accent-purple" onclick="openHourlyPunchModal('highest')">
+        <div class="labor-header">
+            <div class="labor-title">
+                Highest Time Loss
+            </div>
+            <div class="labor-icon icon-purple">
+                <i class="bi bi-graph-up"></i>
+            </div>
+        </div>
+        <div class="labor-value-container">
+            <div class="labor-value" id="kpiHighestLossEmp">Andrew R</div>
+            <div class="labor-trend down">
+                <i class="bi bi-arrow-down"></i> 2.3%
+            </div>
+        </div>
+    </div>
+</div>
                   <div class="search-bar-container">
                      <div class="search-wrapper">
                         <input type="text" placeholder="Search Employees...">
@@ -3989,80 +4213,67 @@
                <div id="fixIssuesView" class="tab-view hidden">
                   <!-- KPI STRIP -->
                   <!-- KPI TILES -->
-                  <div class="fix-kpi-grid">
-                     <!-- OPEN PUNCHES -->
-                     <div class="labor-card" onclick="openIssueModal('open')">
-                        <div class="labor-header">
-                           <div class="labor-title">
-                              <i class="bi bi-graph-up"></i>
-                              Open Punches
-                           </div>
-                           <div class="labor-icon icon-blue">
-                              <i class="bi bi-clock-history"></i>
-                           </div>
-                        </div>
-                        <div class="labor-value">1</div>
-                        <div class="labor-trend up">
-                           <i class="bi bi-arrow-up"></i>
-                           +12.0% this week
-                        </div>
+<div class="fix-kpi-grid">
+    <div class="labor-card accent-blue" onclick="openIssueModal('open')">
+        <div class="labor-header">
+            <div class="labor-title">Open Punches</div>
+            <div class="labor-icon icon-blue">
+                <i class="bi bi-clock-history"></i>
+            </div>
+        </div>
+        <div class="labor-value-container">
+            <div class="labor-value">1</div>
+            <div class="labor-trend up">
+                <i class="bi bi-arrow-up"></i> 12.0%
+            </div>
+        </div>
+    </div>
 
-                     </div>
-                     <!-- MISMATCHED PUNCHES -->
-                     <div class="labor-card" onclick="openIssueModal('mismatch')">
-                        <div class="labor-header">
-                           <div class="labor-title">
-                              <i class="bi bi-graph-up"></i>
-                              Mismatched Punches
-                           </div>
-                           <div class="labor-icon icon-orange">
-                              <i class="bi bi-exclamation-triangle"></i>
-                           </div>
-                        </div>
-                        <div class="labor-value">1</div>
-                        <div class="labor-trend down">
-                           <i class="bi bi-arrow-down"></i>
-                           −4.0% this week
-                        </div>
+    <div class="labor-card accent-orange" onclick="openIssueModal('mismatch')">
+        <div class="labor-header">
+            <div class="labor-title">Mismatched Punches</div>
+            <div class="labor-icon icon-orange">
+                <i class="bi bi-exclamation-triangle"></i>
+            </div>
+        </div>
+        <div class="labor-value-container">
+            <div class="labor-value">1</div>
+            <div class="labor-trend down">
+                <i class="bi bi-arrow-down"></i> 4.0%
+            </div>
+        </div>
+    </div>
 
-                     </div>
-                     <!-- UNAUTHORIZED PUNCHES -->
-                     <div class="labor-card" onclick="openIssueModal('unauthorized')">
-                        <div class="labor-header">
-                           <div class="labor-title">
-                              <i class="bi bi-graph-up"></i>
-                              Unauthorized Punches
-                           </div>
-                           <div class="labor-icon icon-red">
-                              <i class="bi bi-shield-x"></i>
-                           </div>
-                        </div>
-                        <div class="labor-value">1</div>
-                        <div class="labor-trend up">
-                           <i class="bi bi-arrow-up"></i>
-                           +8.0% this week
-                        </div>
+    <div class="labor-card accent-red" onclick="openIssueModal('unauthorized')">
+        <div class="labor-header">
+            <div class="labor-title">Unauthorized Punches</div>
+            <div class="labor-icon icon-red">
+                <i class="bi bi-shield-x"></i>
+            </div>
+        </div>
+        <div class="labor-value-container">
+            <div class="labor-value">1</div>
+            <div class="labor-trend up">
+                <i class="bi bi-arrow-up"></i> 8.0%
+            </div>
+        </div>
+    </div>
 
-                     </div>
-                     <!-- GEO LOCATION PUNCHES -->
-                     <div class="labor-card" onclick="openIssueModal('geo')">
-                        <div class="labor-header">
-                           <div class="labor-title">
-                              <i class="bi bi-graph-up"></i>
-                              Geo Location Punches
-                           </div>
-                           <div class="labor-icon icon-purple">
-                              <i class="bi bi-geo-alt"></i>
-                           </div>
-                        </div>
-                        <div class="labor-value">1</div>
-                        <div class="labor-trend down">
-                           <i class="bi bi-arrow-down"></i>
-                           −2.0% this week
-                        </div>
- 
-                     </div>
-                  </div>
+    <div class="labor-card accent-purple" onclick="openIssueModal('geo')">
+        <div class="labor-header">
+            <div class="labor-title">Geo Location Punches</div>
+            <div class="labor-icon icon-purple">
+                <i class="bi bi-geo-alt"></i>
+            </div>
+        </div>
+        <div class="labor-value-container">
+            <div class="labor-value">1</div>
+            <div class="labor-trend down">
+                <i class="bi bi-arrow-down"></i> 2.0%
+            </div>
+        </div>
+    </div>
+</div>
                   <!-- ISSUE MODAL -->
                   <div id="issueModal" class="modal-overlay hidden" onclick="closeIssueModal(event)">
                      <div class="modal-box" onclick="event.stopPropagation()">
@@ -4230,86 +4441,39 @@
                <!-- EXTRA PAY VIEW -->
                <div id="extraPayView" class="tab-view hidden">
                   <!-- EXTRA PAY TILES -->
-                  <div class="fix-kpi-grid">
-                     <!-- TOTAL EXTRA PAY -->
-                     <div class="labor-card" onclick="openExtraPayModal('total')">
-                        <div class="labor-header">
-                           <div class="labor-title">
-                              <i class="bi bi-graph-up"></i>
-                              Total Extra Pay
-                           </div>
-                           <div class="labor-icon icon-green">
-                              <i class="bi bi-cash-stack"></i>
-                           </div>
-                        </div>
-                        <div class="labor-value">$239.25</div>
-                        <div class="labor-trend up">
-                           <i class="bi bi-arrow-up"></i>
-                           +9.4% this week
-                        </div>
-   
-                     </div>
-                     <!-- EXTRA PAY ENTRIES -->
-                     <!-- <div class="labor-card" onclick="openExtraPayModal('entries')">
-                        <div class="labor-header">
-                           <div class="labor-title">
-                              <i class="bi bi-graph-up"></i>
-                              Extra Pay Entries
-                           </div>
-                           <div class="labor-icon icon-blue">
-                              <i class="bi bi-receipt"></i>
-                           </div>
-                        </div>
-                        <div class="labor-value">7</div>
-                        <div class="labor-trend up">
-                           <i class="bi bi-arrow-up"></i>
-                           +16.7% this week
-                        </div>
+<div class="fix-kpi-grid">
+    <div class="labor-card accent-green" onclick="openExtraPayModal('total')">
+        <div class="labor-header">
+            <div class="labor-title">Total Extra Pay</div>
+            <div class="labor-icon icon-green">
+                <i class="bi bi-cash-stack"></i>
+            </div>
+        </div>
+        <div class="labor-value-container">
+            <div class="labor-value" id="kpiTotalExtraPay">$239.25</div>
+            <div class="labor-trend up">
+                <i class="bi bi-arrow-up"></i> 9.4%
+            </div>
+        </div>
+    </div>
 
-                     </div> -->
-                     <!-- MOST USED REASON -->
-                     <div class="labor-card" onclick="openExtraPayModal('reason')">
-                        <div class="labor-header">
-                           <div class="labor-title">
-                              <i class="bi bi-graph-up"></i>
-                              Most Used Reason
-                           </div>
-                           <div class="labor-icon icon-orange">
-                              <i class="bi bi-bar-chart"></i>
-                           </div>
-                        </div>
-                        <div class="labor-value" style="font-size:18px;">
-                           Paid Time-Off
-                           <span id="mostUsedReasonCount" class="kpi-count-badge"></span>
-                        </div>
-                        <div class="labor-trend up">
-                           <i class="bi bi-arrow-up"></i>
-                           +5.0% this week
-                        </div>
-
-                     </div>
-                     <!-- MOST UPDATED BY -->
-                    <!-- <div class="labor-card" onclick="openExtraPayModal('user')">
-                        <div class="labor-header">
-                           <div class="labor-title">
-                              <i class="bi bi-graph-up"></i>
-                              Most Updated By
-                           </div>
-                           <div class="labor-icon icon-purple">
-                              <i class="bi bi-person-check"></i>
-                           </div>
-                        </div>
-                        <div class="labor-value" style="font-size:18px;">
-                           Tushar
-                           <span id="mostUpdatedByCount" class="kpi-count-badge"></span>
-                        </div>
-                        <div class="labor-trend down">
-                           <i class="bi bi-arrow-down"></i>
-                           −3.2% this week
-                        </div>
-
-                     </div> -->
-                  </div>
+    <div class="labor-card accent-orange" onclick="openExtraPayModal('reason')">
+        <div class="labor-header">
+            <div class="labor-title">Most Used Reason</div>
+            <div class="labor-icon icon-orange">
+                <i class="bi bi-bar-chart"></i>
+            </div>
+        </div>
+        <div class="labor-value-container">
+            <div class="labor-value" style="font-size:16px;">
+                Paid Time-Off <span id="mostUsedReasonCount" class="kpi-count-badge">2</span>
+            </div>
+            <div class="labor-trend up">
+                <i class="bi bi-arrow-up"></i> 5.0%
+            </div>
+        </div>
+    </div>
+</div>
                   <div class="fix-filter-bar"
                      style="display:grid; grid-template-columns: 1fr auto 1fr; align-items:center; margin-bottom:12px;">
                      <!-- LEFT spacer -->
@@ -4741,6 +4905,38 @@
             </div>
          </div>
       </div>
+
+<div id="timeLossTrendModal" class="modal-overlay hidden" onclick="closeModal(event, 'timeLossTrendModal')">
+    <div class="dynamic-modal trend-modal-compact" onclick="event.stopPropagation()">
+        <div class="modern-modal-header">
+            <div>
+                <h2 style="font-size: 18px; font-weight: 800; color: #0f172a;">Time Loss Trend</h2>
+                <p id="trendModalEmp" style="font-size: 13px; color: #64748b;"></p>
+            </div>
+            <i class="bi bi-x-circle-fill" style="font-size: 22px; color: #cbd5e1; cursor: pointer;" onclick="closeTrendModal()"></i>
+        </div>
+
+        <div style="padding: 15px 25px; display: flex; justify-content: space-between; align-items: center; background: #f8fafc;">
+<select id="trendMetricToggle" class="metric-dropdown" style="width: 150px;" onchange="renderTrendGraph(this.value)">
+    <option value="dollars">Dollars ($)</option>
+    <option value="hours">Hours</option>
+</select>
+            
+            <div class="chart-legend" style="display: flex; gap: 15px;">
+                <span style="font-size: 12px; font-weight: 700; color: #475569;">
+                    <span class="dot" style="background:#6366f1; width: 10px; height: 10px;"></span> Total
+                </span>
+                <span style="font-size: 12px; font-weight: 700; color: #475569;">
+                    <span class="dot" style="background:#f59e0b; width: 10px; height: 10px;"></span> Loss
+                </span>
+            </div>
+        </div>
+
+        <div id="trendGraphContent" style="height: 320px; padding: 20px 30px 40px 30px;">
+            </div>
+    </div>
+</div>
+
       <script>
          const employeeData = [
              { name: "Andrew K", reg: "29.22 | 628.16", ot: "0.00 | 0.00", dt: "0.00 | 0.00", ex: "0.00 | 0.00", total: "29.22 | 628.16", cTip: "0.00", csTip: "0.00", tTip: "0.00", tl: "4.82 | 103.56" },
@@ -5804,24 +6000,28 @@
          
          
          
-         function renderHourlyPunches() {
-             const tbody = document.getElementById('hourlyTableBody');
-             tbody.innerHTML = employeeData.map(emp => `
-                 <tr>
-                     <td style="font-weight:600">${emp.name}</td>
-                     <td>${emp.reg}</td>
-                     <td>${emp.ot}</td>
-                     <td>${emp.dt}</td>
-                     <td>${emp.ex}</td>
-                     <td>${emp.total}</td>
-                     <td>${emp.cTip}</td>
-                     <td>${emp.csTip}</td>
-                     <td>${emp.tTip}</td>
-                     <td><span class="link-blue" onclick="openTimeLoss()">${emp.tl}</span></td>
-                     <td style="text-align:center"><i class="bi bi-eye eye-btn" onclick="openEyeAction()"></i></td>
-                 </tr>
-             `).join('');
-         }
+function renderHourlyPunches() {
+    const tbody = document.getElementById('hourlyTableBody');
+    tbody.innerHTML = employeeData.map(emp => `
+        <tr>
+            <td style="font-weight:600">${emp.name}</td>
+            <td>${emp.reg}</td>
+            <td>${emp.ot}</td>
+            <td>${emp.dt}</td>
+            <td>${emp.ex}</td>
+            <td>${emp.total}</td>
+            <td>${emp.cTip}</td>
+            <td>${emp.csTip}</td>
+            <td>${emp.tTip}</td>
+            <td><span class="link-blue" onclick="openTimeLoss()">${emp.tl}</span></td>
+            <td style="text-align:center; display:flex; gap:10px; justify-content:center;">
+                <i class="bi bi-eye eye-btn" onclick="openEyeAction()"></i>
+                <i class="bi bi-bar-chart-line-fill eye-btn" style="color: #f59e0b;" 
+                   title="View Time Loss Trend" onclick="openTimeLossTrend('${emp.name}')"></i>
+            </td>
+        </tr>
+    `).join('');
+}
          
          const highValueData = [
          { date: "01/02/2026", early: "5.50 | $ 120.00", late: "2.10 | $ 45.00", ot: "0.00", break: "0.00", total: "7.60 | $ 165.00", val: 165.00 },
@@ -6159,6 +6359,107 @@ function filterTermination(query) {
         const name = row.querySelector('.emp-name').innerText.toLowerCase();
         row.style.display = name.includes(value) ? '' : 'none';
     });
+}
+
+let currentTrendEmployee = "";
+
+function openTimeLossTrend(empName) {
+    currentTrendEmployee = empName;
+    document.getElementById('trendModalEmp').innerText = empName;
+    document.getElementById('timeLossTrendModal').classList.remove('hidden');
+    document.getElementById('timeLossTrendModal').style.display = 'flex';
+    
+    // Set dropdown to Dollars and trigger initial render
+    const toggle = document.getElementById('trendMetricToggle');
+    toggle.value = 'dollars'; 
+    renderTrendGraph('dollars');
+}
+
+function renderTrendGraph(metric) {
+    const container = document.getElementById('trendGraphContent');
+    const isDollars = metric === 'dollars';
+    const unit = isDollars ? '$' : 'hrs';
+    const weeks = ['Week 1', 'Week 2', 'Week 3', 'Week 4', 'Week 5', 'Week 6'];
+    
+    // Data sets matched to visual reference
+    const data = isDollars ? 
+        { total: [1240, 1180, 1350, 1100, 1290, 1420], loss: [85, 40, 110, 25, 65, 90] } :
+        { total: [40.0, 38.5, 44.0, 36.0, 42.0, 45.5], loss: [2.8, 1.2, 3.5, 0.8, 2.1, 3.0] };
+
+    // Calculate dynamic Y-axis scale (5-point distribution)
+    const maxVal = Math.max(...data.total) * 1.15;
+    const scale = [maxVal, maxVal * 0.75, maxVal * 0.5, maxVal * 0.25, 0];
+
+    container.innerHTML = `
+        <div id="chartTooltip" class="chart-tooltip"></div>
+        <div class="trend-grid-container">
+            <div class="y-axis-wrapper">
+                ${scale.map(val => `
+                    <span class="y-axis-number">${isDollars ? '$' : ''}${Math.round(val)}</span>
+                `).join('')}
+            </div>
+
+            <div style="display: flex; justify-content: space-around; align-items: flex-end; padding: 0 10px;">
+                ${weeks.map((week, i) => {
+                    const tH = (data.total[i] / maxVal) * 100;
+                    const lH = (data.loss[i] / maxVal) * 100;
+                    return `
+                    <div class="bar-group" 
+                         onmousemove="showCombinedTooltip(event, '${week}', '${data.total[i]}', '${data.loss[i]}', '${unit}')"
+                         onmouseleave="hideTrendTooltip()"
+                         style="display: flex; align-items: flex-end; gap: 4px; height: 100%; cursor: pointer;">
+                        <div style="height:${tH}%; background:#6366f1; width:22px; border-radius:4px 4px 0 0;"></div>
+                        <div style="height:${lH}%; background:#f59e0b; width:22px; border-radius:4px 4px 0 0;"></div>
+                    </div>`;
+                }).join('')}
+            </div>
+
+            <div></div>
+            <div style="display: flex; justify-content: space-around; border-top: 1px solid #e2e8f0; padding-top: 8px;">
+                ${weeks.map(w => `<span style="font-size:11px; font-weight:700; color:#64748b;">${w}</span>`).join('')}
+            </div>
+        </div>
+    `;
+}
+
+function showCombinedTooltip(event, week, total, loss, unit) {
+    const tooltip = document.getElementById('chartTooltip');
+    const fTotal = unit === '$' ? `$${total}` : `${total} hrs`;
+    const fLoss = unit === '$' ? `$${loss}` : `${loss} hrs`;
+    
+    tooltip.innerHTML = `
+        <div style="border-bottom: 1px solid #334155; padding-bottom: 6px; margin-bottom: 8px; font-weight: 800; color: #94a3b8; font-size: 11px;">${week.toUpperCase()} DETAILS</div>
+        <div style="display:flex; justify-content:space-between; margin-bottom:4px;">
+            <span>Total:</span> <b style="color:#818cf8">${fTotal}</b>
+        </div>
+        <div style="display:flex; justify-content:space-between;">
+            <span>Time Loss:</span> <b style="color:#fbbf24">${fLoss}</b>
+        </div>
+    `;
+    tooltip.style.display = 'block';
+    tooltip.style.left = (event.clientX + 20) + 'px';
+    tooltip.style.top = (event.clientY - 40) + 'px';
+}
+
+// Tooltip positioning adjustment for full-screen view
+function showTrendTooltip(event, label, value, unit) {
+    const tooltip = document.getElementById('chartTooltip');
+    const formattedVal = unit === '$' ? `$${parseFloat(value).toLocaleString()}` : `${value} hrs`;
+    tooltip.innerHTML = `
+        <div style="color: #94a3b8; font-size: 10px; text-transform: uppercase; margin-bottom: 4px; font-weight: 800;">${label}</div>
+        <div style="font-size: 16px; font-weight: 800;">${formattedVal}</div>
+    `;
+    tooltip.style.display = 'block';
+    tooltip.style.left = (event.clientX + 15) + 'px';
+    tooltip.style.top = (event.clientY - 60) + 'px';
+}
+
+function hideTrendTooltip() {
+    document.getElementById('chartTooltip').style.display = 'none';
+}
+
+function closeTrendModal() {
+    document.getElementById('timeLossTrendModal').style.display = 'none';
 }
          
       </script>
