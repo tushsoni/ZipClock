@@ -3744,6 +3744,58 @@
     }
 }
 
+/* Align popovers to the center container */
+#centerFilterContainer .filter-popover {
+    top: 45px;
+    left: 50%;
+    transform: translateX(-50%);
+}
+/* Ensure the button looks consistent in the header */
+.tab-filter-wrap .filter-btn {
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+}
+
+#centerFilterContainer {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 1100; /* Ensure it stays above other content */
+}
+
+/* Adjusting the popover position to align with header buttons */
+#centerFilterContainer .filter-popover {
+    position: absolute;
+    top: 45px; /* Adjust based on your header height */
+    left: 50%;
+    transform: translateX(-50%);
+    display: none;
+    z-index: 1200;
+}
+
+.filter-popover {
+    position: absolute;
+    /* Position it exactly below the button */
+    top: calc(100% + 10px); 
+    left: 50%;
+    transform: translateX(-50%);
+    
+    /* Ensure it stays on top of the table content */
+    z-index: 2100; 
+    
+    /* Existing styles */
+    background: #ffffff;
+    border-radius: 12px;
+    width: 260px;
+    border: 1px solid #e2e8f0;
+    box-shadow: 0 14px 30px rgba(0,0,0,0.15);
+    display: none;
+}
+
+/* Ensure the center container doesn't clip the popover */
+#centerFilterContainer {
+    overflow: visible !important;
+}
+
 
       </style>
    </head>
@@ -3860,31 +3912,76 @@
             </div>
             <div id="detailScreen" class="payroll-panel hidden">
                <div class="panel-header detail-header-premium">
-                  <div class="header-top-row">
-                     <div class="panel-title panel-title-premium">
-                        Payroll <span id="activePeriod">01/27/2026 - 02/02/2026</span>
-                     </div>
-<div style="display: flex; align-items: center; gap: 20px;">
-   
-   <div id="headerFinalizeContainer" class="hidden">
-      <button class="btn-finalize" style="padding: 8px 20px; font-size: 14px;">
-         Finalize
-      </button>
+<div class="header-top-row" style="position: relative;">
+   <div class="panel-title panel-title-premium">
+      Payroll <span id="activePeriod">01/27/2026 - 02/02/2026</span>
    </div>
 
-   <div class="report-dropdown-wrapper">
-      <button class="btn-report-trigger" onclick="toggleReportMenu(event)">
-         <i class="bi bi-printer"></i>
-         <i class="bi bi-caret-down-fill" style="font-size: 8px;"></i>
+<div id="centerFilterContainer" style="position: absolute; left: 50%; transform: translateX(-50%); display: flex; align-items: center;">
+   
+   <div id="fixIssuesFilterBtn" class="tab-filter-wrap hidden" style="position: relative;">
+      <button class="filter-btn" onclick="toggleIssueFilter()">
+         <i class="bi bi-funnel"></i> Filter
       </button>
       </div>
-   
-   <button class="btn-back-modern" onclick="showLandingView()">
-      <i class="bi bi-arrow-left" style="font-size: 18px;"></i> 
-      Back
-   </button>
+
+   <div id="extraPayFilterBtn" class="tab-filter-wrap hidden" style="position: relative;">
+      <button class="filter-btn" onclick="toggleExtraPayFilter()">
+         <i class="bi bi-funnel"></i> Filter
+      </button>
+      </div>
+
+                           <div id="issueFilterPopover" class="filter-popover">
+                        <div class="filter-header">
+                           <span>Issue Type</span>
+                           <i class="bi bi-x" onclick="toggleIssueFilter()"></i>
+                        </div>
+                        <div class="filter-body">
+                           <label><input type="checkbox" value="open" checked> Open Punch</label>
+                           <label><input type="checkbox" value="mismatch" checked> Mismatched Punch</label>
+                           <label><input type="checkbox" value="unauthorized" checked> Unauthorized Punch</label>
+                           <label><input type="checkbox" value="geo" checked> Geo Location Punch</label>
+                        </div>
+                        <div class="filter-footer">
+                           <button class="btn-clear" onclick="clearIssueFilter()">Clear</button>
+                           <button class="btn-apply" onclick="applyIssueFilter()">Apply</button>
+                        </div>
+                     </div>
+
+                                             <div id="extraPayFilterPopover" class="filter-popover">
+                           <div class="filter-header">
+                              <span>Reason</span>
+                              <i class="bi bi-x" onclick="toggleExtraPayFilter()"></i>
+                           </div>
+                           <div class="filter-body" id="extraPayFilterBody"></div>
+                           <div class="filter-footer">
+                              <button class="btn-clear" onclick="clearExtraPayFilter()">Clear</button>
+                              <button class="btn-apply" onclick="applyExtraPayFilter()">Apply</button>
+                           </div>
+                        </div>
+
 </div>
-                  </div>
+
+   <div style="display: flex; align-items: center; gap: 20px;">
+      <div id="headerFinalizeContainer" class="hidden">
+         <button class="btn-finalize" style="padding: 8px 20px; font-size: 14px;">
+            Finalize
+         </button>
+      </div>
+
+      <div class="report-dropdown-wrapper">
+         <button class="btn-report-trigger" onclick="toggleReportMenu(event)">
+            <i class="bi bi-printer"></i>
+            <i class="bi bi-caret-down-fill" style="font-size: 8px;"></i>
+         </button>
+      </div>
+
+      <button class="btn-back-modern" onclick="showLandingView()">
+         <i class="bi bi-arrow-left" style="font-size: 18px;"></i> 
+         Back
+      </button>
+   </div>
+</div>
                </div>
                <br> 
 <div class="stepper-full-container">
@@ -3974,9 +4071,7 @@
                         </span>
                         <span class="ai-text">AI Insights</span>
                         </button>
-                        <button class="btn-finalize">
-                        Finalize
-                        </button>
+
                      </div>
                   </div>
                   <!-- ===== INSIGHTS SECTION (HIDDEN INITIALLY) ===== -->
@@ -4345,7 +4440,7 @@
             </div>
         </div>
         <div class="labor-value-container">
-            <div class="labor-value" id="kpiTotalHrsPay">99.00 | $600.00</div>
+            <div class="labor-value">99.00 | $600.00</div>
             <div class="labor-trend up">
                 <i class="bi bi-arrow-up"></i> 4.2%
             </div>
@@ -4611,27 +4706,9 @@
                   </div>
                   <!-- FILTER BAR -->
                   <div class="fix-filter-bar">
-                     <button class="filter-btn" onclick="toggleIssueFilter()">
-                     <i class="bi bi-funnel"></i>
-                     Filter
-                     </button>
+
                      <!-- FILTER POPOVER -->
-                     <div id="issueFilterPopover" class="filter-popover">
-                        <div class="filter-header">
-                           <span>Issue Type</span>
-                           <i class="bi bi-x" onclick="toggleIssueFilter()"></i>
-                        </div>
-                        <div class="filter-body">
-                           <label><input type="checkbox" value="open" checked> Open Punch</label>
-                           <label><input type="checkbox" value="mismatch" checked> Mismatched Punch</label>
-                           <label><input type="checkbox" value="unauthorized" checked> Unauthorized Punch</label>
-                           <label><input type="checkbox" value="geo" checked> Geo Location Punch</label>
-                        </div>
-                        <div class="filter-footer">
-                           <button class="btn-clear" onclick="clearIssueFilter()">Clear</button>
-                           <button class="btn-apply" onclick="applyIssueFilter()">Apply</button>
-                        </div>
-                     </div>
+
                   </div>
                   <!-- FIX ISSUES TABLE -->
                   <div class="payroll-table-container" style="margin-top:20px;">
@@ -4792,22 +4869,9 @@
                      <div></div>
                      <!-- CENTER: FILTER -->
                      <div style="display:flex; justify-content:center;">
-                        <button class="filter-btn" onclick="toggleExtraPayFilter()">
-                        <i class="bi bi-funnel"></i>
-                        Filter
-                        </button>
+
                         <!-- EXTRA PAY FILTER POPOVER -->
-                        <div id="extraPayFilterPopover" class="filter-popover">
-                           <div class="filter-header">
-                              <span>Reason</span>
-                              <i class="bi bi-x" onclick="toggleExtraPayFilter()"></i>
-                           </div>
-                           <div class="filter-body" id="extraPayFilterBody"></div>
-                           <div class="filter-footer">
-                              <button class="btn-clear" onclick="clearExtraPayFilter()">Clear</button>
-                              <button class="btn-apply" onclick="applyExtraPayFilter()">Apply</button>
-                           </div>
-                        </div>
+
                      </div>
                      <!-- RIGHT: ADD -->
                      <div style="display:flex; justify-content:flex-end;">
@@ -5795,23 +5859,39 @@ function openHourlyPunchModal(type) {
     
     body.innerHTML = '';
     
-    // Helper to extract data from the live table rows
+    // Extract data accurately from the live table columns
     const getTableData = () => {
         return Array.from(document.querySelectorAll('#hourlyTableBody tr')).map(row => {
             const cells = row.querySelectorAll('td');
             return {
                 emp: cells[0].innerText.trim(),
-                ot: cells[2].innerText.trim(),
-                total: cells[5].innerText.trim(),
-                loss: cells[9].innerText.trim()
+                reg: cells[1].innerText.trim(), // Column 2
+                ot: cells[2].innerText.trim(),  // Column 3
+                total: cells[5].innerText.trim(), // Column 6
+                loss: cells[9].innerText.trim()   // Column 10
             };
         });
     };
 
     const currentData = getTableData();
 
-    // 1. Overtime Logic (Replaces Regular)
-    if (type === 'overtime') {
+    // 1. Regular Hours Logic (This was missing/incomplete)
+    if (type === 'regular') {
+        title.innerText = 'Regular Hours | Pay';
+        thead.innerHTML = '<th>Employee</th><th>Regular Hours</th><th>Regular Pay ($)</th>';
+        
+        currentData.forEach(r => {
+            if (r.reg.includes('|')) {
+                const [h, p] = r.reg.split('|').map(v => v.trim());
+                if (parseFloat(h) > 0) {
+                    body.innerHTML += `<tr><td class="emp-name">${r.emp}</td><td>${h}</td><td>${p}</td></tr>`;
+                }
+            }
+        });
+    }
+    
+    // 2. Overtime Logic
+    else if (type === 'overtime') {
         title.innerText = 'Overtime Hours | Pay';
         thead.innerHTML = '<th>Employee</th><th>OT Hours</th><th>OT Pay ($)</th>';
         
@@ -5825,8 +5905,8 @@ function openHourlyPunchModal(type) {
         });
     }
     
-    // 2. Total Hours Logic
-    if (type === 'total') {
+    // 3. Total Hours Logic
+    else if (type === 'total') {
         title.innerText = 'Total Hours | Pay';
         thead.innerHTML = '<th>Employee</th><th>Total Hrs</th><th>Pay ($)</th>';
         
@@ -5838,8 +5918,8 @@ function openHourlyPunchModal(type) {
         });
     }
     
-    // 3. Time Loss Logic
-    if (type === 'loss') {
+    // 4. Time Loss Logic
+    else if (type === 'loss') {
         title.innerText = 'Time Loss Hours | Pay';
         thead.innerHTML = '<th>Employee</th><th>Loss Hrs</th><th>Loss ($)</th>';
         
@@ -5852,11 +5932,12 @@ function openHourlyPunchModal(type) {
             }
         });
     }
-    
+
     // 4. Highest Time Loss Logic
     if (type === 'highest') {
         const validLossData = currentData.filter(r => r.loss.includes('|'));
         if (validLossData.length > 0) {
+            // Find the record with the maximum dollar value in the loss column
             const max = validLossData.reduce((a, b) => {
                 const valA = parseFloat(a.loss.split('|')[1].replace(/[^0-9.]/g, '')) || 0;
                 const valB = parseFloat(b.loss.split('|')[1].replace(/[^0-9.]/g, '')) || 0;
@@ -5864,14 +5945,16 @@ function openHourlyPunchModal(type) {
             });
             
             title.innerText = 'Highest Time Loss';
+            // Update the headers to match the expected data
             thead.innerHTML = '<th>Employee</th><th>Loss Hrs</th><th>Loss ($)</th>';
             
             const [h, p] = max.loss.split('|').map(v => v.trim());
+            // Inject the result into the body
             body.innerHTML = `<tr><td class="emp-name">${max.emp}</td><td>${h}</td><td>${p}</td></tr>`;
         }
     }
-    
-    // Show Modal
+
+    // Handle empty state
     if (body.innerHTML === '') {
         body.innerHTML = '<tr><td colspan="3" style="text-align:center; padding: 20px;">No records found for this category.</td></tr>';
     }
@@ -6316,102 +6399,7 @@ function renderAIPayrollInsights(insights) {
              document.getElementById('landingScreen').classList.remove('hidden');
          }
          
-function setActiveStep(element, tab) {
-    /* ===========================================
-    1. ACTIVATE STEPPER UI
-    =========================================== */
-    document.querySelectorAll('.step-item')
-        .forEach(step => step.classList.remove('active'));
-    element.classList.add('active');
 
-    /* ===========================================
-    2. HEADER FINALIZATION LOGIC
-    =========================================== */
-    // Only show the header Finalize button when on the 'submit' tab
-    const headerFinalize = document.getElementById('headerFinalizeContainer');
-    if (headerFinalize) {
-        if (tab === 'submit') {
-            headerFinalize.classList.remove('hidden');
-        } else {
-            headerFinalize.classList.add('hidden');
-        }
-    }
-
-    /* ===========================================
-    3. HIDE ALL TAB VIEWS (RESET)
-    =========================================== */
-    const views = [
-        'fixIssuesView',
-        'extraPayView',
-        'hourlyView',
-        'terminationView',
-        'submitPayrollView'
-    ];
-
-    views.forEach(id => {
-        const el = document.getElementById(id);
-        if (el) el.classList.add('hidden');
-    });
-
-    /* ===========================================
-    4. TAB SPECIFIC LOGIC
-    =========================================== */
-    
-    // FIX ISSUES
-    if (tab === 'fix') {
-        document.getElementById('fixIssuesView').classList.remove('hidden');
-    }
-
-    // EXTRA PAY
-    if (tab === 'extra') {
-        document.getElementById('extraPayView').classList.remove('hidden');
-        if (typeof renderExtraPay === 'function') {
-            renderExtraPay();
-        }
-    }
-
-    // REVIEW HOURLY PUNCHES
-    if (tab === 'hourly') {
-        const hourlyView = document.getElementById('hourlyView');
-        if (hourlyView) {
-            hourlyView.classList.remove('hidden');
-            // Ensure KPIs calculate AFTER render
-            setTimeout(() => {
-                if (typeof updateHourlyPunchKPIs === 'function') {
-                    updateHourlyPunchKPIs();
-                }
-            }, 0);
-        }
-    }
-
-    // TERMINATION SETTLEMENT
-    if (tab === 'termination') {
-        const termView = document.getElementById('terminationView');
-        if (termView) termView.classList.remove('hidden');
-    }
-
-    // SUBMIT PAYROLL
-    if (tab === 'submit') {
-        const submitView = document.getElementById('submitPayrollView');
-        if (submitView) {
-            submitView.classList.remove('hidden');
-            
-            // Populate the summary values
-            if (typeof populateSubmitPayrollTiles === 'function') {
-                populateSubmitPayrollTiles();
-            }
-
-            // Hide insights initially until toggled
-            const insights = document.getElementById('payrollInsights');
-            if (insights) insights.classList.add('hidden');
-
-            // Build graphs with axes and grids
-            if (typeof buildPayrollInsights === 'function') {
-                buildPayrollInsights();
-            }
-        }
-    }
-}
          
          
          
@@ -6762,25 +6750,113 @@ const tabOrder = ['fix', 'extra', 'hourly', 'termination', 'submit'];
 
 // 2. Update setActiveStep to handle the new view
 function setActiveStep(element, tab) {
-    document.querySelectorAll('.step-item').forEach(step => step.classList.remove('active'));
+    /* ===========================================
+    1. ACTIVATE STEPPER UI
+    =========================================== */
+    document.querySelectorAll('.step-item')
+        .forEach(step => step.classList.remove('active'));
     element.classList.add('active');
 
-    const views = ['fixIssuesView', 'extraPayView', 'hourlyView', 'terminationView', 'submitPayrollView'];
+    /* ===========================================
+    2. HEADER ELEMENT LOGIC (FILTERS & BUTTONS)
+    =========================================== */
+    const headerFinalize = document.getElementById('headerFinalizeContainer');
+    const fixFilter = document.getElementById('fixIssuesFilterBtn');
+    const extraFilter = document.getElementById('extraPayFilterBtn');
+
+    // Reset Header visibility
+    if (headerFinalize) headerFinalize.classList.add('hidden');
+    if (fixFilter) fixFilter.classList.add('hidden');
+    if (extraFilter) extraFilter.classList.add('hidden');
+
+    // Contextual Header Logic
+    if (tab === 'submit' && headerFinalize) {
+        headerFinalize.classList.remove('hidden');
+    } else if (tab === 'fix' && fixFilter) {
+        fixFilter.classList.remove('hidden');
+    } else if (tab === 'extra' && extraFilter) {
+        extraFilter.classList.remove('hidden');
+    }
+
+    /* ===========================================
+    3. HIDE ALL TAB VIEWS (RESET)
+    =========================================== */
+    const views = [
+        'fixIssuesView',
+        'extraPayView',
+        'hourlyView',
+        'terminationView',
+        'submitPayrollView'
+    ];
+
     views.forEach(id => {
         const el = document.getElementById(id);
         if (el) el.classList.add('hidden');
     });
 
-    if (tab === 'termination') {
-        document.getElementById('terminationView').classList.remove('hidden');
+    /* ===========================================
+    4. TAB SPECIFIC LOGIC
+    =========================================== */
+    
+    // FIX ISSUES
+    if (tab === 'fix') {
+        const fixView = document.getElementById('fixIssuesView');
+        if (fixView) fixView.classList.remove('hidden');
     }
-    // ... rest of your existing if/else logic ...
-    if (tab === 'fix') document.getElementById('fixIssuesView').classList.remove('hidden');
-    if (tab === 'extra') document.getElementById('extraPayView').classList.remove('hidden');
-    if (tab === 'hourly') document.getElementById('hourlyView').classList.remove('hidden');
-    if (tab === 'submit') document.getElementById('submitPayrollView').classList.remove('hidden');
-}
 
+    // EXTRA PAY
+    if (tab === 'extra') {
+        const extraView = document.getElementById('extraPayView');
+        if (extraView) {
+            extraView.classList.remove('hidden');
+            if (typeof renderExtraPay === 'function') {
+                renderExtraPay();
+            }
+        }
+    }
+
+    // REVIEW HOURLY PUNCHES
+    if (tab === 'hourly') {
+        const hourlyView = document.getElementById('hourlyView');
+        if (hourlyView) {
+            hourlyView.classList.remove('hidden');
+            // Ensure KPIs calculate AFTER render
+            setTimeout(() => {
+                if (typeof updateHourlyPunchKPIs === 'function') {
+                    updateHourlyPunchKPIs();
+                }
+            }, 0);
+        }
+    }
+
+    // TERMINATION SETTLEMENT
+    if (tab === 'termination') {
+        const termView = document.getElementById('terminationView');
+        if (termView) termView.classList.remove('hidden');
+    }
+
+    // SUBMIT PAYROLL
+    if (tab === 'submit') {
+        const submitView = document.getElementById('submitPayrollView');
+        if (submitView) {
+            submitView.classList.remove('hidden');
+            
+            // Populate the summary values
+            if (typeof populateSubmitPayrollTiles === 'function') {
+                populateSubmitPayrollTiles();
+            }
+
+            // Hide insights initially until toggled
+            const insights = document.getElementById('payrollInsights');
+            if (insights) insights.classList.add('hidden');
+
+            // Build graphs with axes and grids
+            if (typeof buildPayrollInsights === 'function') {
+                buildPayrollInsights();
+            }
+        }
+    }
+}
 // 3. Search Filter for Termination
 function filterTermination(query) {
     const rows = document.querySelectorAll('#terminationTableBody tr');
