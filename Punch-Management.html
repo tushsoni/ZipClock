@@ -1,0 +1,2944 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Punch Management</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
+    <style>
+        :root {
+            --bg-color: #f6f7ff;
+            --nav-navy: #001d3d;
+            --accent-blue: #1e62ff;
+            --settings-blue: #5ea3f5;
+            --sidebar-collapsed: 60px;
+            --sidebar-expanded: 240px;
+            --text-dim: #b0b8c1;
+            --border-color: #e5e7eb;
+            --success-green: #4ade80;
+            --warning-red: #f87171;
+            --punch-bg: #dcfce7;
+            --punch-border: #86efac;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Roboto', sans-serif; }
+        body { background-color: var(--bg-color); overflow-x: hidden; color: #374151; }
+
+        /* --- Existing Header --- */
+        header {
+            height: 50px; background-color: var(--nav-navy); display: grid;
+            grid-template-columns: 1fr auto 1fr; align-items: center; padding: 0 15px;
+            color: white; position: fixed; top: 0; width: 100%; z-index: 1000;
+        }
+        .header-left {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.header-center {
+    margin: 0 auto;   /* keeps it centered */
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.header-right {
+    margin-left: auto;   /* pushes icons to extreme right */
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+        .app-logo { width: 28px; height: 28px; }
+        .nav-link { display: flex; align-items: center; gap: 6px; font-size: 13px; color: #d1d5db; cursor: pointer; }
+        .time-box { display: flex; align-items: baseline; gap: 4px; font-size: 14px; }
+        .store-tag { background: rgba(255,255,255,0.15); padding: 3px 10px; border-radius: 15px; font-size: 12px; }
+
+        /* --- Existing Sidebar --- */
+        .sidebar {
+            width: var(--sidebar-collapsed); background-color: var(--nav-navy); height: calc(100vh - 50px);
+            position: fixed; top: 50px; left: 0; transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            overflow: hidden; z-index: 999; display: flex; flex-direction: column;
+        }
+        .sidebar:hover { width: var(--sidebar-expanded); }
+        .menu-list { list-style: none; flex-grow: 1; padding-top: 5px; }
+        .menu-item { display: flex; align-items: center; height: 44px; padding: 0 18px; color: var(--text-dim); text-decoration: none; white-space: nowrap; }
+        .menu-label { margin-left: 15px; font-size: 13px; opacity: 0; transition: opacity 0.2s; }
+        .sidebar:hover .menu-label { opacity: 1; }
+        .menu-item.active { border-left: 3px solid #3b82f6; background: #1a3557; color: white; }
+        .sidebar-footer { padding: 20px 14px; display: flex; flex-direction: column; gap: 15px; }
+        .settings-circle { width: 32px; height: 32px; background: var(--settings-blue); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; cursor: pointer; }
+        .help-main { width: 32px; height: 32px; background: var(--accent-blue); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-size: 10px; font-weight: 800; cursor: pointer; }
+
+        /* --- Punch Management Content --- */
+        .main-content { margin-left: var(--sidebar-collapsed); padding: 65px 20px 20px 20px; }
+
+        .toolbar {
+            display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; margin-bottom: 15px;
+            background: white; padding: 10px 15px; border-radius: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+        }
+        .date-nav { display: flex; align-items: center; gap: 10px; border: 1px solid var(--border-color); padding: 5px 12px; border-radius: 4px; }
+        .action-btns { display: flex; gap: 8px; justify-content: flex-end; }
+        .btn { padding: 6px 14px; border-radius: 20px; border: none; font-size: 14px; font-weight: 500; cursor: pointer; display: flex; align-items: center; gap: 6px; transition: all 0.2s ease; }
+        .btn-outline { border: 1px solid var(--border-color); background: white; color: #475569; }
+        .btn-outline:hover { border-color: #3b82f6; background: #eff6ff; color: #3b82f6; }
+        .btn-green { background: #10b981; color: white; box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3); }
+        .btn-green:hover { background: #059669; box-shadow: 0 6px 16px rgba(16, 185, 129, 0.4); transform: translateY(-2px); }
+        .btn-blue { background: var(--accent-blue); color: white; box-shadow: 0 4px 12px rgba(30, 98, 255, 0.3); }
+        .btn-blue:hover { background: #1d4ed8; box-shadow: 0 6px 16px rgba(30, 98, 255, 0.4); transform: translateY(-2px); }
+
+        /* --- Table Grid Layout --- */
+        .grid-container {
+    height: calc(100vh - 180px); /* Adjust based on your header/toolbar height */
+    display: flex;
+    flex-direction: column;
+    overflow: hidden; /* Prevent container from scrolling */
+}
+.table-wrapper {
+    flex-grow: 1;
+    overflow-y: auto;
+    overflow-x: auto;
+}
+
+
+
+
+th:last-child, td:last-child {
+    border-right: none;
+}
+
+thead th {
+    position: sticky;
+    top: 0;
+    z-index: 20;
+    background: #f9fafb;
+    border-bottom: 1px solid var(--border-color);
+}
+        th { 
+            background: #f9fafb; padding: 12px; font-size: 12px; text-transform: uppercase; 
+            color: #6b7280; border-bottom: 1px solid var(--border-color); text-align: left;
+            position: sticky; top: 0; z-index: 10;
+        }
+        td { padding: 10px; border-bottom: 1px solid #f3f4f6; vertical-align: top; }
+        
+        .emp-cell { display: flex; align-items: center; gap: 10px; min-width: 180px; }
+        .avatar { width: 32px; height: 32px; border-radius: 50%; background: #e5e7eb; display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: bold; }
+        .emp-info div { font-size: 12px; font-weight: 600; }
+        .emp-info span { font-size: 10px; color: #9ca3af; }
+
+        /* --- Shift Blocks --- */
+
+.punch-block {
+    border-radius: 6px;
+    padding: 6px 40px 6px 10px;
+    height: 44px;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    position: relative;
+    cursor: pointer;
+    font-size: 11px;
+    transition: all 0.2s ease;
+    border: 1px solid; /* Border width defined here, color defined by job below */
+}
+
+/* Color updates for specific Job Codes */
+/* Unique color definitions for specific Job Codes */
+.punch-block.MANAGER { background-color: #f3e8ff; border-color: #d8b4fe; } /* Light Purple */
+.punch-block.CASHIER { background-color: #fff1f2; border-color: #fecdd3; } /* Soft Peach/Pink */
+
+/* Other Job Codes for reference */
+.punch-block.ASST\.MGR { background-color: #e0f2fe; border-color: #7dd3fc; } /* Light Blue */
+.punch-block.SHIFT\.LEADER { background-color: #fef3c7; border-color: #fcd34d; } /* Light Amber */
+.punch-block.CREW { background-color: #dcfce7; border-color: #86efac; } /* Light Green */
+
+
+/* Hover Effect (like your 2nd screenshot) */
+.punch-block:hover {
+    filter: brightness(0.95);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
+    transform: translateY(-1px);
+}
+
+.punch-time {
+    font-weight: 600;
+    font-size: 13px;
+    margin-bottom: 1px;
+}
+
+.punch-role {
+    font-size: 11px;
+    line-height: 1;
+}
+
+.hover-actions {
+    position: absolute;
+    top: 50%;
+    right: 10px;
+    transform: translateY(-50%);
+    display: flex;
+    gap: 6px;
+    opacity: 0;
+    transition: all 0.2s ease;
+    pointer-events: none;
+}
+
+.punch-block:hover .hover-actions {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+.icon-btn {
+    width: 26px;
+    height: 26px;
+    border-radius: 50%;
+    background: white;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    font-size: 12px;
+    transition: 0.2s ease;
+}
+
+.icon-btn i {
+    font-size: 13px;
+}
+
+.icon-btn.edit i {
+    color: #3b82f6;
+}
+
+.icon-btn.warning i {
+    color: #ef4444;
+}
+
+.icon-btn.add i {
+    color: #3b82f6;
+}
+
+.icon-btn:hover {
+    transform: scale(1.1);
+}
+
+        .punch-block:hover .hover-actions { display: flex; }
+        .hover-actions i { cursor: pointer; font-size: 14px; }
+        .hover-actions i:hover { color: var(--accent-blue); }
+
+        /* --- Summary Section --- */
+.summary-footer {
+    background: white;
+    border-top: 1px solid var(--border-color);
+    position: sticky;
+    bottom: 0;
+    z-index: 1000;
+}
+
+.weekly-summary-bar {
+    display: grid;
+    grid-template-columns: 1fr auto 1fr; /* Centering trick */
+    align-items: center;
+    padding: 8px 20px;
+    background: #fdfdfd;
+    border-bottom: 1px solid #f0f0f0;
+    font-size: 16px;
+}
+
+.weekly-summary-label {
+    font-size: 15px;
+    font-weight: 500;
+    color: #374151;
+    text-align: left;
+}
+
+.weekly-summary-totals {
+    font-size: 14px;
+    font-weight: 500;
+    color: #374151;
+    text-align: center; /* Centers the text within the middle column */
+    white-space: nowrap;
+}
+
+
+.weekly-summary-spacer {
+    display: block;
+}
+
+.daily-summary-header {
+    display: grid;
+    grid-template-columns: 200px repeat(7, 1fr); /* 200px matches Employee column */
+    align-items: center;
+    background: #f9fafb;
+    cursor: pointer;
+    border-bottom: 1px solid #eee;
+}
+
+.daily-summary-toggle-btn {
+    padding: 10px 15px;
+    font-size: 15px;
+    font-weight: 600;
+    color: #374151;
+    display: flex;
+    align-items: center;
+}
+
+.daily-time-cell {
+    padding: 10px 5px;
+    font-size: 13px;
+    font-weight: 600;
+    text-align: center;
+    color: #374151;
+    border-left: 1px solid #f0f0f0;
+}
+
+
+.daily-summary-toggle {
+    display: flex;
+    align-items: center;
+    padding: 8px 15px;
+    cursor: pointer;
+    font-size: 13px;
+    font-weight: 600;
+    color: #374151;
+    background: #f9fafb;
+}
+
+.daily-summary-details {
+    display: none; /* Hidden by default */
+    background: white;
+}
+
+.summary-data-row {
+    display: grid;
+    grid-template-columns: 200px repeat(7, 1fr); /* Matches header alignment */
+    border-bottom: 1px solid #f3f4f6;
+    align-items: center;
+}
+
+.data-cell {
+    padding: 8px 10px;
+    font-size: 11px;
+    text-align: center;
+    border-right: 1px solid #f3f4f6;
+}
+
+.data-label {
+    text-align: left;
+    font-weight: 600;
+    padding-left: 15px;
+}
+
+
+.daily-summary-container {
+    display: none; /* Toggled via JS */
+    background: white;
+}
+
+.summary-grid-row {
+    display: grid;
+    grid-template-columns: 200px 100px repeat(7, 1fr); /* Align with Table: Name | Total | 7 Days */
+    border-top: 1px solid #f3f4f6;
+    align-items: center;
+}
+
+.summary-grid-row.header-row {
+    background: #f9fafb;
+    font-weight: 600;
+}
+
+.summary-cell {
+    padding: 8px 10px;
+    font-size: 13px;
+    border-right: 1px solid #f3f4f6;
+    white-space: nowrap;
+    text-align: center;
+}
+
+.summary-label-cell {
+    text-align: left;
+    font-weight: 600;
+    padding-left: 15px;
+}
+
+.text-danger { color: #ef4444; } /* For the Red Labor % in screenshot */
+
+.daily-summary-row {
+    display: grid;
+    grid-template-columns: 200px repeat(7, 1fr); /* Matches employee cell width */
+    background: #f9fafb;
+    border-top: 1px solid #eee;
+}
+
+.daily-summary-cell {
+    padding: 12px 5px;
+    text-align: center;
+    font-size: 12px;
+    font-weight: 600;
+    color: #4b5563;
+    border-right: 1px solid #f3f4f6;
+}
+
+        .summary-row { display: flex; padding: 12px 20px; font-size: 12px; font-weight: 600; background: #f9fafb; cursor: pointer; }
+        .daily-details { display: none; padding: 15px; background: white; border-top: 1px solid #eee; }
+        .details-grid { display: grid; grid-template-columns: repeat(8, 1fr); gap: 10px; font-size: 11px; }
+
+        /* --- Popups / Modals --- */
+       .modal-overlay {
+    position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+    background: rgba(15, 23, 42, 0.6); /* Deeper, blurred backdrop */
+    backdrop-filter: blur(4px);
+    display: none; justify-content: center; align-items: center; z-index: 2000;
+}
+        .modal-content {
+            background: white; border-radius: 12px; width: 500px; padding: 0;
+            overflow: hidden; box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1);
+        }
+        .modal-header { background: #f8fafc; padding: 15px 20px; border-bottom: 1px solid #eee; display: flex; justify-content: space-between; align-items: center; }
+        .modal-body { padding: 20px; }
+        .form-group { margin-bottom: 15px; }
+        .form-group label { display: block; font-size: 12px; font-weight: 600; margin-bottom: 5px; color: #4b5563; }
+        .form-control { width: 100%; padding: 8px 12px; border: 1px solid #d1d5db; border-radius: 6px; outline: none; }
+        .modal-footer { padding: 15px 20px; border-top: 1px solid #eee; display: flex; justify-content: flex-end; gap: 10px; }
+
+        /* Dropdown Menus */
+        .dropdown-menu {
+            position: absolute; background: white; border: none;
+            border-radius: 12px; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+            width: 200px; display: none; z-index: 1500; padding: 8px 0; overflow: hidden;
+        }
+        .dropdown-item { 
+            padding: 12px 16px; font-size: 13px; cursor: pointer; display: flex; align-items: center; gap: 12px;
+            transition: all 0.2s ease; border-left: 3px solid transparent;
+        }
+        .dropdown-item:hover { 
+            background: #f8fafc; border-left-color: #3b82f6; padding-left: 18px;
+        }
+        .dropdown-item i { font-size: 16px; }
+
+        .violation-badge { color: var(--warning-red); margin-left: 5px; }
+
+        /* Enhanced Button Styling */
+        .btn i { transition: all 0.2s ease; }
+        .btn:hover i { transform: scale(1.1); }
+        .btn-outline:hover i { color: inherit; }
+
+        /* --- Header Grid Styling --- */
+.grid-header {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    background: #f9fafb;
+}
+
+
+.header-cell {
+    font-size: 12px;
+    font-weight: 600;
+    color: #4b5563;
+    justify-content: space-between;
+}
+
+.header-cell:last-child {
+    border-right: none;
+}
+
+.header-cell i {
+    font-size: 18px;
+    cursor: pointer;
+}
+
+/* Default header icon color */
+.header-cell i:not(.graph-btn):not(.modern-pin) {
+    color: #9ca3af;
+}
+
+.header-cell.employee-header {
+    justify-content: flex-start;
+    gap: 8px;
+}
+
+/* Day text and icon wrapper */
+.day-label {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+}
+
+/* Container for the entire scrollable grid */
+.punch-management-container {
+    display: flex;
+    flex-direction: column;
+    height: calc(100vh - 120px);
+    background: white;
+    border: 1px solid #e5e7eb;
+    margin: 10px;
+}
+
+/* Common Grid Definition: Employee Column (200px) + 7 Days (1fr each) */
+.grid-row-layout {
+    display: grid;
+    grid-template-columns: 240px repeat(7, minmax(220px, 1fr));
+    width: 100%;
+}
+
+/* Border Styling for Grid Cells */
+.grid-cell {
+    min-height: 55px;
+    padding: 6px 8px;
+    border-right: 1px solid #e5e7eb;
+    border-bottom: 1px solid #e5e7eb;
+    display: flex;
+    align-items: center;
+    position: relative;
+    font-size: 15px;
+}
+
+.grid-cell:last-child {
+    border-right: none;
+}
+
+.violation-popup {
+    position: absolute;
+    width: 260px;
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.25);
+    display: none;
+    z-index: 3000;
+    overflow: visible;
+}
+
+/* Arrow */
+.violation-popup::after {
+    content: "";
+    position: absolute;
+    bottom: -10px;
+    left: 40px; /* adjust horizontal arrow position */
+    border-width: 10px 10px 0 10px;
+    border-style: solid;
+    border-color: white transparent transparent transparent;
+}
+
+/* Red Header */
+.violation-header {
+    background: #ef4444;
+    color: white;
+    padding: 10px 14px;
+    font-weight: 600;
+    font-size: 13px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-top-left-radius: 8px;
+    border-top-right-radius: 8px;
+}
+
+.violation-body {
+    padding: 12px 14px;
+    font-size: 12px;
+    color: #ef4444;
+    border-top: 1px solid #eee;
+}
+
+.empty-cell {
+    justify-content: center;
+    cursor: pointer;
+    position: relative;
+    transition: background 0.2s ease;
+}
+
+/* subtle hover background */
+.empty-cell:hover {
+    background: #f3f4f6;
+}
+
+/* modern circular plus */
+.empty-plus {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: white;
+    border: 1px dashed #d1d5db;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #9ca3af;
+    font-size: 18px;
+    opacity: 0;
+    transition: all 0.2s ease;
+}
+
+/* show only on hover */
+.empty-cell:hover .empty-plus {
+    opacity: 1;
+    background: #e0f2fe;
+    border-color: #38bdf8;
+    color: #0284c7;
+    transform: scale(1.05);
+}
+
+@keyframes modalSlideUp {
+    from { transform: translateY(20px); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
+}
+
+.modern-modal {
+    background: #ffffff;
+    border-radius: 16px;
+    width: 720px; /* Slightly wider to accommodate 3 columns */
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+    overflow: hidden;
+    border: 1px solid #e2e8f0;
+}
+
+.modern-modal-header {
+    padding: 24px 30px;
+    background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+    border-bottom: 1px solid #e2e8f0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.modal-title-group h3 { font-size: 18px; color: #1e293b; font-weight: 700; }
+.modal-title-group p { font-size: 13px; color: #64748b; margin-top: 3px; font-weight: 500; }
+
+.btn-close-circle {
+    width: 32px; height: 32px; border-radius: 50%; border: none;
+    background: #f1f5f9; color: #ef4444; cursor: pointer; transition: all 0.2s;
+    display: flex; align-items: center; justify-content: center;
+}
+.btn-close-circle:hover { 
+    background: #fee2e2; 
+    transform: rotate(90deg) scale(1.1);
+}
+
+
+.mode-toggle-container { padding: 15px 30px; display: flex; gap: 8px; }
+.pill-tab {
+    padding: 6px 18px; border-radius: 20px; font-size: 12px; font-weight: 600;
+    cursor: pointer; border: 1px solid #e2e8f0; color: #64748b; transition: 0.2s;
+}
+.pill-tab.active { background: #3b82f6; color: white; border-color: #3b82f6; }
+
+.modern-modal-body { padding: 10px 30px 30px 30px; max-height: 70vh; overflow-y: auto; }
+
+.form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 20px; }
+.field-label { display: block; font-size: 12px; font-weight: 600; color: #475569; margin-bottom: 6px; }
+.field-label span { color: #ef4444; }
+
+.modern-input {
+    width: 100%; padding: 10px 14px; border: 1.5px solid #e2e8f0; border-radius: 10px;
+    font-size: 13px; transition: 0.2s; color: #1e293b;
+}
+.modern-input:focus { border-color: #3b82f6; outline: none; box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1); }
+
+/* Break Section Styling */
+.section-divider {
+    display: flex; align-items: center; gap: 15px; margin: 25px 0 15px;
+    font-size: 13px; font-weight: 700; color: #334155;
+}
+.section-divider::after { content: ""; flex: 1; height: 1px; background: #e2e8f0; }
+
+.break-row {
+    display: grid; grid-template-columns: 1.2fr 1.2fr 1.5fr auto; gap: 12px;
+    align-items: center; background: #f8fafc; padding: 12px; border-radius: 12px; margin-bottom: 10px;
+}
+.btn-add-break {
+    width: 28px; height: 28px; border-radius: 50%; background: #3b82f6;
+    color: white; border: none; cursor: pointer; display: flex; align-items: center; justify-content: center;
+}
+.btn-del-break { color: #ef4444; background: none; border: none; cursor: pointer; font-size: 18px; }
+
+.modern-modal-footer {
+    padding: 20px 30px; border-top: 1px solid #e2e8f0;
+    display: flex; justify-content: flex-end; gap: 12px;
+}
+.btn-primary-lg {
+    background: #3b82f6; color: white; border: none; padding: 10px 30px;
+    border-radius: 25px; font-weight: 600; cursor: pointer; box-shadow: 0 4px 14px rgba(59, 130, 246, 0.4);
+}
+
+.modal-title {
+    font-size: 16px;
+    font-weight: 600;
+}
+
+.modal-subtitle {
+    font-size: 12px;
+    color: #64748b;
+}
+
+.close-btn {
+    background: #f1f5f9;
+    border: none;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+}
+
+.mode-switch {
+    padding: 12px 24px;
+    display: flex;
+    gap: 10px;
+}
+
+.mode-btn {
+    padding: 6px 14px;
+    border-radius: 20px;
+    border: 1px solid #e2e8f0;
+    background: #f8fafc;
+    font-size: 12px;
+}
+
+.mode-btn.active {
+    background: #3b82f6;
+    color: white;
+    border: none;
+}
+
+.modern-modal-body {
+    padding: 20px 24px;
+    overflow-y: auto;
+}
+
+.form-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 18px;
+    margin-bottom: 20px;
+}
+
+.section-header {
+    font-weight: 600;
+    font-size: 14px;
+    margin: 20px 0 10px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.circle-btn {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: #3b82f6;
+    color: white;
+    border: none;
+}
+
+.modern-modal-footer {
+    padding: 16px 24px;
+    border-top: 1px solid #f1f5f9;
+    display: flex;
+    justify-content: flex-end;
+}
+
+.primary-btn {
+    background: #3b82f6;
+    color: white;
+    padding: 10px 20px;
+    border-radius: 25px;
+    border: none;
+}
+
+.modern-pin {
+    font-size: 16px;
+    color: #3b82f6; /* Clean Blue */
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.modern-pin:hover {
+    color: #1d4ed8; /* Darker Blue on hover */
+    transform: scale(1.15);
+}
+
+/* Graph Icon Styling */
+.graph-btn {
+    color: #10b981; /* Professional Green */
+    margin-right: 8px;
+    cursor: pointer;
+    font-size: 16px;
+    transition: all 0.2s ease;
+}
+
+.graph-btn:hover {
+    color: #059669; /* Darker Green on hover */
+    transform: scale(1.15);
+}
+/* Chart Modal Specifics */
+.chart-modal-content {
+    width: 1050px;
+    background: white;
+    border-radius: 16px;
+    overflow: hidden;
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.15);
+    border: 1px solid #e2e8f0;
+}
+.chart-controls {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    padding: 20px 30px;
+    background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+    border-bottom: 1px solid #e2e8f0;
+}
+.chart-container {
+    padding: 30px;
+    height: 400px;
+    display: flex;
+    align-items: flex-end;
+    gap: 4px;
+    border-bottom: 1px solid #e2e8f0;
+}
+.bar-pair {
+    flex: 1;
+    display: flex;
+    align-items: flex-end;
+    gap: 2px;
+    height: 100%;
+}
+.bar {
+    width: 50%;
+    border-top-left-radius: 4px;
+    border-top-right-radius: 4px;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+.bar:hover {
+    filter: brightness(1.1);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+.bar.actual { background: linear-gradient(180deg, #3b82f6 0%, #2563eb 100%); }
+.bar.secondary { background: linear-gradient(180deg, #10b981 0%, #059669 100%); }
+
+/* Graph Layout with Axes */
+.chart-layout {
+    display: grid;
+    grid-template-columns: 50px 1fr;
+    grid-template-rows: 1fr 35px;
+    height: 380px;
+    padding: 30px 30px 20px 20px;
+    gap: 15px;
+    background: linear-gradient(135deg, #fafbfc 0%, #ffffff 100%);
+    position: relative;
+}
+
+.y-axis {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: flex-end;
+    font-size: 11px;
+    font-weight: 600;
+    color: #64748b;
+    padding-bottom: 5px;
+    padding-right: 10px;
+}
+
+.x-axis {
+    grid-column: 2;
+    display: flex;
+    justify-content: space-between;
+    font-size: 10px;
+    font-weight: 500;
+    color: #64748b;
+    padding-top: 10px;
+    padding-right: 5px;
+}
+.chart-canvas {
+    display: flex; 
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 3px;
+    height: 100%;
+    padding: 0 5px;
+    position: relative;
+    border-left: 2px solid #cbd5e1;
+    border-bottom: 2px solid #cbd5e1;
+    background: linear-gradient(180deg, #ffffff 0%, #f8fafc 100%);
+}
+
+/* Hover Tooltip */
+.bar-unit {
+    position: relative;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.bar-unit:hover {
+    filter: brightness(1.15);
+}
+
+/* Group-level Tooltip - Shows both values on hover */
+.bar-group {
+    position: relative;
+}
+
+.bar-group:hover::after {
+    content: attr(data-time-values);
+    position: absolute;
+    bottom: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    background: #1e293b;
+    color: white;
+    padding: 10px 14px;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 700;
+    white-space: nowrap;
+    z-index: 1000;
+    margin-bottom: 12px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+    border: 1px solid #334155;
+}
+
+.bar-group:hover::before {
+    content: '';
+    position: absolute;
+    bottom: calc(100% + 2px);
+    left: 50%;
+    transform: translateX(-50%);
+    border: 5px solid transparent;
+    border-top-color: #1e293b;
+    z-index: 1000;
+}
+
+/* Centered Legend */
+.legend-container {
+    display: flex;
+    justify-content: center;
+    gap: 40px;
+    padding: 20px 30px;
+    border-top: 1px solid #e2e8f0;
+    background: linear-gradient(135deg, #f8fafc 0%, #ffffff 100%);
+}
+.legend-container div {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 13px;
+    font-weight: 600;
+    color: #1e293b;
+}
+.legend-container i {
+    font-size: 14px;
+}
+
+/* Bar Group Layout */
+.bar-group {
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+    gap: 4px;
+    height: 100%;
+    flex: 1;
+}
+
+/* Individual Bar */
+.bar-unit {
+    width: 12px;   /* Increased from 6px → 12px */
+    border-top-left-radius: 4px;
+    border-top-right-radius: 4px;
+    transition: height 0.4s ease, transform 0.2s ease;
+}
+
+/* Hover effect */
+.bar-unit:hover {
+    transform: scaleY(1.05);
+}
+
+/* Colors */
+.bar-actual {
+    background: #3b82f6;
+}
+
+.bar-compare {
+    background: #10b981;
+}
+
+.chart-dropdown {
+    padding: 10px 16px;
+    font-size: 13px;
+    font-weight: 600;
+    border-radius: 10px;
+    border: 1.5px solid #cbd5e1;
+    background: white;
+    color: #1e293b;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    min-width: 240px;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+}
+
+.chart-dropdown:hover {
+    border-color: #3b82f6;
+    background: #eff6ff;
+    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.15);
+}
+
+.chart-dropdown:focus {
+    outline: none;
+    border-color: #3b82f6;
+    box-shadow: 0 0 0 3px rgba(59,130,246,0.15), 0 4px 12px rgba(59,130,246,0.15);
+}
+
+/* KPI Modal */
+.kpi-modal {
+    width: 1100px;
+    background: white;
+    border-radius: 16px;
+    overflow: hidden;
+    box-shadow: 0 30px 60px rgba(0,0,0,0.15);
+    border: 1px solid #e2e8f0;
+}
+
+/* Header */
+.kpi-header {
+    padding: 22px 30px;
+    background: #f8fafc;
+    color: #1e293b;
+    border-bottom: 1px solid #e2e8f0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.kpi-header p {
+    color: #64748b;
+}
+
+.kpi-header h3 {
+    font-size: 18px;
+    font-weight: 700;
+}
+
+/* Body */
+.kpi-body {
+    padding: 30px;
+    background: #f8fafc;
+}
+
+/* Table */
+.kpi-table-wrapper {
+    background: white;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.05);
+}
+
+.kpi-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+}
+
+.kpi-table thead {
+    background: #eef2ff;
+}
+
+.kpi-table th {
+    padding: 14px;
+    font-weight: 600;
+    color: #334155;
+    text-align: center;
+}
+
+.kpi-table th:first-child {
+    text-align: left;
+    padding-left: 20px;
+}
+
+.kpi-table td {
+    padding: 12px;
+    text-align: center;
+    border-top: 1px solid #f1f5f9;
+    transition: background 0.2s ease;
+}
+
+.kpi-table td:first-child {
+    text-align: left;
+    padding-left: 20px;
+    font-weight: 500;
+    color: #475569;
+}
+
+/* Row hover effect */
+.kpi-table tbody tr:hover {
+    background: #f1f5ff;
+}
+
+/* Footer */
+.kpi-footer {
+    padding: 20px;
+    text-align: center;
+    background: #ffffff;
+    border-top: 1px solid #f1f5f9;
+}
+
+.kpi-ok-btn {
+    background: #3b82f6;
+    color: white;
+    border: none;
+    padding: 8px 30px;
+    border-radius: 25px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: 0.2s ease;
+}
+
+.kpi-ok-btn:hover {
+    background: #1d4ed8;
+    transform: translateY(-2px);
+}
+
+.popover-tile {
+    background: white; border: 1px solid #e2e8f0; padding: 15px; border-radius: 10px;
+    display: flex; flex-direction: column; align-items: center; gap: 8px; cursor: pointer;
+    transition: all 0.2s; font-size: 12px; font-weight: 600;
+}
+.popover-tile:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0,0,0,0.05); border-color: #3b82f6; }
+.popover-tile i { font-size: 20px; }
+
+.kpi-tile { flex: 1; padding: 15px; border-radius: 10px; text-align: center; min-width: 100px; }
+.kpi-tile b { display: block; font-size: 16px; margin-bottom: 4px; }
+.kpi-tile span { font-size: 10px; color: #64748b; text-transform: uppercase; letter-spacing: 0.5px; }
+
+.detail-row { display: grid; grid-template-columns: 1.5fr 1fr 0.8fr 0.8fr 1fr; padding: 10px 15px; border-bottom: 1px solid #f1f5f9; font-size: 12px; align-items: center; }
+.detail-row-header { background: #f8fafc; font-weight: 700; border-bottom: 2px solid #e2e8f0; }
+.original-punch { color: #3b82f6; background: #eff6ff; }
+
+/* Range Buttons */
+.range-btn {
+    border: 1px solid #e2e8f0; background: #f8fafc; padding: 4px 12px;
+    border-radius: 20px; font-size: 12px; font-weight: 600; cursor: pointer; color: #64748b;
+}
+.range-btn.active { background: #eff6ff; color: #3b82f6; border-color: #3b82f6; }
+
+/* iOS Style Switch */
+.switch { position: relative; display: inline-block; width: 34px; height: 20px; }
+.switch input { opacity: 0; width: 0; height: 0; }
+.slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #ccc; transition: .4s; border-radius: 34px; }
+.slider:before { position: absolute; content: ""; height: 14px; width: 14px; left: 3px; bottom: 3px; background-color: white; transition: .4s; border-radius: 50%; }
+input:checked + .slider { background-color: #3b82f6; }
+input:checked + .slider:before { transform: translateX(14px); }
+
+
+.icon-btn-blue {
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
+    background: #eff6ff; /* Soft blue background */
+    color: #3b82f6; /* Theme blue icon */
+    border: 1px solid #dbeafe;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+    transition: all 0.2s ease;
+}
+
+.icon-btn-blue:hover {
+    background: #3b82f6;
+    color: #ffffff;
+    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.2);
+}
+
+.range-btn {
+    border: 1px solid #e2e8f0; background: #fff; padding: 4px 14px; 
+    border-radius: 15px; font-size: 11px; font-weight: 600; cursor: pointer; color: #64748b;
+}
+.range-btn.active { background: #eff6ff; color: #3b82f6; border-color: #3b82f6; }
+
+/* Specific light colors for Job Codes */
+.punch-ASST.MGR { background-color: #e0f2fe; border-color: #7dd3fc; } /* Light Blue */
+.punch-SHIFT.LEADER { background-color: #fef3c7; border-color: #fcd34d; } /* Light Amber */
+.punch-MANAGER { background-color: #f3e8ff; border-color: #d8b4fe; } /* Light Purple */
+.punch-CREW { background-color: #dcfce7; border-color: #86efac; } /* Light Green (Default) */
+.punch-CASHIER { background-color: #fae8ff; border-color: #f5d0fe; } /* Light Pink */
+
+/* Green Corner Tag */
+.corner-tag {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 0;
+    height: 0;
+    border-style: solid;
+    border-width: 12px 12px 0 0;
+    border-color: #86efac transparent transparent transparent; /* Success Green */
+    z-index: 5;
+}
+
+.modern-date-nav {
+    display: flex;
+    align-items: center;
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    padding: 2px;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+    transition: all 0.2s ease;
+    width: fit-content;
+}
+
+.modern-date-nav:hover {
+    border-color: #cbd5e1;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+}
+
+.nav-arrow {
+    background: transparent;
+    border: none;
+    width: 28px;
+    height: 28px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 6px;
+    color: #64748b;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.nav-arrow:hover {
+    background: #f1f5f9;
+    color: #1e293b;
+}
+
+.date-display {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 0 10px;
+    cursor: pointer;
+    border-left: 1px solid #f1f5f9;
+    border-right: 1px solid #f1f5f9;
+}
+
+.current-date {
+    font-size: 13px;
+    font-weight: 600;
+    color: #1e293b;
+    letter-spacing: -0.01em;
+}
+
+.calendar-icon {
+    font-size: 15px;
+    color: #3b82f6; /* Modern Blue Accent */
+}
+
+/* Subtle clock icon update for the employee list if Ideal */
+.bi-clock {
+    font-size: 13px;
+    vertical-align: middle;
+    margin-right: 4px;
+    color: #94a3b8;
+}
+
+/* Update the specific employee header cell */
+.grid-cell.employee-header {
+    background-color: #f9fafb; /* Solid white background */
+    border-bottom: 1px solid var(--border-color);
+    color: #1e62ff; /* Blue text color matching the 'Employees' label */
+    font-weight: 600;
+    justify-content: flex-start;
+    gap: 8px;
+}
+
+/* Ensure the employee data cells in the rows also match */
+.grid-row-layout .grid-cell:first-child {
+    background-color: #f9fafb; /* Matches the header column */
+    border-right: 1px solid var(--border-color);
+    z-index: 50; /* Keeps it above the scrollable grid if Ideal */
+}
+
+/* Refined styling for the employee name and info */
+.emp-info div {
+    color: #1e62ff; /* Matching the blue shade from the screenshot */
+    font-size: 15px;
+    font-weight: 600;
+}
+
+
+/* Compact Modal Container */
+.modern-modal {
+    width: 620px; /* Reduced from 720px */
+    border-radius: 12px;
+}
+
+.modern-modal-header {
+    padding: 16px 24px; /* Reduced padding */
+}
+
+.modern-modal-body {
+    padding: 12px 24px 20px 24px; /* Tighter vertical spacing */
+}
+
+/* More Compact Form Grid */
+.form-row {
+    display: grid; 
+    grid-template-columns: 1fr 1fr; 
+    gap: 12px 20px; /* Tighter gap */
+    margin-bottom: 12px; /* Reduced margin */
+}
+
+.form-group {
+    margin-bottom: 0; /* Let grid gap handle spacing */
+}
+
+/* Sleeker Inputs */
+.modern-input {
+    padding: 8px 12px; /* Reduced height */
+    border-radius: 8px;
+    font-size: 13px;
+    border: 1px solid #e2e8f0;
+}
+
+/* Compact Section Dividers */
+.section-divider {
+    margin: 16px 0 10px; /* Reduced margins */
+    font-size: 12px;
+    color: #64748b;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+/* Compact Break Rows */
+.break-row {
+    padding: 8px 12px;
+    gap: 8px;
+    margin-bottom: 8px;
+    background: #f1f5f9; /* Slightly darker to define the area */
+}
+
+/* Modern Footer */
+.modern-modal-footer {
+    padding: 12px 24px;
+    background: #f8fafc; /* Subtle background for footer */
+}
+
+.btn-primary-lg {
+    padding: 8px 24px; /* More standard button size */
+    font-size: 13px;
+}
+
+/* Modern Action Popover Styling */
+#employeePopover {
+    width: 340px !important;
+    background: #ffffff;
+    border: none !important;
+    border-radius: 16px !important;
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.15) !important;
+    overflow: hidden;
+}
+
+.popover-header {
+    padding: 22px 24px;
+    background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+    border-bottom: 1px solid #e2e8f0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.popover-header h4 {
+    margin: 0;
+    font-size: 16px;
+    color: #1e293b;
+    font-weight: 700;
+    letter-spacing: -0.01em;
+}
+
+.popover-header i {
+    cursor: pointer;
+    color: #94a3b8;
+    font-size: 16px;
+    transition: all 0.2s ease;
+    padding: 4px;
+    border-radius: 6px;
+}
+
+.popover-header i:hover {
+    color: #ef4444;
+    background: #fee2e2;
+    transform: rotate(90deg) scale(1.1);
+}
+
+/* Updated Tile Grid */
+.popover-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    padding: 16px;
+    background: #fafbfc;
+}
+
+.popover-tile {
+    background: white;
+    border: 1.5px solid #e2e8f0;
+    border-radius: 10px;
+    padding: 14px 12px;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);
+}
+
+.popover-tile:hover {
+    border-color: #3b82f6;
+    background: #eff6ff;
+    transform: translateY(-3px);
+    box-shadow: 0 6px 16px rgba(59, 130, 246, 0.12);
+}
+
+.popover-tile i {
+    font-size: 18px;
+    flex-shrink: 0;
+    transition: all 0.2s ease;
+}
+
+.popover-tile:hover i {
+    transform: scale(1.1);
+}
+
+.popover-tile span {
+    font-size: 12px;
+    font-weight: 700;
+    color: #1e293b;
+    text-align: center;
+}
+
+/* Large detail tile */
+.popover-tile.full-width {
+    grid-column: span 2;
+    flex-direction: row;
+    justify-content: center;
+    padding: 14px 12px;
+    background: white;
+    border-color: #e2e8f0;
+}
+
+.popover-tile.full-width:hover {
+    background: #eff6ff;
+    border-color: #3b82f6;
+    box-shadow: 0 6px 16px rgba(59, 130, 246, 0.12);
+}
+
+/* Footer details */
+.popover-footer {
+    padding: 16px 24px;
+    background: linear-gradient(135deg, #fafbfc 0%, #ffffff 100%);
+    border-top: 1px solid #e2e8f0;
+}
+
+.footer-info {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.label-pill {
+    background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+    padding: 6px 12px;
+    border-radius: 8px;
+    font-size: 11px;
+    font-weight: 700;
+    color: #ffffff;
+    letter-spacing: 0.5px;
+    box-shadow: 0 3px 10px rgba(59, 130, 246, 0.3);
+}
+
+.original-punch-label {
+    display: block;
+    color: #3b82f6;
+    font-size: 10px;
+    font-weight: 600;
+    margin-top: 2px;
+    background: #eff6ff;
+    padding: 2px 4px;
+    border-radius: 4px;
+    width: fit-content;
+}
+
+
+/* Yellow Break Pill Styling */
+.break-pill-label {
+    display: inline-block;
+    color: #b45309; /* Darker amber text for readability */
+    font-size: 10px;
+    font-weight: 600;
+    margin-top: 4px;
+    background: #fef3c7; /* Soft Yellow background */
+    padding: 2px 8px;
+    border-radius: 4px;
+    width: fit-content;
+    border: 1px solid #fcd34d;
+}
+
+/* Update the layout to accommodate Axis Titles */
+.chart-layout {
+    display: grid;
+    grid-template-columns: 60px 1fr; /* Increased left margin for Y-axis title */
+    grid-template-rows: 1fr 40px 20px; /* Added row for X-axis title */
+    height: 400px;
+    padding: 20px 30px;
+    gap: 5px;
+    position: relative;
+}
+
+/* Background Grid Styling */
+.chart-canvas {
+    display: flex; 
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 2px;
+    height: 100%;
+    padding: 0 5px;
+    position: relative;
+    border-left: 1px solid #cbd5e1;
+    border-bottom: 1px solid #cbd5e1;
+    /* This creates the horizontal grid lines */
+    background-image: linear-gradient(#f1f5f9 1px, transparent 1px);
+    background-size: 100% 20%; /* Creates 5 horizontal sections */
+}
+
+/* Axis Title Styling */
+.axis-title-x {
+    grid-column: 2;
+    text-align: center;
+    font-size: 13px;
+    font-weight: 700;
+    color: #1e293b;
+    margin-top: 5px;
+    letter-spacing: -0.01em;
+}
+
+.axis-title-y {
+    position: absolute;
+    left: -20px;
+    top: 50%;
+    transform: rotate(-90deg) translateY(-50%);
+    font-size: 13px;
+    font-weight: 700;
+    color: #1e293b;
+    white-space: nowrap;
+    letter-spacing: -0.01em;
+}
+
+.chart-canvas {
+    display: flex; 
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 2px;
+    height: 100%;
+    padding: 0 5px;
+    position: relative;
+
+    border-left: 2px solid #94a3b8;
+    border-bottom: 2px solid #94a3b8;
+
+    /* Horizontal + Vertical Grid */
+    background-image:
+        linear-gradient(#cbd5e1 1px, transparent 1px),
+        linear-gradient(90deg, #e2e8f0 1px, transparent 1px);
+
+    background-size:
+        100% 20%,     /* horizontal grid */
+        8.33% 100%;   /* vertical grid (24 hours) */
+}
+
+.axis-title-x {
+    grid-column: 2;
+    text-align: center;
+    font-size: 13px;
+    font-weight: 700;
+    color: #475569;
+    padding-top: 5px;
+}
+
+.axis-title-y {
+    position: absolute;
+    left: 5px;
+    top: 50%;
+    transform: rotate(-90deg) translateY(-50%);
+    font-size: 13px;
+    font-weight: 700;
+    color: #475569;
+    white-space: nowrap;
+}
+
+
+
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="header-left">
+            <img src="https://agcdn.altametrics.com/hw_prod_others/common/images/app_icon/zipclock.svg" class="app-logo">
+            <div class="nav-link"><i class="bi bi-grid-3x3-gap-fill"></i> My App <i class="bi bi-caret-down-fill" style="font-size: 8px;"></i></div>
+            <div class="nav-link"><i class="bi bi-house-door"></i> Dashboard</div>
+            <div class="nav-link"><i class="bi bi-clock-history"></i> Site Clock</div>
+            <div class="nav-link"><i class="bi bi-geo-alt"></i> 00814-00201 <i class="bi bi-caret-down-fill" style="font-size: 8px;"></i></div>
+        </div>
+        <div class="header-center">
+            <div class="weather"><i class="bi bi-cloud-snow"></i><span>-6°C</span></div>
+            <div class="v-divider"></div>
+            <div class="time-box"><b>04:19</b><sup>P</sup><span>America/Toronto</span></div>
+        </div>
+        <div class="header-right">
+            <div class="store-tag"><i class="bi bi-shop"></i> 814</div>
+            <i class="bi bi-moon" style="cursor: pointer;"></i>
+            <i class="bi bi-gear" style="cursor: pointer;"></i>
+            <i class="bi bi-person-circle" style="cursor: pointer;"></i>
+        </div>
+    </header>
+
+    <aside class="sidebar">
+        <ul class="menu-list">
+            <li><a href="index.html" class="menu-item"><i class="bi bi-house-door"></i><span class="menu-label">Dashboard</span></a></li>
+            <li><a href="Site-Clock.html" class="menu-item"><i class="bi bi-clock"></i><span class="menu-label">Site Clock</span></a></li>
+            <li><a href="Punch-Management.html" class="menu-item active"><i class="bi bi-calendar-check"></i><span class="menu-label">Punch Management</span></a></li>
+            <li><a href="Payroll-Management.html" class="menu-item"><i class="bi bi-wallet2"></i><span class="menu-label">Payroll Management</span></a></li>
+            <li><a href="#" class="menu-item"><i class="bi bi-graph-down-arrow"></i><span class="menu-label">Time Loss Summary</span></a></li>
+            <li><a href="#" class="menu-item"><i class="bi bi-file-earmark-bar-graph"></i><span class="menu-label">Reports</span></a></li>
+            <li><a href="#" class="menu-item"><i class="bi bi-clock"></i><span class="menu-label">Time Clock Devices</span></a></li>
+            <li><a href="#" class="menu-item"><i class="bi bi-people"></i><span class="menu-label">Employees</span></a></li>
+        </ul>
+        <div class="sidebar-footer">
+            <div class="settings-circle"><i class="bi bi-gear"></i></div>
+            <div class="help-main">Help</div>
+        </div>
+    </aside>
+
+    <main class="main-content">
+        <div class="toolbar">
+<div class="modern-date-nav">
+    <button class="nav-arrow" onclick="changeDate(-1)">
+        <i class="bi bi-chevron-left"></i>
+    </button>
+    
+    <div class="date-display" onclick="toggleDatePicker()">
+        <span class="current-date">03/02/2026</span>
+        <i class="bi bi-calendar3 calendar-icon"></i>
+    </div>
+    
+    <button class="nav-arrow" onclick="changeDate(1)">
+        <i class="bi bi-chevron-right"></i>
+    </button>
+</div>
+
+<button class="btn btn-outline" onclick="toggleFilterPanel(event)" style="justify-self: center; border-color: #e2e8f0; color: #475569;">
+    <i class="bi bi-funnel" style="color: #3b82f6;"></i> Filter
+</button>
+
+<div class="action-btns">
+    <button class="btn btn-outline" title="Help" style="border-color: #e2e8f0; color: #64748b;"><i class="bi bi-question-circle" style="color: #6366f1; font-size: 16px;"></i></button>
+    <button class="btn btn-green"><i class="bi bi-currency-dollar" style="font-weight: bold;"></i> Proceed to Payroll</button>
+    
+    <button class="btn btn-outline" id="btnActions" style="border-color: #e2e8f0; color: #475569;">
+        <i class="bi bi-lightning-charge" style="color: #f59e0b;"></i> Actions <i class="bi bi-caret-down-fill" style="font-size: 8px;"></i>
+    </button>
+    
+    <button class="btn btn-outline" id="btnReports" style="border-color: #e2e8f0; color: #475569;">
+        <i class="bi bi-file-earmark-bar-graph" style="color: #8b5cf6;"></i> Reports <i class="bi bi-caret-down-fill" style="font-size: 8px;"></i>
+    </button>
+
+    <button class="btn btn-outline" onclick="openKpiModal()" style="border-color: #e2e8f0; color: #475569;">
+        <i class="bi bi-speedometer2" style="color: #6366f1; font-weight: bold;"></i> KPIs
+    </button>
+
+    <button class="btn btn-outline" onclick="openForecastGraph()" style="border-color: #e2e8f0; color: #475569; padding: 6px 12px;">
+        <i class="bi bi-bar-chart-line-fill" style="color: #10b981; font-weight: bold;"></i> 
+    </button>
+
+</div>
+        </div>
+<div class="grid-container">
+    <div class="table-wrapper">
+<div class="table-wrapper">
+    <div class="grid-header grid-row-layout">
+        <div class="grid-cell header-cell employee-header">
+            Employees <i class="bi bi-search"></i>
+        </div>
+
+<div class="grid-cell header-cell">Tue 24 <div class="header-icons"><i class="bi bi-bar-chart-fill graph-btn" onclick="openChartPopup('Tue 24')"></i><i class="bi bi-pin-angle-fill modern-pin"></i></div></div>
+<div class="grid-cell header-cell">Wed 25 <div class="header-icons"><i class="bi bi-bar-chart-fill graph-btn" onclick="openChartPopup('Wed 25')"></i><i class="bi bi-pin-angle-fill modern-pin"></i></div></div>
+<div class="grid-cell header-cell">Thu 26 <div class="header-icons"><i class="bi bi-bar-chart-fill graph-btn" onclick="openChartPopup('Thu 26')"></i><i class="bi bi-pin-angle-fill modern-pin"></i></div></div>
+<div class="grid-cell header-cell">Fri 27 <div class="header-icons"><i class="bi bi-bar-chart-fill graph-btn" onclick="openChartPopup('Fri 27')"></i><i class="bi bi-pin-angle-fill modern-pin"></i></div></div>
+<div class="grid-cell header-cell">Sat 28 <div class="header-icons"><i class="bi bi-bar-chart-fill graph-btn" onclick="openChartPopup('Sat 28')"></i><i class="bi bi-pin-angle-fill modern-pin"></i></div></div>
+<div class="grid-cell header-cell">Sun 01 <div class="header-icons"><i class="bi bi-bar-chart-fill graph-btn" onclick="openChartPopup('Sun 01')"></i><i class="bi bi-pin-angle-fill modern-pin"></i></div></div>
+<div class="grid-cell header-cell">Mon 02 <div class="header-icons"><i class="bi bi-bar-chart-fill graph-btn" onclick="openChartPopup('Mon 02')"></i><i class="bi bi-pin-angle-fill modern-pin"></i></div></div>
+    </div>
+
+    <div id="employeeRows"></div>
+</div>
+    </div>
+
+<div class="summary-footer">
+    <div class="weekly-summary-bar">
+        <div class="weekly-summary-label">Weekly Summary</div>
+        <div class="weekly-summary-totals">
+            Hrs. 374:15 | OT 00:00 | DT 00:00 | Ideal 599:00
+        </div>
+        <div></div> </div>
+
+    <div class="daily-summary-header" onclick="toggleDailySummary()">
+        <div class="daily-summary-toggle-btn">
+            <i class="bi bi-chevron-down" id="sumIcon" style="margin-right: 10px;"></i> Daily Summary
+        </div>
+        <div class="daily-time-cell">50:28 | 00:00 | 00:00 | 77:00</div>
+        <div class="daily-time-cell">50:56 | 00:00 | 00:00 | 75:00</div>
+        <div class="daily-time-cell">64:31 | 00:00 | 00:00 | 98:00</div>
+        <div class="daily-time-cell">80:39 | 00:00 | 00:00 | 139:00</div>
+        <div class="daily-time-cell">64:02 | 00:00 | 00:00 | 104:00</div>
+        <div class="daily-time-cell">39:58 | 00:00 | 00:00 | 69:00</div>
+        <div class="daily-time-cell">21:37 | 00:00 | 00:00 | 37:00</div>
+    </div>
+
+    <div class="daily-summary-container" id="dailySummarySection" style="display: none;">
+        <div class="summary-grid-row">
+            <div class="summary-cell summary-label-cell">Actual Sales</div>
+            <div class="summary-cell">42098.04</div>
+            <div class="summary-cell">5526.34</div>
+            <div class="summary-cell">5386.34</div>
+            <div class="summary-cell">7009.84</div>
+            <div class="summary-cell">10305.41</div>
+            <div class="summary-cell">7587.17</div>
+            <div class="summary-cell">4905.47</div>
+            <div class="summary-cell">1377.47</div>
+        </div>
+
+        <div class="summary-grid-row">
+            <div class="summary-cell summary-label-cell">Actual Transactions</div>
+            <div class="summary-cell">1872</div>
+            <div class="summary-cell">241</div>
+            <div class="summary-cell">244</div>
+            <div class="summary-cell">276</div>
+            <div class="summary-cell">477</div>
+            <div class="summary-cell">340</div>
+            <div class="summary-cell">241</div>
+            <div class="summary-cell">53</div>
+        </div>
+
+        <div class="summary-grid-row">
+            <div class="summary-cell summary-label-cell">Labor %</div>
+            <div class="summary-cell">18.14 %</div>
+            <div class="summary-cell">18.68 %</div>
+            <div class="summary-cell">19.05 %</div>
+            <div class="summary-cell">19.25 %</div>
+            <div class="summary-cell">15.81 %</div>
+            <div class="summary-cell">17.53 %</div>
+            <div class="summary-cell">15.79 %</div>
+            <div class="summary-cell text-danger">35.98 %</div>
+        </div>
+
+        <div class="summary-grid-row">
+            <div class="summary-cell summary-label-cell">Labor ($)</div>
+            <div class="summary-cell">$ 7,637.17</div>
+            <div class="summary-cell">$ 1,032.32</div>
+            <div class="summary-cell">$ 1,026.05</div>
+            <div class="summary-cell">$ 1,349.40</div>
+            <div class="summary-cell">$ 1,628.97</div>
+            <div class="summary-cell">$ 1,330.06</div>
+            <div class="summary-cell">$ 774.71</div>
+            <div class="summary-cell">$ 495.66</div>
+        </div>
+    </div>
+</div>
+</div>
+    </main>
+
+<div class="modal-overlay" id="punchModal">
+    <div class="modern-modal">
+        <div class="modern-modal-header">
+            <div class="modal-title-group">
+                <h3 id="modalTitle">Add Punch (Tracey S)</h3>
+                <p id="modalDate">Wed, Feb 25, 2026</p>
+            </div>
+            <button class="btn-close-circle" onclick="closeModal('punchModal')">
+                <i class="bi bi-x-lg"></i>
+            </button>
+        </div>
+
+        <div class="mode-toggle-container">
+            <div class="pill-tab active">Edit</div>
+            <div class="pill-tab">Audit</div>
+        </div>
+
+        <div class="modern-modal-body">
+            <div class="form-row">
+                <div class="form-group">
+                    <label class="field-label">Job Code <span>*</span></label>
+                    <select class="modern-input" id="modalJobCode">
+                        <option>ASST MGR</option>
+                        <option>SHIFT LEADER</option>
+                        <option>CREW</option>
+                        <option>MANAGER</option>
+                        <option>CASHIER</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label class="field-label">Pay Rate</label>
+                    <input type="text" class="modern-input" value="$ 23.50">
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label class="field-label">Clock In <span>*</span></label>
+                    <input type="time" class="modern-input" id="modalClockIn">
+                </div>
+                <div class="form-group">
+                    <label class="field-label">Clock Out</label>
+                    <input type="time" class="modern-input" id="modalClockOut">
+                </div>
+            </div>
+
+            <div class="section-divider">
+                Break <button class="btn-add-break" onclick="addBreakRow()"><i class="bi bi-plus"></i></button>
+            </div>
+            <div id="breakContainer">
+                </div>
+
+            <div class="section-divider">Tip Amount</div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label class="field-label">Cash</label>
+                    <input type="text" class="modern-input" value="$ 0.00">
+                </div>
+                <div class="form-group">
+                    <label class="field-label">Credit</label>
+                    <input type="text" class="modern-input" value="$ 0.00">
+                </div>
+            </div>
+
+            <div class="form-group" style="margin-top: 20px;">
+                <label class="field-label">Adjustment Reason <span>*</span></label>
+                <select class="modern-input">
+                    <option>Select Reason</option>
+                    <option>Forgot to punch</option>
+                    <option>Technical Issue</option>
+                </select>
+            </div>
+
+            <div class="form-group" style="margin-top: 20px;">
+                <label class="field-label">Comments</label>
+                <textarea class="modern-input" rows="2" placeholder="Enter any notes..."></textarea>
+            </div>
+        </div>
+
+        <div class="modern-modal-footer">
+            <button class="btn-primary-lg" id="modalSubmitBtn">+ Add</button>
+        </div>
+    </div>
+</div>
+
+    <!-- FOOTER -->
+
+</div>
+    </div>
+
+    <div class="modal-overlay" id="filterModal">
+        <div class="modal-content" style="width: 600px;">
+            <div class="modal-header">
+                <h3>Filters</h3>
+                <i class="bi bi-x-lg" onclick="closeModal('filterModal')"></i>
+            </div>
+            <div class="modal-body" style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 20px;">
+                <div>
+                    <p style="font-weight:bold; margin-bottom:10px; font-size:12px;">Highlight Punch For</p>
+                    <label style="display:block; font-size:12px;"><input type="checkbox" checked> Show All</label>
+                    <label style="display:block; font-size:12px;"><input type="checkbox"> Authorized</label>
+                    <label style="display:block; font-size:12px;"><input type="checkbox"> Un-Authorized</label>
+                </div>
+                <div>
+                    <p style="font-weight:bold; margin-bottom:10px; font-size:12px;">Violations</p>
+                    <label style="display:block; font-size:12px;"><input type="checkbox" checked> Show All</label>
+                    <label style="display:block; font-size:12px;"><input type="checkbox"> Compliant</label>
+                </div>
+                <div>
+                    <p style="font-weight:bold; margin-bottom:10px; font-size:12px;">Job Codes</p>
+                    <label style="display:block; font-size:12px;"><input type="checkbox" checked> All Job Codes</label>
+                    <label style="display:block; font-size:12px;"><input type="checkbox" checked> ASST MGR</label>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-outline" style="color:red">Clear</button>
+                <button class="btn btn-blue">Apply</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="dropdown-menu" id="actionsMenu">
+        <div class="dropdown-item"><i class="bi bi-check-circle" style="color: #10b981;"></i> Authorize All</div>
+        <div class="dropdown-item"><i class="bi bi-person-plus" style="color: #3b82f6;"></i> Invite Employee</div>
+        <div class="dropdown-item"><i class="bi bi-plus-circle" style="color: #f59e0b;"></i> Add Employee</div>
+    </div>
+
+    <div class="dropdown-menu" id="reportsMenu">
+        <div class="dropdown-item"><i class="bi bi-journal-text" style="color: #ef4444;"></i> Audit Trail Report</div>
+        <div class="dropdown-item"><i class="bi bi-file-earmark-text" style="color: #8b5cf6;"></i> Punch Report</div>
+    </div>
+
+    <div class="violation-popup" id="violationPopup">
+    <div class="violation-header">
+        VIOLATIONS
+        <span onclick="closeViolationPopup()">×</span>
+    </div>
+    <div class="violation-body">
+        <div>Meal Break Has Been Violated.</div>
+        <div>Rest Break Has Been Violated.</div>
+    </div>
+</div>
+
+<div class="modal-overlay" id="chartModal">
+    <div class="chart-modal-content">
+        <div class="modern-modal-header">
+            <div class="modal-title-group">
+                <h3 id="chartTitle">Chart View</h3>
+                <p>Hourly Labor Comparison</p>
+            </div>
+            <button class="btn-close-circle" onclick="closeModal('chartModal')"><i class="bi bi-x-lg"></i></button>
+        </div>
+
+        <div class="chart-filters" style="display:flex; align-items:center; gap:15px; padding:20px 30px; background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%); border-bottom: 1px solid #e2e8f0;">
+    
+    <label style="font-size:13px; font-weight:700; color:#334155; display: flex; align-items: center; gap: 8px;">
+        <i class="bi bi-sliders" style="color: #3b82f6; font-size: 14px;"></i> Comparison Mode:
+    </label>
+
+<select class="chart-dropdown" id="chartCompareMode" onchange="renderBars()">
+    <option value="ideal">Ideal Vs Actual</option>
+    <option value="schedule">Schedule Vs Actual</option>
+    <option value="forecastActual">Forecasted Vs Actual</option>
+    <option value="idealSchedule">Ideal Vs Schedule</option>
+    <option value="idealForecast">Ideal Vs Forecasted</option>
+</select>
+</div>
+
+<div class="chart-layout">
+
+    <div class="axis-title-y">Hours</div>
+
+    <div class="y-axis">
+        <span>50</span>
+        <span>40</span>
+        <span>30</span>
+        <span>20</span>
+        <span>10</span>
+        <span>0</span>
+    </div>
+
+    <div class="chart-canvas" id="chartBarsContainer"></div>
+
+    <div class="x-axis" id="xAxisLabels"></div>
+
+    <div class="axis-title-x">Time</div>
+
+</div>
+
+        <div class="legend-container">
+            <div style="font-size:12px; font-weight:600;"><i class="bi bi-square-fill" style="color:#3b82f6"></i> Actual</div>
+            <div style="font-size:12px; font-weight:600;"><i class="bi bi-square-fill" style="color:#10b981"></i> <span id="compareLabel">Ideal</span></div>
+        </div>
+    </div>
+</div>
+
+
+<div class="modal-overlay" id="forecastGraphModal">
+    <div class="chart-modal-content" style="width:1000px;">
+        
+<div class="modern-modal-header">
+    <div class="modal-title-group" style="display: flex; align-items: center; gap: 20px;">
+        <h3 id="forecastModalTitle">Workforce Hours Comparison</h3>
+        <select class="chart-dropdown" id="comparisonModeSelect" onchange="toggleForecastMode()">
+            <option value="forecast">Workforce Hours Comparison</option>
+            <option value="comparison">Labor Hours Comparison</option>
+        </select>
+    </div>
+    <div id="rangeFilterGroup" style="display: none; gap: 8px; margin-right: 20px;">
+        <button class="range-btn active" onclick="updateForecastRange(this, '7D')">7 D</button>
+        <button class="range-btn" onclick="updateForecastRange(this, '1M')">1 M</button>
+        <button class="range-btn" onclick="updateForecastRange(this, '3M')">3 M</button>
+        <button class="range-btn" onclick="updateForecastRange(this, '6M')">6 M</button>
+        <button class="range-btn" onclick="updateForecastRange(this, '1Y')">1 Y</button>
+    </div>
+    <button class="btn-close-circle" onclick="closeModal('forecastGraphModal')">
+        <i class="bi bi-x-lg"></i>
+    </button>
+</div>
+
+        <div style="padding:30px;">
+            <canvas id="forecastChart" height="120"></canvas>
+        </div>
+
+    </div>
+</div>
+
+
+<div class="modal-overlay" id="kpiModal">
+    <div class="kpi-modal">
+
+        <div class="kpi-header">
+            <div>
+                <h3>Weekly KPI Dashboard</h3>
+                <p>Performance Overview (02/24 - 03/02)</p>
+            </div>
+            <button class="btn-close-circle" onclick="closeModal('kpiModal')">
+                <i class="bi bi-x-lg"></i>
+            </button>
+        </div>
+
+        <div class="kpi-body">
+
+            <div class="kpi-table-wrapper">
+                <table class="kpi-table">
+                    <thead>
+                        <tr>
+                            <th>KPI</th>
+                            <th>Mon</th>
+                            <th>Tue</th>
+                            <th>Wed</th>
+                            <th>Thu</th>
+                            <th>Fri</th>
+                            <th>Sat</th>
+                            <th>Sun</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Sales Per Punched Hours ($)</td>
+                            <td>$54.08</td><td>$54.84</td><td>$49.83</td><td>$62.76</td><td>$62.85</td><td>$51.60</td><td>$68.09</td>
+                        </tr>
+                        <tr>
+                            <td>Sales Per Crew Hours ($)</td>
+                            <td>$62.51</td><td>$61.83</td><td>$55.51</td><td>$67.92</td><td>$64.70</td><td>$59.55</td><td>$66.57</td>
+                        </tr>
+                        <tr>
+                            <td>Sales Per Manager Hours ($)</td>
+                            <td>$769.11</td><td>$770.87</td><td>$775.07</td><td>$0.00</td><td>$967.22</td><td>$808.34</td><td>$0.00</td>
+                        </tr>
+                        <tr>
+                            <td>Transaction Per Punched Hours</td>
+                            <td>8.31</td><td>8.35</td><td>7.38</td><td>8.54</td><td>7.97</td><td>6.69</td><td>7.23</td>
+                        </tr>
+                        <tr>
+                            <td>Transaction Per Crew Hours</td>
+                            <td>8.31</td><td>8.35</td><td>7.38</td><td>8.54</td><td>7.97</td><td>6.69</td><td>7.23</td>
+                        </tr>
+                        <tr>
+                            <td>Transaction Per Manager Hours</td>
+                            <td>102.22</td><td>104.11</td><td>103.00</td><td>0.00</td><td>119.22</td><td>90.78</td><td>0.00</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+        </div>
+
+        <div class="kpi-footer">
+            <button class="kpi-ok-btn" onclick="closeModal('kpiModal')">OK</button>
+        </div>
+
+    </div>
+</div>
+
+
+<div id="employeePopover" class="violation-popup">
+    <div class="popover-header">
+        <h4 id="popoverEmpName">Aaron H</h4>
+        <i class="bi bi-x-lg" onclick="closePopover()"></i>
+    </div>
+
+    <div class="popover-grid">
+        <div class="popover-tile" onclick="openEditEmployee()">
+            <i class="bi bi-pencil-square" style="color: #3b82f6;"></i>
+            <span>Edit Employee</span>
+        </div>
+        <div class="popover-tile" onclick="openAdjustPay()">
+            <i class="bi bi-currency-dollar" style="color: #ef4444;"></i>
+            <span>Adjust Pay</span>
+        </div>
+        <div class="popover-tile full-width" onclick="openPunchDetails()">
+            <i class="bi bi-clock-history" style="color: #10b981;"></i>
+            <span>View Punch Details</span>
+        </div>
+    </div>
+
+    <div class="popover-footer">
+        <div class="footer-info">
+            <span style="font-size: 12px; color: #64748b; font-weight: 600;">Rate: <b style="color: #3b82f6;">$ 27.50</b></span>
+            <span class="label-pill">MANAGER</span>
+        </div>
+    </div>
+</div>
+
+<div class="modal-overlay" id="punchDetailsModal">
+    <div class="modern-modal" style="width: 1000px; max-width: 95vw;">
+        <div class="modern-modal-header" style="background:#fff">
+            <h2 id="detailEmpName" style="margin:0; font-size:24px;">Employee Name</h2>
+            <div style="display: flex; gap: 15px; align-items: center;">
+                <span style="background: #f1f5f9; padding: 6px 16px; border-radius: 6px; font-weight: 700; font-size:14px;">Week : 02/24/2025</span>
+                <button class="btn-close-circle" onclick="closeModal('punchDetailsModal')"><i class="bi bi-x-lg"></i></button>
+            </div>
+        </div>
+        
+<div class="modern-modal-body" style="padding: 15px;">
+    <div style="display: flex; gap: 4px; margin-bottom: 20px; overflow-x: auto; padding-bottom: 5px;">
+        <div class="kpi-tile" style="background: #eef2ff;"><b>17:21</b><span>Labor Hours</span></div>
+        <div class="kpi-tile" style="background: #ecfdf5;"><b>$277.60</b><span>Est. Labor Dollars</span></div>
+        <div class="kpi-tile" style="background: #fef2f2;"><b>6</b><span>Warnings</span></div>
+        <div class="kpi-tile" style="background: #f7fee7;"><b>2:00</b><span>Overtime</span></div>
+        <div class="kpi-tile" style="background: #fff7ed;"><b>18:00</b><span>Scheduled Hours</span></div>
+    </div>
+
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+        <h4 style="margin:0; font-size:15px; color:#1e293b;">Shift Detail</h4>
+        <div style="display: flex; align-items: center; gap: 12px;">
+            <div style="display: flex; align-items: center; gap: 6px; font-size: 11px; font-weight: 600;">
+                <span>Hide Breaks</span>
+                <label class="switch"><input type="checkbox" id="hideBreaksToggle" onchange="updateDetailView()"><span class="slider round"></span></label>
+            </div>
+            <div style="display: flex; align-items: center; gap: 6px; font-size: 11px; font-weight: 600;">
+                <span>Show Original Punch</span>
+                <label class="switch"><input type="checkbox" id="showOriginalToggle" onchange="updateDetailView()"><span class="slider round"></span></label>
+            </div>
+            <button class="icon-btn-blue" onclick="toggleDetailGraphView()" title="Toggle Graph View" style="margin-left: 8px;">
+                <i class="bi bi-bar-chart-line"></i>
+            </button>
+        </div>
+    </div>
+
+    <div id="detailGraphSection" style="display: none; background: #fff; padding: 20px; border: 1px solid #e2e8f0; border-radius: 8px; margin-bottom: 15px;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+            <div style="display: flex; gap: 8px;">
+                <button class="range-btn active" onclick="updateRange(this, '7D')">7 D</button>
+                <button class="range-btn" onclick="updateRange(this, '1M')">1 M</button>
+                <button class="range-btn" onclick="updateRange(this, '3M')">3 M</button>
+                <button class="range-btn" onclick="updateRange(this, '6M')">6 M</button>
+                <button class="range-btn" onclick="updateRange(this, '1Y')">1 Y</button>
+            </div>
+            <div style="font-size: 13px; font-weight: 700; color: #1e293b;">Total Hours: <span style="color: #3b82f6;">17.21</span></div>
+        </div>
+        
+        <div style="display: grid; grid-template-columns: 1fr; gap: 20px;">
+            <div style="height: 300px;">
+                <canvas id="rangeBarChart"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <div id="detailTableContainer" style="max-height: 400px; overflow-y: auto; border: 1px solid #e2e8f0; border-radius: 6px;">
+        <table class="kpi-table" style="width: 100%; border-collapse: collapse;">
+            <thead style="position: sticky; top: 0; background: #f8fafc; z-index: 10;">
+                <tr>
+                    <th style="text-align:left; padding-left:15px; width:25%;">ACTUAL</th>
+                    <th>JOB CODE</th>
+                    <th>HOURS</th>
+                    <th>LABOR $</th>
+                    <th style="text-align: center;">WARNINGS</th>
+                    <th>SCHEDULE</th>
+                </tr>
+            </thead>
+            <tbody id="detailTableBody"></tbody>
+        </table>
+    </div>
+</div>
+        <div class="modern-modal-footer">
+            <button class="btn-primary-lg" onclick="closeModal('punchDetailsModal')">OK</button>
+        </div>
+    </div>
+</div>
+
+
+
+    <script>
+        const employees = [
+            "Aaron H", "Andrew K", "Corinne M", "Destiny S", "Devin S", "Mackenzie B", "Mark C", 
+            "Taasil T", "Test T", "Tracey S", "Alida N", "Anais E", "James R", "Sarah W", "Kevin D",
+            "Linda M", "Robert P", "Jessica K", "Brian L", "Melissa J", "Chris H", "Ashley T", "Edward B",
+            "Karen S", "Jason M", "Laura C", "Paul W", "Michelle G", "Ryan A", "Stephanie D"
+        ];
+
+        const jobCodes = ["ASST MGR", "SHIFT LEADER", "MANAGER", "CREW", "CASHIER"];
+
+function formatTime(hour, minute) {
+    const ampm = hour >= 12 ? "P" : "A";
+    const h = hour % 12 || 12;
+    return `${h}:${minute.toString().padStart(2, '0')}${ampm}`;
+}
+
+function generateRandomShift() {
+    const startHour = Math.floor(Math.random() * 6) + 6; // 6AM–11AM
+    const startMin = Math.random() > 0.5 ? 0 : 30;
+
+    const duration = Math.floor(Math.random() * 5) + 6; // 6–10 hours
+    const endHour = startHour + duration;
+
+    return {
+        clockIn: `${startHour.toString().padStart(2,'0')}:${startMin.toString().padStart(2,'0')}`,
+        clockOut: `${endHour.toString().padStart(2,'0')}:${startMin.toString().padStart(2,'0')}`,
+        displayTime: `${formatTime(startHour,startMin)} - ${formatTime(endHour,startMin)}`,
+        job: jobCodes[Math.floor(Math.random()*jobCodes.length)]
+    };
+}
+
+function initTable() {
+    const container = document.getElementById('employeeRows');
+    container.innerHTML = "";
+
+    const jobCodes = ["ASST MGR", "SHIFT LEADER", "MANAGER", "CREW", "CASHIER"];
+
+    function formatTime(hour, minute) {
+        const ampm = hour >= 12 ? "P" : "A";
+        const h = hour % 12 || 12;
+        return `${h}:${minute.toString().padStart(2, '0')}${ampm}`;
+    }
+
+    function generateRandomShift() {
+        const startHour = Math.floor(Math.random() * 6) + 6;
+        const startMin = Math.random() > 0.5 ? 0 : 30;
+        const duration = Math.floor(Math.random() * 5) + 6;
+        const endHour = startHour + duration;
+
+        return {
+            clockIn: `${startHour.toString().padStart(2, '0')}:${startMin.toString().padStart(2, '0')}`,
+            clockOut: `${endHour.toString().padStart(2, '0')}:${startMin.toString().padStart(2, '0')}`,
+            display: `${formatTime(startHour, startMin)} - ${formatTime(endHour, startMin)}`,
+            job: jobCodes[Math.floor(Math.random() * jobCodes.length)]
+        };
+    }
+
+    employees.forEach((name, index) => {
+        const row = document.createElement('div');
+        row.className = "grid-row-layout";
+        const faceId = index + 1;
+
+        // Apply green tag to the first 6 employees
+        const hasGreenTag = index < 6;
+        
+        // Randomize Stats
+        const totalHrs = Math.floor(Math.random() * 40).toString().padStart(2, '0');
+        const otHrs = (Math.random() > 0.4 ? Math.floor(Math.random() * 8) : 0).toString().padStart(2, '0');
+        
+        // Warning Logic (60% chance)
+        const hasWarning = Math.random() > 0.4;
+
+        let rowHtml = `
+            <div class="grid-cell" style="position: relative;">
+                ${hasGreenTag ? '<div class="corner-tag"></div>' : ''}
+                <div class="emp-cell" style="width: 100%;">
+                    <img src="https://i.pravatar.cc/150?u=${faceId}" class="avatar">
+                    <div class="emp-info" onclick="openEmpPopover(event, '${name}')" style="cursor:pointer; flex: 1; position: relative; padding-right: 25px;">
+                        <div style="color:#3b82f6; font-weight: 600;">${name}</div>
+                        <span style="font-size: 13px; color: #9ca3af;">
+                           <i class="bi bi-clock" style="font-size: 10px;"></i> Hrs ${totalHrs}:00 | OT ${otHrs}:00
+                        </span>
+                        
+                        ${hasWarning ? `
+                            <i class="bi bi-exclamation-triangle-fill" 
+                               style="color: #ef4444; font-size: 14px; position: absolute; right: 5px; top: 50%; transform: translateY(-50%); cursor: pointer;" 
+                               onclick="event.stopPropagation(); showViolationPopup(event)"></i>
+                        ` : ''}
+                    </div>
+                </div>
+            </div>
+        `;
+
+        for (let i = 0; i < 7; i++) {
+            const hasShift = Math.random() > 0.4;
+            if (hasShift) {
+                const shift = generateRandomShift();
+                const hasBreak = Math.random() > 0.5;
+                const hasManualEdit = Math.random() > 0.85;
+                const jobClass = shift.job.replace(/\s+/g, '.');
+
+                rowHtml += `
+    <div class="grid-cell">
+        <div class="punch-block ${jobClass}" 
+             data-name="${name}" 
+             data-clockin="${shift.clockIn}" 
+             data-clockout="${shift.clockOut}" 
+             data-job="${shift.job}" 
+             onclick="event.stopPropagation(); openEditFromElement(this)">
+            <span class="punch-time">${shift.display}</span>
+            <span class="punch-role">${shift.job}</span>
+            ${hasManualEdit ? '<i class="bi bi-pencil-fill" style="position: absolute; top: 4px; right: 8px; color: #3b82f6; font-size: 11px;"></i>' : ''}
+            ${hasBreak ? '<i class="bi bi-cup-hot-fill" style="position: absolute; bottom: 4px; right: 8px; color: #ef4444; font-size: 13px;"></i>' : ''}
+            <div class="hover-actions">
+                <div class="icon-btn edit"><i class="bi bi-pencil-square"></i></div>
+                <div class="icon-btn warning" onclick="showViolationPopup(event)"><i class="bi bi-exclamation-triangle"></i></div>
+                <div class="icon-btn add" onclick="openAddPunch('${name}')"><i class="bi bi-plus"></i></div>
+            </div>
+        </div>
+    </div>`;
+            } else {
+                rowHtml += `<div class="grid-cell empty-cell" onclick="openAddPunch('${name}')"><div class="empty-plus"><i class="bi bi-plus-lg"></i></div></div>`;
+            }
+        }
+        row.innerHTML = rowHtml;
+        container.appendChild(row);
+    });
+}
+
+
+function toggleDailySummary() {
+    const details = document.getElementById('dailySummarySection');
+    const icon = document.getElementById('sumIcon');
+    
+    if (details.style.display === 'none' || details.style.display === '') {
+        details.style.display = 'block';
+        icon.classList.replace('bi-chevron-down', 'bi-chevron-up');
+    } else {
+        details.style.display = 'none';
+        icon.classList.replace('bi-chevron-up', 'bi-chevron-down');
+    }
+}
+
+function openAddPunch(name) {
+    document.getElementById('modalTitle').innerText = `Add Punch (${name})`;
+    document.getElementById('modalSubmitBtn').innerText = '+ Add';
+    
+    document.getElementById('modalClockIn').value = "";
+    document.getElementById('modalClockOut').value = "";
+    document.getElementById('breakContainer').innerHTML = '';
+
+    toggleModal('punchModal');
+}
+
+function openEditFromElement(element) {
+    // This pulls the string from the data-name attribute you just added
+    const name = element.dataset.name; 
+    const clockIn = element.dataset.clockin;
+    const clockOut = element.dataset.clockout;
+    const job = element.dataset.job;
+
+    // Updates the heading text to "Approve Punch (Employee Name)"
+    document.getElementById('modalTitle').innerText = `Approve Punch (${name})`;
+    document.getElementById('modalSubmitBtn').innerText = 'Approve';
+    
+    document.getElementById('modalJobCode').value = job;
+    document.getElementById('modalClockIn').value = clockIn;
+    document.getElementById('modalClockOut').value = clockOut;
+    
+    document.getElementById('breakContainer').innerHTML = '';
+
+    toggleModal('punchModal');
+}
+
+
+        function toggleModal(id) {
+            const m = document.getElementById(id);
+            m.style.display = m.style.display === 'flex' ? 'none' : 'flex';
+        }
+
+        function closeModal(id) {
+            document.getElementById(id).style.display = 'none';
+        }
+
+        function getRandomColor() {
+            const colors = ['#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6'];
+            return colors[Math.floor(Math.random() * colors.length)];
+        }
+
+        // Dropdown Handlers
+        document.getElementById('btnActions').onclick = (e) => {
+            const menu = document.getElementById('actionsMenu');
+            menu.style.display = 'block';
+            menu.style.top = (e.pageY + 10) + 'px';
+            menu.style.left = (e.pageX - 100) + 'px';
+            e.stopPropagation();
+        };
+
+        document.getElementById('btnReports').onclick = (e) => {
+            const menu = document.getElementById('reportsMenu');
+            menu.style.display = 'block';
+            menu.style.top = (e.pageY + 10) + 'px';
+            menu.style.left = (e.pageX - 100) + 'px';
+            e.stopPropagation();
+        };
+
+        window.onclick = () => {
+            document.querySelectorAll('.dropdown-menu').forEach(d => d.style.display = 'none');
+        };
+
+function showViolationPopup(e) {
+    e.stopPropagation();
+    const popup = document.getElementById("violationPopup");
+    popup.style.display = "block";
+
+    // Detect if click came from employee cell or punch block
+    const isEmpCell = e.target.closest(".emp-info");
+    const rect = (isEmpCell || e.target.closest(".punch-block")).getBoundingClientRect();
+
+    // Position above the element
+    popup.style.top = (window.scrollY + rect.top - popup.offsetHeight - 10) + "px";
+    popup.style.left = (window.scrollX + rect.left + 10) + "px";
+}
+
+function closeViolationPopup() {
+    document.getElementById("violationPopup").style.display = "none";
+}
+
+document.addEventListener("click", function(e) {
+    const popup = document.getElementById("violationPopup");
+    if (!popup.contains(e.target)) {
+        popup.style.display = "none";
+    }
+});
+
+function addBreakRow() {
+    const container = document.getElementById('breakContainer');
+    const rowId = 'break_' + Date.now();
+    
+    const row = document.createElement('div');
+    row.className = 'break-row';
+    row.id = rowId;
+    
+    row.innerHTML = `
+        <div class="form-group">
+            <label class="field-label">Start</label>
+            <input type="time" class="modern-input">
+        </div>
+        <div class="form-group">
+            <label class="field-label">End</label>
+            <input type="time" class="modern-input">
+        </div>
+        <div class="form-group">
+            <label class="field-label">Type</label>
+            <select class="modern-input">
+                <option>MEAL</option>
+                <option>REST</option>
+            </select>
+        </div>
+        <button class="btn-del-break" onclick="document.getElementById('${rowId}').remove()">
+            <i class="bi bi-trash3"></i>
+        </button>
+    `;
+    container.appendChild(row);
+}
+
+
+function openChartPopup(dayLabel) {
+    document.getElementById('chartTitle').innerText = `Chart View - ${dayLabel}`;
+    updateChartBars();
+    toggleModal('chartModal');
+}
+
+function updateChartBars() {
+    const container = document.getElementById('chartBars');
+    container.innerHTML = '';
+    
+    // Simulate 24 hours of data
+    for (let i = 4; i <= 23; i++) {
+        const barPair = document.createElement('div');
+        barPair.className = 'bar-pair';
+        
+        const actualHeight = Math.floor(Math.random() * 40) + 10;
+        const secondaryHeight = Math.floor(Math.random() * 80) + 20;
+
+        barPair.innerHTML = `
+            <div class="bar actual" style="height: ${actualHeight}%" title="Actual: ${actualHeight}hrs"></div>
+            <div class="bar secondary" style="height: ${secondaryHeight}%" title="Target: ${secondaryHeight}hrs"></div>
+        `;
+        container.appendChild(barPair);
+    }
+}
+
+
+function openChartPopup(day) {
+    document.getElementById('chartTitle').innerText = `Chart View - ${day}`;
+    renderBars();
+    document.getElementById('chartModal').style.display = 'flex';
+}
+
+function renderBars() {
+    const container = document.getElementById('chartBarsContainer');
+    const xLabelContainer = document.getElementById('xAxisLabels');
+    const mode = document.getElementById('chartCompareMode').value;
+    
+    // Define Mapping for Labels and Colors
+    const modeConfigs = {
+        'ideal': { left: 'Actual', right: 'Ideal', leftCol: '#3b82f6', rightCol: '#10b981' },
+        'schedule': { left: 'Actual', right: 'Schedule', leftCol: '#3b82f6', rightCol: '#10b981' },
+        'forecastActual': { left: 'Actual', right: 'Forecasted', leftCol: '#3b82f6', rightCol: '#f97316' },
+        'idealSchedule': { left: 'Schedule', right: 'Ideal', leftCol: '#10b981', rightCol: '#8b5cf6' },
+        'idealForecast': { left: 'Forecasted', right: 'Ideal', leftCol: '#f97316', rightCol: '#10b981' }
+    };
+
+    const config = modeConfigs[mode];
+    
+    // Update Legend Labels and Colors
+    const legend = document.querySelector('.legend-container');
+    legend.innerHTML = `
+        <div style="font-size:12px; font-weight:600;"><i class="bi bi-square-fill" style="color:${config.leftCol}"></i> ${config.left}</div>
+        <div style="font-size:12px; font-weight:600;"><i class="bi bi-square-fill" style="color:${config.rightCol}"></i> ${config.right}</div>
+    `;
+
+    container.innerHTML = '';
+    xLabelContainer.innerHTML = '';
+    
+    for (let i = 0; i < 24; i++) {
+        let hour = (i + 4) % 24;
+        let displayHour = `${hour}:00`;
+        
+        // Add X-Axis Label
+        const span = document.createElement('span');
+        span.innerText = displayHour;
+        xLabelContainer.appendChild(span);
+
+        // Add Bars with Dynamic Colors
+        const group = document.createElement('div');
+        group.className = 'bar-group';
+        const v1 = Math.floor(Math.random() * 40) + 5;
+        const v2 = Math.floor(Math.random() * 45) + 5;
+        
+        // Create unified tooltip data for the time group
+        const tooltipData = `${displayHour} - ${config.left}: ${v1}, ${config.right}: ${v2}`;
+        group.setAttribute('data-time-values', tooltipData);
+        
+        group.innerHTML = `
+            <div class="bar-unit" style="height: ${v1 * 2}%; background: ${config.leftCol}"></div>
+            <div class="bar-unit" style="height: ${v2 * 2}%; background: ${config.rightCol}"></div>
+        `;
+        container.appendChild(group);
+    }
+}
+
+let forecastChartInstance = null;
+
+let forecastMode = 'forecast';
+// Data mapped from provided screenshots
+const forecastDataRange = {
+    '7D': { labels: ['2/19', '2/20', '2/21', '2/22', '2/23', '2/24', '2/25'], forecast: [250, 245, 265, 270, 255, 240, 250], sched: [260, 253, 270, 273, 250, 229, 243], actual: [244, 230, 256, 263, 249, 242, 238], Ideal: [234, 238, 262, 268, 238, 228, 237] },
+    '1M': { labels: ['1/29', '2/5', '2/12', '2/19'], forecast: [1720, 1680, 1660, 1750], sched: [1702, 1730, 1720, 1778], actual: [1665, 1632, 1575, 1632], Ideal: [1740, 1638, 1622, 1705] },
+    '3M': { labels: ['12/4', '12/11', '12/18', '12/25', '1/1', '1/8', '1/15', '1/22', '1/29', '2/5', '2/12', '2/19'], forecast: [1800, 1850, 1860, 1750, 1600, 1730, 1700, 1705, 1730, 1630, 1615, 1698], sched: [1775, 1685, 1725, 1615, 1708, 1755, 1765, 1810, 1702, 1730, 1720, 1780], actual: [1735, 1795, 1755, 1600, 1490, 1630, 1655, 1665, 1665, 1635, 1575, 1635], Ideal: [1810, 1860, 1870, 1760, 1612, 1740, 1710, 1715, 1740, 1640, 1625, 1708] },
+    '6M': { labels: ['Aug', 'Sep', 'Oct', 'Nov', 'Dec', 'Jan'], forecast: [1050, 8000, 8300, 7700, 7950, 200], sched: [1010, 7650, 8080, 7950, 7500, 250], actual: [1080, 8150, 8420, 7900, 8000, 210], Ideal: [1100, 8100, 8350, 7750, 8050, 230] },
+    '1Y': { labels: ['Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec', 'Jan', 'Feb'], forecast: [8050, 8030, 8470, 8330, 8400, 8270, 8100, 8300, 7730, 8030, 7300, 6400], sched: [7750, 7420, 8000, 7850, 8090, 7950, 7600, 8050, 7950, 7550, 7800, 6650], actual: [8280, 8390, 8710, 8540, 8650, 8450, 8180, 8440, 7880, 7990, 7580, 6650], Ideal: [8100, 8080, 8520, 8380, 8450, 8320, 8150, 8350, 7780, 8080, 7350, 6450] }
+};
+
+function openForecastGraph() {
+    document.getElementById('forecastGraphModal').style.display = 'flex';
+    if (!forecastChartInstance) {
+        const ctx = document.getElementById('forecastChart').getContext('2d');
+        forecastChartInstance = new Chart(ctx, {
+            type: 'bar',
+            data: { labels: [], datasets: [] },
+            options: {
+                responsive: true,
+                interaction: { mode: 'index', intersect: false },
+                plugins: { legend: { position: 'bottom' } },
+                scales: {
+                    y: { beginAtZero: true, title: { display: true, text: 'Hours' } },
+                    y1: { position: 'right', beginAtZero: true, grid: { drawOnChartArea: false }, title: { display: true, text: 'Sales / Dollars' } }
+                }
+            }
+        });
+    }
+    // Always reset to standard forecast view when modal is first opened
+    document.getElementById('comparisonModeSelect').value = 'forecast';
+    toggleForecastMode();
+}
+
+function toggleForecastMode() {
+    const mode = document.getElementById('comparisonModeSelect').value;
+    const rangeGroup = document.getElementById('rangeFilterGroup');
+    const title = document.getElementById('forecastModalTitle');
+    
+    forecastMode = mode;
+    if (mode === 'comparison') {
+        rangeGroup.style.display = 'flex';
+        title.innerText = "Labor Hours Comparison";
+        
+        // Find the 7D button and trigger it to ensure it is highlighted and data is loaded
+        const btn7D = document.querySelector('[data-range="7D"]');
+        updateForecastRange(btn7D, '7D');
+    } else {
+        rangeGroup.style.display = 'none';
+        title.innerText = "Workforce Hours Comparison";
+        loadWeeklyForecastView();
+    }
+}
+
+function loadWeeklyForecastView() {
+    forecastChartInstance.data.labels = ['02/24/2025','02/25/2025','02/26/2025','02/27/2025','02/28/2025','03/01/2025','03/02/2025'];
+    forecastChartInstance.data.datasets = [
+        // Bar: Forecasted Hours
+        { 
+            label: 'Forecast', 
+            data: [138, 135, 148, 155, 150, 142, 135], 
+            backgroundColor: '#f97316', 
+            borderRadius: 6, 
+            order: 2 
+        },
+        // Bar: Schedule Hours
+        { 
+            label: 'Schedule', 
+            data: [125, 122, 140, 120, 138, 141, 110], 
+            backgroundColor: '#06b6d4', 
+            borderRadius: 6, 
+            order: 2 
+        },
+        // Line: Actual Hours
+        { 
+            type: 'line', 
+            label: 'Actual', 
+            data: [130, 128, 145, 155, 158, 148, 134], 
+            borderColor: '#2563eb', 
+            backgroundColor: '#2563eb', 
+            tension: 0.4, 
+            borderWidth: 3, 
+            pointRadius: 5, 
+            order: 1 
+        },
+        // Line: Ideal Hours
+        { 
+            type: 'line', 
+            label: 'Ideal', 
+            data: [120, 118, 135, 145, 142, 136, 122], 
+            borderColor: '#8b5cf6', 
+            backgroundColor: '#8b5cf6', 
+            tension: 0.4, 
+            borderWidth: 3, 
+            pointRadius: 5, 
+            order: 1 
+        }
+    ];
+
+    // Disable the secondary Y-axis (Sales/Dollars) since all data is now in Hours
+    forecastChartInstance.options.scales.y1.display = false;
+    
+    forecastChartInstance.update();
+}
+function updateForecastRange(btn, range) {
+    // UI Logic: Remove active class from all and add to the clicked/selected one
+    document.querySelectorAll('#rangeFilterGroup .range-btn').forEach(b => b.classList.remove('active'));
+    if (btn) btn.classList.add('active');
+
+    const data = forecastDataRange[range];
+    
+    // Update chart with order: Forecast, Schedule, Actual, Ideal
+    forecastChartInstance.data.labels = data.labels;
+    forecastChartInstance.data.datasets = [
+        { label: 'Forecast', data: data.forecast, backgroundColor: '#f97316', borderRadius: 4, order: 2 },
+        { label: 'Schedule', data: data.sched, backgroundColor: '#06b6d4', borderRadius: 4, order: 2 },
+        { label: 'Actual', data: data.actual, backgroundColor: '#2563eb', borderRadius: 4, order: 2 },
+        { label: 'Ideal', data: data.Ideal, backgroundColor: '#8b5cf6', borderRadius: 4, order: 2 }
+    ];
+    
+    // Hide Sales axis for pure hour comparison
+    forecastChartInstance.options.scales.y1.display = false;
+    forecastChartInstance.update();
+}
+
+function openKpiModal() {
+    document.getElementById('kpiModal').style.display = 'flex';
+}
+
+function openEmpPopover(e, name) {
+    e.stopPropagation();
+    const popover = document.getElementById('employeePopover');
+    const rect = e.currentTarget.getBoundingClientRect();
+    
+    document.getElementById('popoverEmpName').innerText = name;
+    popover.style.display = 'block';
+    popover.style.top = (window.scrollY + rect.top) + 'px';
+    popover.style.left = (window.scrollX + rect.right + 10) + 'px';
+}
+
+function closePopover() { document.getElementById('employeePopover').style.display = 'none'; }
+
+function openEditEmployee() {
+    // Assuming your existing filterModal or a new one serves as "Edit Employee"
+    closePopover();
+}
+
+function openAdjustPay() {
+    // Adjust Pay functionality
+    closePopover();
+}
+
+function openPunchDetails() {
+    closePopover();
+    const name = document.getElementById('popoverEmpName').innerText;
+    const detailEmpName = document.getElementById('detailEmpName');
+    
+    if (detailEmpName) {
+        detailEmpName.innerText = name;
+    }
+
+    // Ensure table is populated before showing the modal
+    updateDetailView(); 
+    
+    // Show the modal
+    const modal = document.getElementById('punchDetailsModal');
+    if (modal) {
+        modal.style.display = 'flex';
+    }
+}
+
+function toggleBreaks(cb) {
+    document.querySelectorAll('.meal-row').forEach(row => row.style.display = cb.checked ? 'none' : 'grid');
+}
+
+function toggleOriginal(cb) {
+    if(cb.checked) {
+        // Simple mock: duplicate the time line in blue
+        document.querySelectorAll('.detail-row b').forEach(el => {
+            if(!el.nextSibling.className) {
+                const span = document.createElement('div');
+                span.className = 'original-punch';
+                span.innerText = "Original: " + el.nextSibling.textContent;
+                el.parentNode.appendChild(span);
+            }
+        });
+    } else {
+        document.querySelectorAll('.original-punch').forEach(el => el.remove());
+    }
+}
+
+let detailChart = null;
+function toggleDetailGraph() {
+    const graphDiv = document.getElementById('detailGraphView');
+    graphDiv.style.display = graphDiv.style.display === 'none' ? 'block' : 'none';
+    
+    if (graphDiv.style.display === 'block' && !detailChart) {
+        const ctx = document.getElementById('empDetailChart').getContext('2d');
+        detailChart = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+                datasets: [{ label: 'Actual', data: [4, 4.2, 4.5, 0, 4.3, 0, 0], backgroundColor: '#3b82f6' }]
+            }
+        });
+    }
+}
+
+let detailBarChart = null;
+
+// Range Data for Screenshots 2, 3, 4, 5, 6
+// Full Data for all months and days
+const rangeDataMap = {
+    '7D': { 
+        labels: ['2/24', '2/25', '2/26', '2/27', '2/28', '3/1', '3/2'], 
+        actual: [4, 4.2, 4.5, 8, 4.4, 4, 6], 
+        sched: [4, 4, 5, 8, 5, 4, 5] 
+    },
+    '1M': { 
+        // Full Month (28 Days for Feb)
+        labels: Array.from({length: 28}, (_, i) => `2/${i + 1}`),
+        actual: Array.from({length: 28}, () => (Math.random() * 5 + 3).toFixed(1)),
+        sched: Array.from({length: 28}, () => (Math.random() * 5 + 3).toFixed(1))
+    },
+    '3M': { 
+        labels: ['Dec', 'Jan', 'Feb'], 
+        actual: [120, 145, 155], 
+        sched: [115, 140, 160] 
+    },
+    '6M': { 
+        // 6 Month View
+        labels: ['Sep', 'Oct', 'Nov', 'Dec', 'Jan', 'Feb'], 
+        actual: [95, 110, 105, 120, 145, 155], 
+        sched: [100, 105, 110, 115, 140, 160] 
+    },
+    '1Y': { 
+        // 12 Month View
+        labels: ['Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec', 'Jan', 'Feb'], 
+        actual: [80, 85, 90, 88, 92, 95, 100, 110, 105, 120, 145, 155], 
+        sched: [85, 80, 95, 90, 90, 100, 105, 105, 110, 115, 140, 160] 
+    }
+};
+
+function openPunchDetails() {
+    closePopover();
+    const name = document.getElementById('popoverEmpName').innerText;
+    document.getElementById('detailEmpName').innerText = name;
+    
+    updateDetailView(); // Load table data
+    toggleModal('punchDetailsModal');
+}
+
+function updateDetailView() {
+    const tbody = document.getElementById('detailTableBody');
+    if (!tbody) return;
+
+    const hideBreaks = document.getElementById('hideBreaksToggle')?.checked || false;
+    const showOriginal = document.getElementById('showOriginalToggle')?.checked || false;
+
+    const fullWeekData = [
+        { 
+            day: 'Monday - 02/24/2025', act: '07:02 - 11:06', orig: '07:00 - 11:00', hrs: '4:04', lab: '$65.07', sch: '07:00 - 11:00',
+            meal: '07:30 - 08:30 (Meal)', violations: ['Meal Break Violated'] 
+        },
+        { 
+            day: 'Tuesday - 02/25/2025', act: '08:00 - 14:00', orig: '08:00 - 14:00', hrs: '6:00', lab: '$96.00', sch: '08:00 - 14:00',
+            meal: '13:00 - 13:30 (Meal)', violations: ['Meal Break Violated', 'Rest Break Violated'] 
+        },
+        { 
+            day: 'Wednesday - 02/26/2025', act: '06:01 - 11:11', orig: '06:15 - 11:15', hrs: '4:35', lab: '$73.33', sch: '06:00 - 11:00', 
+            meal: '09:54 - 10:29 (Meal)', violations: ['Rest Break Violated']
+        },
+        { 
+            day: 'Thursday - 02/27/2025', act: '07:30 - 15:30', orig: '07:30 - 15:30', hrs: '8:00', lab: '$128.00', sch: '07:30 - 15:30',
+            violations: [] 
+        },
+        { 
+            day: 'Friday - 02/28/2025', act: '09:00 - 17:00', orig: '09:00 - 17:00', hrs: '8:00', lab: '$128.00', sch: '09:00 - 17:00',
+            meal: '12:00 - 12:30 (Meal)', violations: ['Meal Break Violated', 'Rest Break Violated'] 
+        },
+        { 
+            day: 'Saturday - 03/01/2025', act: '10:00 - 14:00', orig: '10:00 - 14:00', hrs: '4:00', lab: '$64.00', sch: '10:00 - 14:00',
+            violations: [] 
+        },
+        { 
+            day: 'Sunday - 03/02/2025', act: 'Off', orig: '-', hrs: '0:00', lab: '$0.00', sch: 'Off',
+            violations: [] 
+        }
+    ];
+
+    let html = '';
+    fullWeekData.forEach(row => {
+        html += `<tr style="background:#f1f5f9; font-weight:700;"><td colspan="6" style="text-align:left; padding-left:15px; font-size:12px; height:35px;">${row.day} | ${row.hrs} Hrs</td></tr>`;
+        
+        let warningHtml = '<div style="display: flex; flex-direction: column; align-items: center; gap: 2px;">';
+        if (row.violations && row.violations.length > 0) {
+            row.violations.forEach(v => {
+                warningHtml += `<span style="color: #ef4444; font-size: 10px; font-weight: 700;">
+                                    <i class="bi bi-exclamation-triangle-fill"></i> ${v}
+                                </span>`;
+            });
+        } else {
+            warningHtml += `<span style="color: #94a3b8; font-size: 11px;">None</span>`;
+        }
+        warningHtml += '</div>';
+
+        html += `<tr style="border-bottom: 1px solid #f1f5f9;">
+            <td style="text-align:left; padding-left:15px; padding: 12px 8px;">
+                <div style="font-size:13px; font-weight: 600;">${row.act}</div>
+                ${showOriginal && row.orig !== '-' ? `<div class="original-punch-label">Original: ${row.orig}</div>` : ''}
+                ${row.meal && !hideBreaks ? `<div class="break-pill-label">Break: ${row.meal}</div>` : ''}
+            </td>
+            <td style="font-size:12px; color:#64748b;">MANAGER</td>
+            <td style="font-size:12px;">${row.hrs}</td>
+            <td style="font-size:12px;">${row.lab}</td>
+            <td style="text-align: center; padding: 12px 5px; vertical-align: middle;">${warningHtml}</td>
+            <td style="font-size:12px;">${row.sch}</td>
+        </tr>`;
+    });
+    
+    tbody.innerHTML = html;
+}
+
+function toggleDetailGraphView() {
+    const tableContainer = document.getElementById('detailTableContainer');
+    const graphSection = document.getElementById('detailGraphSection');
+    const icon = document.querySelector('.icon-btn-blue i');
+    
+    if (graphSection.style.display === 'none' || graphSection.style.display === '') {
+        // Switch to Graph
+        tableContainer.style.display = 'none';
+        graphSection.style.display = 'block';
+        icon.className = 'bi bi-table'; // Change icon to table to show "go back"
+        if (!detailBarChart) initDetailCharts(); 
+    } else {
+        // Switch to Table
+        tableContainer.style.display = 'block';
+        graphSection.style.display = 'none';
+        icon.className = 'bi bi-bar-chart-line'; // Change back to graph icon
+    }
+}
+
+function initDetailCharts() {
+    // Bar Chart - Actual vs Scheduled Hours
+    const ctxBar = document.getElementById('rangeBarChart').getContext('2d');
+    detailBarChart = new Chart(ctxBar, {
+        type: 'bar',
+        data: {
+            labels: rangeDataMap['7D'].labels,
+            datasets: [
+                { 
+                    label: 'Actual Hours', 
+                    data: rangeDataMap['7D'].actual, 
+                    backgroundColor: '#3b82f6', 
+                    borderRadius: 4 
+                },
+                { 
+                    label: 'Scheduled Hours', 
+                    data: rangeDataMap['7D'].sched, 
+                    backgroundColor: '#10b981', 
+                    borderRadius: 4 
+                }
+            ]
+        },
+        options: { 
+            responsive: true, 
+            maintainAspectRatio: false, 
+            plugins: { 
+                legend: { 
+                    position: 'bottom', 
+                    labels: { 
+                        boxWidth: 10, 
+                        font: { size: 10 },
+                        padding: 15
+                    } 
+                },
+                tooltip: {
+                    backgroundColor: '#1e293b',
+                    padding: 10,
+                    titleFont: { size: 12 },
+                    bodyFont: { size: 12 }
+                }
+            },
+            scales: { 
+                y: { 
+                    beginAtZero: true, 
+                    grid: { color: '#f1f5f9' },
+                    ticks: { font: { size: 10 }, color: '#64748b' } 
+                }, 
+                x: { 
+                    grid: { display: false },
+                    ticks: { 
+                        font: { size: 10 }, 
+                        color: '#64748b',
+                        autoSkip: true, // Prevents overlapping on 1M/Daily views
+                        maxRotation: 0,
+                        minRotation: 0
+                    } 
+                } 
+            }
+        }
+    });
+
+    // Pie Chart - Violation Distribution (Including OT and DT) - REMOVED
+    // The pie chart has been removed and the area is now used for the bar chart
+}
+
+function updateRange(btn, range) {
+    document.querySelectorAll('.range-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    
+    detailBarChart.data.labels = rangeDataMap[range].labels;
+    detailBarChart.data.datasets[0].data = rangeDataMap[range].actual;
+    detailBarChart.data.datasets[1].data = rangeDataMap[range].sched;
+    detailBarChart.update();
+}
+        initTable();
+        
+    </script>
+</body>
+</html>
