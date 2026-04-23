@@ -3127,9 +3127,23 @@ function initDetailCharts() {
                 },
                 tooltip: {
                     backgroundColor: '#1e293b',
-                    padding: 10,
-                    titleFont: { size: 12 },
-                    bodyFont: { size: 12 }
+                    padding: 12,
+                    titleFont: { size: 13, weight: 'bold' },
+                    bodyFont: { size: 12 },
+                    mode: 'index',
+                    intersect: false,
+                    displayColors: true,
+                    callbacks: {
+                        title: function(context) {
+                            return context[0].label;
+                        },
+                        label: function(context) {
+                            return context.dataset.label + ': ' + context.parsed.y;
+                        },
+                        afterLabel: function(context) {
+                            return '';
+                        }
+                    }
                 }
             },
             scales: { 
