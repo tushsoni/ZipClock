@@ -2126,12 +2126,11 @@
 /* Employee rows inside the expanded accordion */
 .att-emp-row {
   display: grid;
-  grid-template-columns: 1fr auto 16px;
+  grid-template-columns: 1fr auto;
   align-items: center;
   gap: 8px;
   padding: 10px 14px;
   border-bottom: 1px solid #f1f5f9;
-  cursor: pointer;
   transition: background 0.15s;
 }
 .att-emp-row:last-child { border-bottom: none; }
@@ -2140,17 +2139,59 @@
 .att-emp-name {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 9px;
+}
+
+.att-name-text {
   font-size: 13px;
   font-weight: 600;
   color: #1e293b;
+  line-height: 1.2;
 }
 
-.att-shift-date {
-  font-size: 12px;
-  color: #64748b;
+.att-date-sub {
+  font-size: 11px;
+  color: #94a3b8;
   font-weight: 500;
-  white-space: nowrap;
+  margin-top: 2px;
+}
+
+/* Action icon buttons */
+.att-row-actions {
+  display: flex;
+  gap: 5px;
+  align-items: center;
+}
+
+.att-action-btn {
+  width: 28px;
+  height: 28px;
+  border-radius: 6px;
+  border: 1px solid #bfdbfe;
+  background: #eff6ff;
+  color: #2563eb;
+  font-size: 13px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.15s;
+}
+
+.att-action-btn:hover {
+  border-color: #3b82f6;
+  background: #dbeafe;
+}
+
+.att-ignore-btn {
+  border-color: #fecaca !important;
+  background: #fee2e2 !important;
+  color: #dc2626 !important;
+}
+
+.att-ignore-btn:hover {
+  border-color: #ef4444 !important;
+  background: #fecaca !important;
 }
 
 /* ===== Attestation Modal Q-cards ===== */
@@ -2819,14 +2860,14 @@
             </div>
           </div>
 
-          <!-- Review Actions Card -->
+          <!-- Attestation Review Card -->
           <div class="action-card premium-header review-actions-card">
             <div class="card-header-navy">
               <div class="header-title-flex">
-                <i class="bi bi-shield-check"></i>
-                <span>Review Actions</span>
+                <i class="bi bi-clipboard2-check"></i>
+                <span>Attestation Review</span>
               </div>
-              <div class="header-badge" style="background: #f59e0b;">5</div>
+              <div class="header-badge" id="attReviewBadge" style="background: #f59e0b;">5</div>
             </div>
             <div class="card-body-content" style="padding: 0; overflow: hidden; display: flex; flex-direction: column;">
 
@@ -2836,58 +2877,79 @@
                   <div style="display: flex; align-items: center; gap: 8px;">
                     <i class="bi bi-exclamation-triangle" style="color: #f59e0b; font-size: 14px;"></i>
                     <span>Attestation Issues Reported</span>
-                    <span class="att-count-chip">5</span>
+                    <span class="att-count-chip" id="attAccordionChip">5</span>
                   </div>
                   <i class="bi bi-chevron-down att-chevron"></i>
                 </div>
 
                 <div class="att-accordion-body att-body-scroll" style="display: none;">
                   <!-- Column headers -->
-                  <div class="att-list-header">
-                    <span>Employee Name</span>
-                    <span>Shift Date</span>
-                  </div>
 
                   <!-- Employee rows -->
-                  <div class="att-emp-row" onclick="openAttestationModal(0)">
+                  <div class="att-emp-row">
                     <div class="att-emp-name">
                       <img src="https://i.pravatar.cc/150?img=47" class="att-photo" alt="Maria S.">
-                      Maria S.
+                      <div>
+                        <div class="att-name-text">Maria S.</div>
+                        <div class="att-date-sub">Shift Date: 04/07/2025</div>
+                      </div>
                     </div>
-                    <span class="att-shift-date">04/07/2025</span>
-                    <i class="bi bi-chevron-right" style="color:#cbd5e1;font-size:12px;"></i>
+                    <div class="att-row-actions">
+                      <button class="att-action-btn" onclick="openAttestationModal(0)" title="View Details"><i class="bi bi-eye"></i></button>
+                      <button class="att-action-btn att-ignore-btn" onclick="ignoreAttestationRow(this)" title="Ignore"><i class="bi bi-x-lg"></i></button>
+                    </div>
                   </div>
-                  <div class="att-emp-row" onclick="openAttestationModal(1)">
+                  <div class="att-emp-row">
                     <div class="att-emp-name">
                       <img src="https://i.pravatar.cc/150?img=68" class="att-photo" alt="John D.">
-                      John D.
+                      <div>
+                        <div class="att-name-text">John D.</div>
+                        <div class="att-date-sub">Shift Date: 04/05/2025</div>
+                      </div>
                     </div>
-                    <span class="att-shift-date">04/05/2025</span>
-                    <i class="bi bi-chevron-right" style="color:#cbd5e1;font-size:12px;"></i>
+                    <div class="att-row-actions">
+                      <button class="att-action-btn" onclick="openAttestationModal(1)" title="View Details"><i class="bi bi-eye"></i></button>
+                      <button class="att-action-btn att-ignore-btn" onclick="ignoreAttestationRow(this)" title="Ignore"><i class="bi bi-x-lg"></i></button>
+                    </div>
                   </div>
-                  <div class="att-emp-row" onclick="openAttestationModal(2)">
+                  <div class="att-emp-row">
                     <div class="att-emp-name">
                       <img src="https://i.pravatar.cc/150?img=44" class="att-photo" alt="Sarah K.">
-                      Sarah K.
+                      <div>
+                        <div class="att-name-text">Sarah K.</div>
+                        <div class="att-date-sub">Shift Date: 04/06/2025</div>
+                      </div>
                     </div>
-                    <span class="att-shift-date">04/06/2025</span>
-                    <i class="bi bi-chevron-right" style="color:#cbd5e1;font-size:12px;"></i>
+                    <div class="att-row-actions">
+                      <button class="att-action-btn" onclick="openAttestationModal(2)" title="View Details"><i class="bi bi-eye"></i></button>
+                      <button class="att-action-btn att-ignore-btn" onclick="ignoreAttestationRow(this)" title="Ignore"><i class="bi bi-x-lg"></i></button>
+                    </div>
                   </div>
-                  <div class="att-emp-row" onclick="openAttestationModal(3)">
+                  <div class="att-emp-row">
                     <div class="att-emp-name">
                       <img src="https://i.pravatar.cc/150?img=3" class="att-photo" alt="Alex M.">
-                      Alex M.
+                      <div>
+                        <div class="att-name-text">Alex M.</div>
+                        <div class="att-date-sub">Shift Date: 04/04/2025</div>
+                      </div>
                     </div>
-                    <span class="att-shift-date">04/04/2025</span>
-                    <i class="bi bi-chevron-right" style="color:#cbd5e1;font-size:12px;"></i>
+                    <div class="att-row-actions">
+                      <button class="att-action-btn" onclick="openAttestationModal(3)" title="View Details"><i class="bi bi-eye"></i></button>
+                      <button class="att-action-btn att-ignore-btn" onclick="ignoreAttestationRow(this)" title="Ignore"><i class="bi bi-x-lg"></i></button>
+                    </div>
                   </div>
-                  <div class="att-emp-row" onclick="openAttestationModal(4)">
+                  <div class="att-emp-row">
                     <div class="att-emp-name">
                       <img src="https://i.pravatar.cc/150?img=49" class="att-photo" alt="Lisa T.">
-                      Lisa T.
+                      <div>
+                        <div class="att-name-text">Lisa T.</div>
+                        <div class="att-date-sub">Shift Date: 04/03/2025</div>
+                      </div>
                     </div>
-                    <span class="att-shift-date">04/03/2025</span>
-                    <i class="bi bi-chevron-right" style="color:#cbd5e1;font-size:12px;"></i>
+                    <div class="att-row-actions">
+                      <button class="att-action-btn" onclick="openAttestationModal(4)" title="View Details"><i class="bi bi-eye"></i></button>
+                      <button class="att-action-btn att-ignore-btn" onclick="ignoreAttestationRow(this)" title="Ignore"><i class="bi bi-x-lg"></i></button>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -2906,7 +2968,6 @@
                 <img id="attModalPhoto" src="" alt="" style="width:46px; height:46px; border-radius:50%; object-fit:cover; border:2px solid #e2e8f0; flex-shrink:0;">
                 <div>
                   <div id="attModalName" style="font-size:16px; font-weight:700; color:#1e293b;"></div>
-                  <div id="attModalDate" style="font-size:12px; color:#64748b; margin-top:2px;"></div>
                 </div>
               </div>
               <button class="modal-close" onclick="closeAttestationModal()">&#x2715;</button>
@@ -6055,7 +6116,6 @@ function openAttestationModal(index) {
   document.getElementById('attModalPhoto').src = d.photo;
   document.getElementById('attModalPhoto').alt = d.name;
   document.getElementById('attModalName').textContent = d.name;
-  document.getElementById('attModalDate').textContent = 'Shift Date: ' + d.shiftDate;
 
   // Info strip — 5 uniform tiles
   const baseTile = (label, value, extraStyle = '') =>
@@ -6065,7 +6125,7 @@ function openAttestationModal(index) {
     </div>`;
 
   document.getElementById('attModalInfoStrip').innerHTML =
-    baseTile('Employee Name', d.name, 'border-right:2px solid #cbd5e1;') +
+    baseTile('Shift Date', d.shiftDate, 'border-right:2px solid #cbd5e1;') +
     baseTile('Clock In',   d.clockIn) +
     baseTile('Clock Out',  d.clockOut) +
     baseTile('Meal Break', d.mealBreak) +
@@ -6106,6 +6166,22 @@ function openAttestationModal(index) {
 
 function closeAttestationModal() {
   document.getElementById('attestationModal').style.display = 'none';
+}
+
+function ignoreAttestationRow(btn) {
+  const row = btn.closest('.att-emp-row');
+  row.style.transition = 'opacity 0.2s ease, transform 0.2s ease';
+  row.style.opacity = '0';
+  row.style.transform = 'translateX(12px)';
+  setTimeout(() => {
+    row.remove();
+    // Update both badge counts
+    const remaining = document.querySelectorAll('.att-accordion-body .att-emp-row').length;
+    const badge = document.getElementById('attReviewBadge');
+    const chip  = document.getElementById('attAccordionChip');
+    if (badge) badge.textContent = remaining;
+    if (chip)  chip.textContent  = remaining;
+  }, 200);
 }
 
     </script>
