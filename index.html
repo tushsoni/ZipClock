@@ -2797,12 +2797,12 @@
           </div>
           <!-- OT | DT -->
           <div class="metric-block block-purple">
-            <div class="metric-sub-item" onclick="openMetricModal('OT')" style="cursor: pointer">
+            <div class="metric-sub-item" onclick="openWeekDetailModal('OT')" style="cursor: pointer">
               <i class="bi bi-stopwatch"></i>
               <span>OT</span>
               <b>12:30</b>
             </div>
-            <div class="metric-sub-item" onclick="openMetricModal('DT')" style="cursor: pointer">
+            <div class="metric-sub-item" onclick="openWeekDetailModal('DT')" style="cursor: pointer">
               <i class="bi bi-stopwatch-fill"></i>
               <span>DT</span>
               <b>08:00</b>
@@ -2810,7 +2810,7 @@
           </div>
           <!-- Labor Amount | Upcoming Shifts -->
           <div class="metric-block block-teal">
-            <div class="metric-sub-item" onclick="openMetricModal('Labor Amount')" style="cursor: pointer">
+            <div class="metric-sub-item" onclick="openWeekDetailModal('Labor Amount')" style="cursor: pointer">
               <i class="bi bi-currency-dollar"></i>
               <span>Labor Amount</span>
               <b>$2,062</b>
@@ -3120,6 +3120,82 @@
             <!-- Footer -->
             <div class="modal-footer" style="flex-shrink:0;">
               <button onclick="closeERPModal()" class="btn-outline" style="font-size:13px; font-weight:600;">Close</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- OT / DT / Labor Amount Week Detail Modal -->
+        <style>
+          #weekDetailModal .wd-box { background:#fff; width:100%; max-width:860px; max-height:88vh; border-radius:10px; overflow:hidden; display:flex; flex-direction:column; box-shadow:0 20px 50px rgba(15,23,42,.25); }
+          #weekDetailModal .wd-head { background:#ececec; padding:12px 16px; display:flex; align-items:flex-start; justify-content:space-between; flex-shrink:0; }
+          #weekDetailModal .wd-head-left { display:flex; align-items:flex-start; gap:12px; }
+          #weekDetailModal .wd-head-left > i { font-size:15px; color:#1e293b; margin-top:5px; }
+          #weekDetailModal .wd-title { font-size:17px; font-weight:500; color:#111827; line-height:1.3; }
+          #weekDetailModal .wd-sub { font-size:12px; color:#1f2937; margin-top:4px; }
+          #weekDetailModal .wd-close { width:22px; height:22px; border-radius:50%; border:1.5px solid #dc2626; background:#fff; color:#dc2626; display:flex; align-items:center; justify-content:center; font-size:12px; cursor:pointer; padding:0; margin-top:10px; }
+          #weekDetailModal .wd-close:hover { background:#fee2e2; }
+          #weekDetailModal .wd-toolbar { display:flex; justify-content:flex-end; align-items:center; gap:8px; padding:12px 16px; flex-shrink:0; }
+          #weekDetailModal .wd-search { position:relative; width:225px; }
+          #weekDetailModal .wd-search i { position:absolute; left:12px; top:50%; transform:translateY(-50%); color:#9ca3af; font-size:13px; }
+          #weekDetailModal .wd-search input { width:100%; height:32px; border:1px solid #d1d5db; border-radius:4px; padding:0 10px 0 32px; font-size:14px; color:#111827; outline:none; box-sizing:border-box; }
+          #weekDetailModal .wd-search input:focus { border-color:#3b82f6; }
+          #weekDetailModal .wd-print { position:relative; }
+          #weekDetailModal .wd-print-btn { height:32px; padding:0 8px; border:1px solid #d1d5db; border-radius:4px; background:#fff; color:#374151; display:flex; align-items:center; gap:4px; cursor:pointer; font-size:13px; }
+          #weekDetailModal .wd-print-menu { display:none; position:absolute; right:0; top:36px; background:#fff; border:1px solid #e5e7eb; border-radius:6px; box-shadow:0 8px 20px rgba(0,0,0,.1); min-width:140px; z-index:5; overflow:hidden; }
+          #weekDetailModal .wd-print-menu.open { display:block; }
+          #weekDetailModal .wd-print-menu button { display:flex; align-items:center; gap:8px; width:100%; padding:8px 12px; background:none; border:none; text-align:left; font-size:13px; color:#374151; cursor:pointer; }
+          #weekDetailModal .wd-print-menu button:hover { background:#f3f4f6; }
+          #weekDetailModal .wd-table-wrap { overflow:auto; flex:1; margin:0 16px 16px; border:1px solid #e5e7eb; border-radius:8px; }
+          #weekDetailModal table { width:100%; border-collapse:collapse; font-size:13px; }
+          #weekDetailModal thead th { background:#f4f6f6; padding:11px 14px; border-bottom:1px solid #e5e7eb; z-index:1; text-align:left; font-weight:600; color:#111827; white-space:nowrap; position:sticky; top:0; }
+          #weekDetailModal tbody td { padding:10px 14px; color:#1f2937; border-bottom:1px solid #f1f1f1; white-space:nowrap; }
+          #weekDetailModal tbody tr:hover td { background:#fafafa; }
+          #weekDetailModal tfoot td { background:#f8fafc; padding:13px 14px; font-weight:700; color:#111827; border-top:2px solid #e5e7eb; white-space:nowrap; position:sticky; bottom:0; }
+          #weekDetailModal tfoot td:not(:first-child) { color:#2563eb; }
+          #weekDetailModal tbody tr:last-child td { border-bottom:none; }
+          #weekDetailModal .wd-emp { display:flex; align-items:center; gap:10px; }
+          #weekDetailModal .wd-emp img { width:30px; height:30px; border-radius:50%; object-fit:cover; border:1px solid #e5e7eb; flex-shrink:0; }
+          #weekDetailModal .wd-empty td { border:1px solid #e5e7eb; text-align:center; padding:8px; color:#111827; }
+        </style>
+        <div class="modal-overlay" id="weekDetailModal" onclick="if(event.target===this) closeWeekDetailModal()">
+          <div class="wd-box">
+
+            <!-- Header -->
+            <div class="wd-head">
+              <div class="wd-head-left">
+                <i id="weekDetailIcon" class="bi bi-calendar3"></i>
+                <div>
+                  <div class="wd-title" id="weekDetailTitle"></div>
+                  <div class="wd-sub" id="weekDetailSubtitle"></div>
+                </div>
+              </div>
+              <button class="wd-close" onclick="closeWeekDetailModal()" title="Close"><i class="bi bi-x-lg"></i></button>
+            </div>
+
+            <!-- Toolbar -->
+            <div class="wd-toolbar">
+              <div class="wd-search">
+                <i class="bi bi-search"></i>
+                <input type="text" id="weekDetailSearch" placeholder="Search Keyword" oninput="renderWeekDetailTable()">
+              </div>
+              <div class="wd-print">
+                <button class="wd-print-btn" onclick="event.stopPropagation(); document.getElementById('weekDetailPrintMenu').classList.toggle('open')">
+                  <i class="bi bi-printer"></i><i class="bi bi-chevron-down" style="font-size:11px;"></i>
+                </button>
+                <div class="wd-print-menu" id="weekDetailPrintMenu">
+                  <button onclick="printWeekDetail()"><i class="bi bi-printer"></i> Print</button>
+                  <button onclick="exportWeekDetailCsv()"><i class="bi bi-filetype-csv"></i> Export CSV</button>
+                </div>
+              </div>
+            </div>
+
+            <!-- Table -->
+            <div class="wd-table-wrap">
+              <table>
+                <thead id="weekDetailHead"></thead>
+                <tbody id="weekDetailBody"></tbody>
+                <tfoot id="weekDetailFoot"></tfoot>
+              </table>
             </div>
           </div>
         </div>
@@ -6416,6 +6492,167 @@ function ignoreERPRow(btn) {
     if (chip)  chip.textContent  = erpRemaining;
   }, 200);
 }
+
+// ===== OT / DT / Labor Amount — week detail tables =====
+// Only dates that actually have OT / DT are listed. Dates are dd/mm/yyyy.
+const weekDetailData = {
+  'OT': {
+    title: 'OT Hours', unit: 'hours',
+    subtitle: 'Overtime hours for the week of 15/04/2026 – 21/04/2026',
+    columns: [
+      { key: 'date', label: 'Date' }, { key: 'emp', label: 'Emp Name' },
+      { key: 'clockIn', label: 'Clock In' }, { key: 'clockOut', label: 'Clock Out' },
+      { key: 'hours', label: 'OT Hours' }
+    ],
+    rows: [
+      { date:'15/04/2026', emp:'Christopher Brown', clockIn:'06:00 AM', clockOut:'04:30 PM', hours:'01:30' },
+      { date:'16/04/2026', emp:'Sarah Jenkins',     clockIn:'07:00 AM', clockOut:'05:00 PM', hours:'02:00' },
+      { date:'17/04/2026', emp:'Andrew Garcia',     clockIn:'08:00 AM', clockOut:'05:45 PM', hours:'01:45' },
+      { date:'18/04/2026', emp:'Christopher Brown', clockIn:'06:00 AM', clockOut:'03:00 PM', hours:'01:00' },
+      { date:'19/04/2026', emp:'Michael Scott',     clockIn:'10:00 AM', clockOut:'09:15 PM', hours:'03:15' },
+      { date:'20/04/2026', emp:'Sarah Jenkins',     clockIn:'07:00 AM', clockOut:'04:30 PM', hours:'01:30' },
+      { date:'21/04/2026', emp:'Andrew Garcia',     clockIn:'08:00 AM', clockOut:'05:30 PM', hours:'01:30' }
+    ]
+  },
+  'DT': {
+    title: 'DT Hours', unit: 'hours',
+    subtitle: 'Double time hours for the week of 15/04/2026 – 21/04/2026',
+    columns: [
+      { key: 'date', label: 'Date' }, { key: 'emp', label: 'Emp Name' },
+      { key: 'clockIn', label: 'Clock In' }, { key: 'clockOut', label: 'Clock Out' },
+      { key: 'hours', label: 'DT Hours' }
+    ],
+    rows: [
+      { date:'15/04/2026', emp:'Michael Scott',     clockIn:'06:00 AM', clockOut:'08:00 PM', hours:'02:00' },
+      { date:'17/04/2026', emp:'Christopher Brown', clockIn:'05:30 AM', clockOut:'07:00 PM', hours:'01:30' },
+      { date:'19/04/2026', emp:'Sarah Jenkins',     clockIn:'06:00 AM', clockOut:'09:00 PM', hours:'03:00' },
+      { date:'20/04/2026', emp:'Andrew Garcia',     clockIn:'07:00 AM', clockOut:'08:30 PM', hours:'01:30' }
+    ]
+  },
+  'Labor Amount': {
+    title: 'Labor Amount', unit: 'amount',
+    subtitle: 'Daily labor cost for the week of 15/04/2026 – 21/04/2026',
+    columns: [
+      { key: 'date', label: 'Date' }, { key: 'amount', label: 'Labor Amount' },
+      { key: 'hours', label: 'Total Hours' }
+    ],
+    rows: [
+      { date:'15/04/2026', amount:'$268', hours:'16:45' },
+      { date:'16/04/2026', amount:'$285', hours:'17:50' },
+      { date:'17/04/2026', amount:'$312', hours:'19:30' },
+      { date:'18/04/2026', amount:'$276', hours:'17:15' },
+      { date:'19/04/2026', amount:'$254', hours:'15:50' },
+      { date:'20/04/2026', amount:'$351', hours:'21:55' },
+      { date:'21/04/2026', amount:'$316', hours:'19:45' }
+    ]
+  }
+};
+
+const wdState = { type: null };
+
+const wdEmpPhotos = {
+  'Christopher Brown': 'https://i.pravatar.cc/150?img=18',
+  'Sarah Jenkins':     'https://i.pravatar.cc/150?img=44',
+  'Andrew Garcia':     'https://i.pravatar.cc/150?img=53',
+  'Michael Scott':     'https://i.pravatar.cc/150?img=7'
+};
+
+function wdToMin(hhmm) { const [h, m] = hhmm.split(':').map(Number); return h * 60 + m; }
+function wdToHHMM(min) { return String(Math.floor(min / 60)).padStart(2, '0') + ':' + String(min % 60).padStart(2, '0'); }
+
+// Cell HTML — employee name gets the photo in front of it
+function wdCell(row, key) {
+  if (key !== 'emp') return row[key];
+  const src = wdEmpPhotos[row.emp] || 'https://i.pravatar.cc/150?u=' + encodeURIComponent(row.emp);
+  return `<div class="wd-emp"><img src="${src}" alt="${row.emp}"><span>${row.emp}</span></div>`;
+}
+
+// Weekly total for the whole week (not affected by search), one value per column
+function wdWeeklyTotals(cfg) {
+  return cfg.columns.map((c, i) => {
+    if (i === 0) return 'Weekly Total';
+    if (c.key === 'hours') return wdToHHMM(cfg.rows.reduce((s, r) => s + wdToMin(r.hours), 0));
+    if (c.key === 'amount') return '$' + cfg.rows.reduce((s, r) => s + Number(r.amount.replace(/[$,]/g, '')), 0).toLocaleString();
+    return '';
+  });
+}
+
+function wdFilteredRows() {
+  const cfg = weekDetailData[wdState.type];
+  const q = document.getElementById('weekDetailSearch').value.trim().toLowerCase();
+  if (!q) return cfg.rows;
+  return cfg.rows.filter(r => cfg.columns.some(c => String(r[c.key]).toLowerCase().includes(q)));
+}
+
+function openWeekDetailModal(type) {
+  const cfg = weekDetailData[type];
+  if (!cfg) return;
+  wdState.type = type;
+
+  document.getElementById('weekDetailTitle').textContent = cfg.title;
+  document.getElementById('weekDetailSubtitle').textContent = cfg.subtitle;
+  document.getElementById('weekDetailSearch').value = '';
+  document.getElementById('weekDetailPrintMenu').classList.remove('open');
+  document.getElementById('weekDetailHead').innerHTML =
+    '<tr>' + cfg.columns.map(c => `<th>${c.label}</th>`).join('') + '</tr>';
+  document.getElementById('weekDetailFoot').innerHTML =
+    '<tr>' + wdWeeklyTotals(cfg).map(v => `<td>${v}</td>`).join('') + '</tr>';
+
+  renderWeekDetailTable();
+  document.getElementById('weekDetailModal').style.display = 'flex';
+}
+
+function renderWeekDetailTable() {
+  const cfg = weekDetailData[wdState.type];
+  const rows = wdFilteredRows();
+
+  document.getElementById('weekDetailBody').innerHTML = rows.length
+    ? rows.map(r => '<tr>' + cfg.columns.map(c => `<td>${wdCell(r, c.key)}</td>`).join('') + '</tr>').join('')
+    : `<tr class="wd-empty"><td colspan="${cfg.columns.length}">No data to display.</td></tr>`;
+}
+
+function printWeekDetail() {
+  const cfg = weekDetailData[wdState.type];
+  const rows = wdFilteredRows();
+  const w = window.open('', '_blank');
+  w.document.write(`<html><head><title>${cfg.title}</title>
+    <style>body{font-family:sans-serif;padding:20px} table{width:100%;border-collapse:collapse;font-size:13px}
+    th,td{border:1px solid #ddd;padding:8px;text-align:left} th{background:#f4f6f6}</style></head><body>
+    <h3 style="margin:0">${document.getElementById('weekDetailTitle').textContent}</h3>
+    <p style="margin:4px 0 16px;font-size:12px">${cfg.subtitle}</p>
+    <table><thead><tr>${cfg.columns.map(c => `<th>${c.label}</th>`).join('')}</tr></thead>
+    <tbody>${rows.map(r => '<tr>' + cfg.columns.map(c => `<td>${r[c.key]}</td>`).join('') + '</tr>').join('')}</tbody>
+    <tfoot><tr>${wdWeeklyTotals(cfg).map(v => `<td style="font-weight:700;background:#f4f6f6">${v}</td>`).join('')}</tr></tfoot></table>
+    </body></html>`);
+  w.document.close();
+  w.print();
+  document.getElementById('weekDetailPrintMenu').classList.remove('open');
+}
+
+function exportWeekDetailCsv() {
+  const cfg = weekDetailData[wdState.type];
+  const esc = v => '"' + String(v).replace(/"/g, '""') + '"';
+  const csv = [cfg.columns.map(c => esc(c.label)).join(',')]
+    .concat(wdFilteredRows().map(r => cfg.columns.map(c => esc(r[c.key])).join(',')))
+    .concat([wdWeeklyTotals(cfg).map(esc).join(',')])
+    .join('\n');
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(new Blob([csv], { type: 'text/csv' }));
+  a.download = cfg.title.replace(/\s+/g, '_') + '.csv';
+  a.click();
+  URL.revokeObjectURL(a.href);
+  document.getElementById('weekDetailPrintMenu').classList.remove('open');
+}
+
+function closeWeekDetailModal() {
+  document.getElementById('weekDetailModal').style.display = 'none';
+  document.getElementById('weekDetailPrintMenu').classList.remove('open');
+}
+
+document.addEventListener('click', () => {
+  const menu = document.getElementById('weekDetailPrintMenu');
+  if (menu) menu.classList.remove('open');
+});
 
     </script>
   </body>
